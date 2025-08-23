@@ -1,5 +1,6 @@
 import HeroSection from "@/components/HeroSection";
-import ServicesGrid from "@/components/ServicesHome";
+import ServicesGrid from "@/components/ServicesGrid";
+import WhyUs from "@/components/WhyUs";
 
 export default function Home() {
   return (
@@ -7,6 +8,7 @@ export default function Home() {
       <main className="">
         <HeroSection />
         <ServicesGrid />
+        <WhyUs />
       </main>
       <footer className=""></footer>
     </div>
