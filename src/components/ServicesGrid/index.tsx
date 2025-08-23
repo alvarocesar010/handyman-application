@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 
 const services = [
-  { slug: "door-maintenance", label: "Door Maintenance", icon: DoorOpen },
+  { slug: "door-replacement", label: "Door Maintenance", icon: DoorOpen },
   { slug: "heater-maintenance", label: "Heater Maintenance", icon: Heater },
   { slug: "furniture-assembly", label: "Furniture Assembly", icon: Drill },
   { slug: "fit-shower", label: "Fit Shower", icon: ShowerHead },

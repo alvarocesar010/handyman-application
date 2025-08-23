@@ -1,93 +1,155 @@
-// app/services/[slug]/page.tsx
-import { notFound } from "next/navigation";
 import Link from "next/link";
+import { notFound } from "next/navigation";
+import { SERVICE_MAP, SERVICES } from "@/lib/services";
 
-type Service = {
-  title: string;
-  summary: string;
-  whatIncluded: string[];
-  startingPrice?: number; // cents
-  durationHint?: string;
-};
+type Params = { slug: string };
 
-const SERVICES: Record<string, Service> = {
-  "door-maintenance": {
-    title: "Door Replacement",
-    summary: "Internal/external doors replaced, hinges aligned, locks fitted.",
-    whatIncluded: [
-      "Remove old door",
-      "Fit new hinges",
-      "Adjust & plane",
-      "Fit handle/lock",
-    ],
-    startingPrice: 12000,
-    durationHint: "Usually 1–2 hours",
-  },
-  "heater-maintenance": {
-    title: "Heater Maintenance",
-    summary: "Annual check, cleaning, performance test (non-gas diagnostics).",
-    whatIncluded: ["Visual inspection", "Cleaning", "Safety checks", "Report"],
-    startingPrice: 9000,
-    durationHint: "About 60–90 minutes",
-  },
-  // …add the rest
-};
+export async function generateStaticParams() {
+  return SERVICES.map((s) => ({ slug: s.slug }));
+}
 
-export function generateMetadata({ params }: { params: { slug: string } }) {
-  const svc = SERVICES[params.slug];
+export function generateMetadata({ params }: { params: Params }) {
+  const svc = SERVICE_MAP.get(params.slug);
   if (!svc) return {};
   return {
-    title: `${svc.title} | Handyman Dublin`,
-    description: `${svc.title} in Dublin. ${svc.summary} Book online.`,
+    title: `${svc.title} | Dublin Handyman`,
+    description: svc.summary,
   };
 }
 
-export default function ServicePage({ params }: { params: { slug: string } }) {
-  const svc = SERVICES[params.slug];
+export default function ServiceDetailPage({ params }: { params: Params }) {
+  const svc = SERVICE_MAP.get(params.slug);
   if (!svc) return notFound();
 
   const price = svc.startingPrice
     ? `from €${(svc.startingPrice / 100).toFixed(0)}`
     : "Get a quote";
 
+  const Icon = svc.icon;
+
   return (
-    <main className="mx-auto max-w-3xl p-6 space-y-6">
+    <main className="mx-auto max-w-3xl px-6 py-10 space-y-8">
+      {/* Header */}
       <header className="space-y-2">
+        <div className="inline-flex items-center gap-2 rounded-lg bg-cyan-50 px-3 py-1 ring-1 ring-cyan-200 text-cyan-800">
+          <Icon className="h-5 w-5" />
+          <span className="text-sm font-medium">{svc.title}</span>
+        </div>
         <h1 className="text-3xl font-extrabold text-slate-900">{svc.title}</h1>
         <p className="text-slate-700">{svc.summary}</p>
         <p className="text-slate-600 text-sm">
           {svc.durationHint && <>Typical duration: {svc.durationHint} · </>}
           Price: {price}
         </p>
+
+        {/* CTA */}
+        <div className="flex gap-3 pt-2">
+          <Link
+            href={`/booking?service=${svc.slug}`}
+            className="inline-flex h-11 items-center justify-center rounded-lg bg-cyan-700 px-5 text-white font-medium shadow hover:bg-cyan-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-600"
+          >
+            Book this service
+          </Link>
+          <a
+            href="tel:+353894924563"
+            className="inline-flex h-11 items-center justify-center rounded-lg bg-slate-900 px-5 text-white font-medium shadow hover:bg-black focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-700"
+          >
+            Call for advice
+          </a>
+        </div>
       </header>
 
-      <section>
-        <h2 className="text-lg font-semibold mb-2">What’s included</h2>
-        <ul className="list-disc pl-6 space-y-1 text-slate-700">
-          {svc.whatIncluded.map((x) => (
-            <li key={x}>{x}</li>
-          ))}
-        </ul>
+      {/* Long description */}
+      <section className="prose prose-slate max-w-none">
+        <h2>What we do</h2>
+        <p>{svc.longDescription}</p>
       </section>
 
-      {/* Booking actions */}
-      <section className="flex flex-wrap gap-3">
+      {/* Inclusions / exclusions */}
+      <section className="grid gap-6 md:grid-cols-2">
+        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h3 className="text-lg font-semibold text-slate-900 mb-2">
+            What’s included
+          </h3>
+          <ul className="list-disc pl-5 text-slate-700 space-y-1">
+            {svc.inclusions.map((x) => (
+              <li key={x}>{x}</li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h3 className="text-lg font-semibold text-slate-900 mb-2">
+            What’s not included
+          </h3>
+          <ul className="list-disc pl-5 text-slate-700 space-y-1">
+            {(
+              svc.exclusions ?? [
+                "Parts & materials unless agreed",
+                "Major re-tiling or re-wiring",
+              ]
+            ).map((x) => (
+              <li key={x}>{x}</li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      {/* FAQs */}
+      {svc.faqs && svc.faqs.length > 0 && (
+        <section className="space-y-3">
+          <h3 className="text-lg font-semibold text-slate-900">FAQs</h3>
+          <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 bg-white">
+            {svc.faqs.map(({ q, a }) => (
+              <details key={q} className="p-4">
+                <summary className="cursor-pointer font-medium text-slate-900">
+                  {q}
+                </summary>
+                <p className="mt-2 text-slate-700">{a}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Bottom CTA */}
+      <div className="flex flex-wrap gap-3 pt-2">
         <Link
-          href={`/booking?service=${params.slug}`}
-          className="inline-flex h-11 items-center justify-center rounded-lg bg-cyan-700 px-5 text-white font-medium shadow hover:bg-cyan-800 focus-visible:ring-2 focus-visible:ring-cyan-600 focus-visible:outline-none"
+          href={`/booking?service=${svc.slug}`}
+          className="inline-flex h-11 items-center justify-center rounded-lg bg-cyan-700 px-5 text-white font-medium hover:bg-cyan-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-600"
         >
-          Book this service
+          Book {svc.title}
         </Link>
-        <a
-          href="tel:+353894924563"
-          className="inline-flex h-11 items-center justify-center rounded-lg bg-slate-900 px-5 text-white font-medium shadow hover:bg-black focus-visible:ring-2 focus-visible:ring-slate-700 focus-visible:outline-none"
+        <Link
+          href="/services"
+          className="inline-flex h-11 items-center justify-center rounded-lg border border-slate-300 px-5 text-slate-800 font-medium hover:bg-white"
         >
-          Call for advice
-        </a>
-      </section>
+          Back to all services
+        </Link>
+      </div>
 
-      {/* FAQ (optional) */}
-      {/* Add FAQs per service to cut support time and improve SEO */}
+      {/* SEO: JSON-LD Service schema */}
+      <script
+        type="application/ld+json"
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Service",
+            name: svc.title,
+            description: svc.summary,
+            areaServed: "Dublin, Ireland",
+            provider: { "@type": "LocalBusiness", name: "Dublin Handyman" },
+            offers: svc.startingPrice
+              ? {
+                  "@type": "Offer",
+                  priceCurrency: "EUR",
+                  price: (svc.startingPrice / 100).toFixed(0),
+                }
+              : undefined,
+          }),
+        }}
+      />
     </main>
   );
 }
