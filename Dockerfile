@@ -2,10 +2,11 @@
 FROM node:18 AS builder
 WORKDIR /app
 
-# Copiar arquivos
+# Copiar pacotes e instalar dependências
 COPY package*.json ./
-RUN npm install
+RUN npm install --legacy-peer-deps
 
+# Copiar o restante do código
 COPY . .
 RUN npm run build
 
@@ -18,4 +19,5 @@ COPY --from=builder /app ./
 
 EXPOSE 8080
 
+# Start no Cloud Run (porta 8080 obrigatória)
 CMD ["npm", "start"]
