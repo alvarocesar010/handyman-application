@@ -1,0 +1,22 @@
+# dependências já serão instaladas dentro do container
+node_modules
+npm-debug.log
+yarn-error.log
+
+# pastas de build/cache locais
+.next/cache
+.next/static
+out
+
+# configs do docker que não precisam ir para a imagem
+Dockerfile
+.dockerignore
+
+# git e docs
+.git
+.gitignore
+README.md
+
+# arquivos de ambiente locais (no Cloud Run você define variáveis de ambiente separadamente)
+.env
+.env.*
