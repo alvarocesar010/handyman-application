@@ -9,6 +9,8 @@ import {
   Lightbulb,
   Zap,
 } from "lucide-react";
+import type { Metadata } from "next";
+import { absUrl, pageTitle } from "@/lib/seo";
 
 const services = [
   {
@@ -62,6 +64,13 @@ const services = [
   },
 ];
 
+export const metadata: Metadata = {
+  title: pageTitle("Services"),
+  description:
+    "Browse our most requested handyman services in Dublin and book online.",
+  alternates: { canonical: absUrl("/services") },
+  openGraph: { url: absUrl("/services") },
+};
 export default function ServicesPage() {
   return (
     <main className="mx-auto max-w-6xl px-6 py-16">

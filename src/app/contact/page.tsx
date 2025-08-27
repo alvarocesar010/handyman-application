@@ -5,10 +5,14 @@ import Link from "next/link";
 import { Phone, Mail, MessageCircle, Clock, MapPin, Send } from "lucide-react";
 
 type Status = "idle" | "loading" | "ok" | "error";
+// src/app/contact/page.tsx
 
 export default function ContactPage() {
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string>("");
+
+  const phoneNumber = process.env.NEXT_PUBLIC_PHONE_NUMBER || "";
+  const phoneHref = `tel:${phoneNumber.replace(/\s/g, "")}`;
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -56,10 +60,10 @@ export default function ContactPage() {
           </div>
           <div className="mt-2">
             <a
-              href="tel:+353894924563"
+              href={`tel:${phoneHref?.replace(/\s/g, "")}`}
               className="text-cyan-700 hover:underline"
             >
-              +353 89 492 4563
+              {phoneHref}
             </a>
             <p className="text-sm text-slate-600">Best for urgent callouts</p>
           </div>
@@ -90,7 +94,10 @@ export default function ContactPage() {
           </div>
           <div className="mt-2">
             <a
-              href="https://wa.me/353894924563?text=Hi%2C%20I%27d%20like%20to%20book%20a%20repair"
+              href={`https://wa.me/${phoneHref?.replace(
+                /\D/g,
+                ""
+              )}?text=Hi%2C%20I%27d%20like%20to%20book%20a%20repair`}
               target="_blank"
               rel="noopener noreferrer"
               className="text-cyan-700 hover:underline"

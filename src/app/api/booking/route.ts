@@ -1,99 +1,223 @@
+// src/app/api/booking/route.ts
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/mongodb";
 import { GridFSBucket, ObjectId } from "mongodb";
 import { Readable } from "node:stream";
+import twilio from "twilio";
 
+/* ---------- Next.js route hints ---------- */
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
-export async function POST(req: Request) {
-  const form = await req.formData();
+/* ---------- Helpers ---------- */
 
-  const service = String(form.get("service") ?? "");
-  const date = String(form.get("date") ?? "");
-  const name = String(form.get("name") ?? "");
-  const phone = String(form.get("phone") ?? "");
-  const address = String(form.get("address") ?? "");
-  const eircode = String(form.get("eircode") ?? "");
-  const description = String(form.get("description") ?? "");
+// Very small Irish/E.164 normaliser. Returns +353… or null if invalid.
+function toE164Irish(input: string): string | null {
+  if (!input) return null;
+  const p = input.trim().replace(/[^\d+]/g, ""); // keep digits and leading +
+  if (p.startsWith("+") && /^\+\d{7,15}$/.test(p)) return p; // already E.164
+  if (/^0\d{7,10}$/.test(p)) return `+353${p.slice(1)}`; // 0XXXXXXXX → +353XXXXXXXX
+  if (/^8\d{7,9}$/.test(p)) return `+353${p}`; // 8XXXXXXXX → +3538XXXXXXXX
+  return null;
+}
 
-  if (
-    !service ||
-    !date ||
-    !name ||
-    !phone ||
-    !address ||
-    !eircode ||
-    !description
-  ) {
-    return NextResponse.json(
-      { error: "Missing required fields" },
-      { status: 400 }
+function labelFromSlug(slug: string) {
+  return slug.replace(/[-_]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+/* Twilio init (server only) */
+const SID = process.env.TWILIO_ACCOUNT_SID || "";
+const TOKEN = process.env.TWILIO_AUTH_TOKEN || "";
+const SMS_FROM = process.env.TWILIO_SMS_FROM || ""; // e.g. +1774… (trial) or a paid number
+const WA_FROM = process.env.TWILIO_WA_FROM || ""; // e.g. whatsapp:+14155238886 (sandbox) or whatsapp:+3538…
+
+const twilioClient = SID && TOKEN ? twilio(SID, TOKEN) : null;
+
+async function sendNotifications(opts: {
+  name: string;
+  phoneE164: string;
+  service: string;
+  date: string;
+  eircode: string;
+}) {
+  if (!twilioClient) return; // not configured; silently skip
+
+  const first = opts.name.split(" ")[0] || "there";
+  const serviceLabel = labelFromSlug(opts.service);
+
+  const smsBody =
+    `Hi ${first}, we received your booking for ${serviceLabel} on ${opts.date}. ` +
+    `We’ll confirm shortly. — Dublin Handyman`;
+
+  const waBody =
+    `✅ *Booking received*\n\n` +
+    `*Name:* ${opts.name}\n` +
+    `*Service:* ${serviceLabel}\n` +
+    `*Date:* ${opts.date}\n` +
+    `*Eircode:* ${opts.eircode}\n\n` +
+    `We’ll confirm availability shortly.\n_Dublin Handyman_`;
+
+  const tasks: Promise<unknown>[] = [];
+
+  if (SMS_FROM) {
+    tasks.push(
+      twilioClient.messages
+        .create({ from: SMS_FROM, to: opts.phoneE164, body: smsBody })
+        .catch((e) => console.error("SMS error:", e?.message || e))
     );
   }
 
-  const db = await getDb();
+  if (WA_FROM) {
+    tasks.push(
+      twilioClient.messages
+        .create({
+          from: WA_FROM,
+          to: `whatsapp:${opts.phoneE164}`,
+          body: waBody,
+        })
+        .catch((e) => console.error("WA error:", e?.message || e))
+    );
+  }
 
-  // 1) Create a placeholder booking (so we can link GridFS files to this _id)
-  const now = new Date();
-  const bookingDoc = {
-    service,
-    date,
-    name,
-    phone,
-    address,
-    eircode,
-    description,
-    photos: [] as {
-      fileId: ObjectId;
-      filename: string;
-      size: number;
-      contentType: string;
-    }[],
-    status: "pending" as const,
-    createdAt: now,
-    updatedAt: now,
-  };
+  await Promise.allSettled(tasks); // don’t block on failures
+}
 
-  // 2) Save photos to GridFS (bucket: "booking-uploads")
-  const bucket = new GridFSBucket(db, { bucketName: "booking-uploads" });
-  const files = form.getAll("photos").filter(Boolean) as File[];
+/* ---------- POST handler ---------- */
+export async function POST(req: Request) {
+  try {
+    const form = await req.formData();
 
-  for (const f of files) {
-    // optional server-side size guard (<= 5 MB)
-    if (f.size > 5 * 1024 * 1024) {
+    // Required fields
+    const service = String(form.get("service") ?? "");
+    const date = String(form.get("date") ?? "");
+    const name = String(form.get("name") ?? "");
+    const phoneRaw = String(form.get("phone") ?? "");
+    const address = String(form.get("address") ?? "");
+    const eircode = String(form.get("eircode") ?? "");
+    const description = String(form.get("description") ?? "");
+
+    if (
+      !service ||
+      !date ||
+      !name ||
+      !phoneRaw ||
+      !address ||
+      !eircode ||
+      !description
+    ) {
       return NextResponse.json(
-        { error: `Image ${f.name} is larger than 5MB` },
+        { error: "Missing required fields." },
         { status: 400 }
       );
     }
 
-    const arrayBuffer = await f.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    const stream = Readable.from(buffer);
+    const phoneE164 = toE164Irish(phoneRaw);
+    if (!phoneE164) {
+      return NextResponse.json(
+        {
+          error:
+            "Please enter a valid Irish phone number (e.g., +353 87 123 4567).",
+        },
+        { status: 400 }
+      );
+    }
 
-    const uploadStream = bucket.openUploadStream(f.name, {
-      contentType: f.type || "application/octet-stream",
-      metadata: { bookingHint: name, service },
-    });
+    // Files (optional)
+    const files = form.getAll("photos").filter(Boolean) as File[];
+    const db = await getDb();
 
-    // pipe + await finish
-    await new Promise<void>((resolve, reject) => {
-      stream
-        .pipe(uploadStream)
-        .on("finish", () => resolve())
-        .on("error", reject);
-    });
+    // Prepare booking doc
+    const now = new Date();
+    const bookingDoc: {
+      _id?: ObjectId;
+      service: string;
+      date: string;
+      name: string;
+      phoneRaw: string;
+      phoneE164: string;
+      address: string;
+      eircode: string;
+      description: string;
+      photos: {
+        fileId: ObjectId;
+        filename: string;
+        size: number;
+        contentType: string;
+      }[];
+      status: "pending" | "confirmed" | "done" | "cancelled";
+      createdAt: Date;
+      updatedAt: Date;
+    } = {
+      service,
+      date,
+      name,
+      phoneRaw,
+      phoneE164,
+      address,
+      eircode,
+      description,
+      photos: [],
+      status: "pending",
+      createdAt: now,
+      updatedAt: now,
+    };
 
-    bookingDoc.photos.push({
-      fileId: uploadStream.id as ObjectId,
-      filename: f.name,
-      size: buffer.length,
-      contentType: f.type || "application/octet-stream",
-    });
+    // Upload images to GridFS
+    if (files.length > 0) {
+      const bucket = new GridFSBucket(db, { bucketName: "booking-uploads" });
+
+      for (const f of files) {
+        // Server-side constraints
+        if (f.size > 5 * 1024 * 1024) {
+          return NextResponse.json(
+            { error: `Image "${f.name}" is larger than 5MB.` },
+            { status: 400 }
+          );
+        }
+
+        const buf = Buffer.from(await f.arrayBuffer());
+        const stream = Readable.from(buf);
+
+        const uploadStream = bucket.openUploadStream(f.name, {
+          contentType: f.type || "application/octet-stream",
+          metadata: { bookingName: name, service },
+        });
+
+        await new Promise<void>((resolve, reject) => {
+          stream
+            .pipe(uploadStream)
+            .on("finish", () => resolve())
+            .on("error", reject);
+        });
+
+        bookingDoc.photos.push({
+          fileId: uploadStream.id as ObjectId,
+          filename: f.name,
+          size: buf.length,
+          contentType: f.type || "application/octet-stream",
+        });
+      }
+    }
+
+    // Save booking
+    const result = await db.collection("bookings").insertOne(bookingDoc);
+
+    // Fire-and-forget notifications (don’t block response)
+    sendNotifications({
+      name,
+      phoneE164,
+      service,
+      date,
+      eircode,
+    }).catch((e) => console.error("notify error:", e?.message || e));
+
+    return NextResponse.json({ ok: true, id: result.insertedId });
+  } catch (err: unknown) {
+    console.error("Booking POST error:", err);
+    return NextResponse.json(
+      { error: "Internal error while creating the booking." },
+      { status: 500 }
+    );
   }
-
-  // 3) Insert the booking with references to GridFS files
-  const result = await db.collection("bookings").insertOne(bookingDoc);
-
-  return NextResponse.json({ ok: true, id: result.insertedId });
 }

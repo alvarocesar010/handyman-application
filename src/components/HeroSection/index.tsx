@@ -25,27 +25,18 @@ const HeroSection = () => {
           {/* CTA buttons */}
           <div className="flex flex-wrap gap-3 pt-2">
             <Link
-              href="#booking" // set this to your booking section id or /booking page
+              href="/booking" // set this to your booking section id or /booking page
               className="inline-flex h-11 items-center justify-center rounded-lg bg-cyan-700 px-5 text-white font-medium shadow hover:bg-cyan-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-600 focus-visible:ring-offset-2"
             >
               Book a Repair
             </Link>
 
             <a
-              href="tel:+353894924563"
+              href={`tel:${process.env.NEXT_PUBLIC_PHONE_NUMBER?.replace(/\s/g, "")}`}
               className="inline-flex h-11 items-center justify-center rounded-lg bg-slate-900 px-5 text-white font-medium shadow hover:bg-black focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-700 focus-visible:ring-offset-2"
             >
               Call Now
             </a>
-
-            {/* Optional WhatsApp CTA */}
-            {/* <a
-              href="https://wa.me/353894924563?text=Hi%2C%20I%27d%20like%20to%20book%20a%20repair"
-              target="_blank" rel="noopener noreferrer"
-              className="inline-flex h-11 items-center justify-center rounded-lg px-5 font-medium border border-slate-300 text-slate-800 hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
-            >
-              WhatsApp
-            </a> */}
           </div>
         </div>
 

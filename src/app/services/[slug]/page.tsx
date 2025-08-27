@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SERVICE_MAP, SERVICES } from "@/lib/services";
+import type { Metadata } from "next";
+import { absUrl, pageTitle, SITE } from "@/lib/seo";
 
 type Params = { slug: string };
 
@@ -8,12 +10,42 @@ export async function generateStaticParams() {
   return SERVICES.map((s) => ({ slug: s.slug }));
 }
 
-export function generateMetadata({ params }: { params: Params }) {
+// Next.js 15: params can be async in APIs, but for pages it’s sync.
+export async function generateMetadata({
+  params,
+}: {
+  params: Params;
+}): Promise<Metadata> {
   const svc = SERVICE_MAP.get(params.slug);
-  if (!svc) return {};
+  if (!svc)
+    return {
+      title: pageTitle("Service not found"),
+      robots: { index: false, follow: false },
+    };
+
+  const url = absUrl(`/services/${svc.slug}`);
+  const title = pageTitle(svc.title);
+  const desc = svc.summary;
+
   return {
-    title: `${svc.title} | Dublin Handyman`,
-    description: svc.summary,
+    title,
+    description: desc,
+    alternates: { canonical: url },
+    openGraph: {
+      type: "article",
+      url,
+      title,
+      description: desc,
+      siteName: SITE.name,
+      images: [{ url: SITE.ogImage, width: 1200, height: 630, alt: svc.title }],
+      locale: SITE.locale,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description: desc,
+      images: [SITE.ogImage],
+    },
   };
 }
 
@@ -51,7 +83,7 @@ export default function ServiceDetailPage({ params }: { params: Params }) {
             Book this service
           </Link>
           <a
-            href="tel:+353894924563"
+            href={`tel:${process.env.NEXT_PUBLIC_PHONE_NUMBER?.replace(/\s/g, "")}`}
             className="inline-flex h-11 items-center justify-center rounded-lg bg-slate-900 px-5 text-white font-medium shadow hover:bg-black focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-700"
           >
             Call for advice
