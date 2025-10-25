@@ -11,7 +11,7 @@ export default function ContactPage() {
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string>("");
 
-  const phoneNumber = process.env.NEXT_PUBLIC_PHONE_NUMBER || "";
+  const phoneNumber = process.env.PHONE_NUMBER || "";
   const phoneHref = `tel:${phoneNumber.replace(/\s/g, "")}`;
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {

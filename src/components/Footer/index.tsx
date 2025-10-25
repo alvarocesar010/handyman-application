@@ -19,7 +19,7 @@ export default function Footer() {
               Book a Repair <ChevronRight className="ml-1 h-4 w-4" />
             </Link>
             <a
-              href={`tel:${process.env.NEXT_PUBLIC_PHONE_NUMBER?.replace(/\s/g, "")}`}
+              href={`tel:${process.env.PHONE_NUMBER?.replace(/\s/g, "")}`}
               className="inline-flex items-center justify-center rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-600"
             >
               Call Now
@@ -116,13 +116,10 @@ export default function Footer() {
               <li className="flex items-center gap-2">
                 <Phone className="h-4 w-4 text-cyan-400" />
                 <a
-                  href={`tel:${process.env.NEXT_PUBLIC_PHONE_NUMBER?.replace(
-                    /\s/g,
-                    ""
-                  )}`}
+                  href={`tel:${process.env.PHONE_NUMBER?.replace(/\s/g, "")}`}
                   className="hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 rounded"
                 >
-                  {process.env.NEXT_PUBLIC_PHONE_NUMBER}
+                  {process.env.PHONE_NUMBER}
                 </a>
               </li>
               <li className="flex items-center gap-2">
@@ -137,7 +134,7 @@ export default function Footer() {
               <li className="flex items-center gap-2">
                 <MessageCircle className="h-4 w-4 text-cyan-400" />
                 <a
-                  href={`https://wa.me/${process.env.NEXT_PUBLIC_PHONE_NUMBER?.replace(
+                  href={`https://wa.me/${process.env.PHONE_NUMBER?.replace(
                     /\D/g,
                     ""
                   )}`}

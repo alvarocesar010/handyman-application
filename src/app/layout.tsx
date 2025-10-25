@@ -83,7 +83,7 @@ export default function RootLayout({
               name: SITE.name,
               url: SITE.url,
               areaServed: "Dublin, Ireland",
-              telephone: `${process.env.NEXT_PUBLIC_PHONE_NUMBER?.replace(/\s/g, "")}`,
+              telephone: `${process.env.PHONE_NUMBER?.replace(/\s/g, "")}`,
               image: absUrl(SITE.logo),
               sameAs: [
                 // add social links if you have them

@@ -32,7 +32,7 @@ const HeroSection = () => {
             </Link>
 
             <a
-              href={`tel:${process.env.NEXT_PUBLIC_PHONE_NUMBER?.replace(/\s/g, "")}`}
+              href={`tel:${process.env.PHONE_NUMBER?.replace(/\s/g, "")}`}
               className="inline-flex h-11 items-center justify-center rounded-lg bg-slate-900 px-5 text-white font-medium shadow hover:bg-black focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-700 focus-visible:ring-offset-2"
             >
               Call Now

@@ -1,7 +1,7 @@
 // src/lib/seo.ts
 export const SITE = {
   name: "Dublin Handyman",
-  url: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
+  url: process.env.NEXT_PUBLIC_SITE_URL || process.env.SITE_URL || "http://localhost:3000",
   locale: "en_IE",
   twitter: "@yourhandle", // or "" if none
   logo: "/logo.png", // put a 512x512
