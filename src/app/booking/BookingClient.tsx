@@ -63,7 +63,13 @@ export default function BookingClient() {
     const files = Array.from(e.target.files ?? []);
     if (!files.length) return;
 
-    const allowed = ["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"];
+    const allowed = [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+      "image/heic",
+      "image/heif",
+    ];
     const maxEach = 5 * 1024 * 1024;
     const maxCount = 5;
 
@@ -119,14 +125,20 @@ export default function BookingClient() {
       form.reset();
       setPhotos([]);
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong. Please try again."
+      );
     }
   }
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-10 space-y-8">
       <header className="space-y-3">
-        <h1 className="text-3xl font-extrabold text-slate-900">Book a Service</h1>
+        <h1 className="text-3xl font-extrabold text-slate-900">
+          Book a Service
+        </h1>
 
         {/* Selected pill */}
         <div className="flex items-center gap-3">
@@ -154,31 +166,69 @@ export default function BookingClient() {
       >
         {/* Date */}
         <div className="grid gap-2">
-          <label className="text-sm font-medium text-slate-700">Preferred date</label>
-          <input type="date" name="date" required className="rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-600" />
+          <label className="text-sm font-medium text-slate-700">
+            Preferred date
+          </label>
+          <input
+            type="date"
+            name="date"
+            required
+            className="rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-600"
+          />
         </div>
 
         {/* Details */}
         <div className="grid gap-2">
-          <label className="text-sm font-medium text-slate-700">Your details</label>
-          <input name="name" placeholder="Full name" required className="rounded-md border border-slate-300 px-3 py-2" />
-          <input name="phone" placeholder="Phone" required className="rounded-md border border-slate-300 px-3 py-2" />
+          <label className="text-sm font-medium text-slate-700">
+            Your details
+          </label>
+          <input
+            name="name"
+            placeholder="Full name"
+            required
+            className="rounded-md border border-slate-300 px-3 py-2"
+          />
+          <input
+            name="phone"
+            placeholder="Phone"
+            required
+            className="rounded-md border border-slate-300 px-3 py-2"
+          />
 
           <div className="grid gap-3 sm:grid-cols-[1fr,200px]">
-            <input name="address" placeholder="Address (Dublin)" required className="rounded-md border border-slate-300 px-3 py-2" />
-            <input name="eircode" placeholder="Eircode (e.g., D01 F5P2)" required className="rounded-md border border-slate-300 px-3 py-2 uppercase" />
+            <input
+              name="address"
+              placeholder="Address (Dublin)"
+              required
+              className="rounded-md border border-slate-300 px-3 py-2"
+            />
+            <input
+              name="eircode"
+              placeholder="Eircode (e.g., D01 F5P2)"
+              required
+              className="rounded-md border border-slate-300 px-3 py-2 uppercase"
+            />
           </div>
         </div>
 
         {/* Problem description */}
         <div className="grid gap-2">
-          <label className="text-sm font-medium text-slate-700">Describe the issue</label>
-          <textarea name="description" rows={4} required className="rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-600" />
+          <label className="text-sm font-medium text-slate-700">
+            Describe the issue
+          </label>
+          <textarea
+            name="description"
+            rows={4}
+            required
+            className="rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-600"
+          />
         </div>
 
         {/* Photos */}
         <div className="grid gap-2">
-          <label className="text-sm font-medium text-slate-700">Add photos (optional)</label>
+          <label className="text-sm font-medium text-slate-700">
+            Add photos (optional)
+          </label>
           <input
             type="file"
             accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
@@ -212,7 +262,9 @@ export default function BookingClient() {
             </div>
           )}
 
-          <p className="text-xs text-slate-500">Up to 5 images, 5MB each. JPG/PNG/WEBP/HEIC supported.</p>
+          <p className="text-xs text-slate-500">
+            Up to 5 images, 5MB each. JPG/PNG/WEBP/HEIC supported.
+          </p>
         </div>
 
         <input type="hidden" name="service" value={selected?.slug ?? ""} />
