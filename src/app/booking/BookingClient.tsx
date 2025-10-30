@@ -20,7 +20,10 @@ declare global {
   }
 }
 
-const ADS_SEND_TO = "AW-10991191295/uFnECOTdjrYbEP-Jgfko";
+const ADS_SEND_TO = "AW-10991191295/_1A7CLqc3LYbEP-Jgfko";
+
+
+
 
 /** Promise-based conversion fire. Resolves on event_callback or after timeout. */
 function reportConversionAwait(
