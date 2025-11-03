@@ -1,68 +1,7 @@
 import Link from "next/link";
-import {
-  DoorOpen,
-  Heater,
-  Wrench,
-  ShowerHead,
-  WashingMachine,
-  Droplet,
-  Lightbulb,
-  Zap,
-} from "lucide-react";
 import type { Metadata } from "next";
 import { absUrl, pageTitle } from "@/lib/seo";
-
-const services = [
-  {
-    slug: "door-replacement",
-    title: "Door Replacement",
-    description: "Replace and fit new doors with hinges, handles, and locks.",
-    icon: DoorOpen,
-  },
-  {
-    slug: "heater-maintenance",
-    title: "Heater Maintenance",
-    description:
-      "Keep your heating system efficient and safe with regular checks.",
-    icon: Heater,
-  },
-  {
-    slug: "furniture-assembly",
-    title: "Furniture Assembly",
-    description: "Flat-pack furniture assembled quickly and correctly.",
-    icon: Wrench,
-  },
-  {
-    slug: "fit-shower",
-    title: "Fit Shower",
-    description: "Professional installation of showers and bathroom fittings.",
-    icon: ShowerHead,
-  },
-  {
-    slug: "fit-washing-dishwasher",
-    title: "Fit Washing Machine & Dishwasher",
-    description: "Safe installation of washing machines and dishwashers.",
-    icon: WashingMachine,
-  },
-  {
-    slug: "tap-replacement",
-    title: "Tap Replacement",
-    description: "Replace leaking or broken taps in kitchens and bathrooms.",
-    icon: Droplet,
-  },
-  {
-    slug: "lights-replacement",
-    title: "Lights Replacement",
-    description: "Swap old fittings for modern, efficient lighting.",
-    icon: Lightbulb,
-  },
-  {
-    slug: "electrical-repairs",
-    title: "Electrical Repairs",
-    description: "Minor electrical fixes carried out safely and efficiently.",
-    icon: Zap,
-  },
-];
+import { SERVICES } from "@/lib/services"; // ← pull data from the lib
 
 export const metadata: Metadata = {
   title: pageTitle("Services"),
@@ -71,7 +10,11 @@ export const metadata: Metadata = {
   alternates: { canonical: absUrl("/services") },
   openGraph: { url: absUrl("/services") },
 };
+
 export default function ServicesPage() {
+  // If you ever want to filter which services show on this index, do it here.
+  const services = SERVICES;
+
   return (
     <main className="mx-auto max-w-6xl px-6 py-16">
       {/* Page header */}
@@ -85,7 +28,7 @@ export default function ServicesPage() {
 
       {/* Services grid */}
       <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-        {services.map(({ slug, title, description, icon: Icon }) => (
+        {services.map(({ slug, title, summary, icon: Icon }) => (
           <Link
             key={slug}
             href={`/services/${slug}`}
@@ -97,7 +40,7 @@ export default function ServicesPage() {
               </div>
               <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
             </div>
-            <p className="text-sm text-slate-600">{description}</p>
+            <p className="text-sm text-slate-600">{summary}</p>
             <p className="mt-3 text-sm font-medium text-cyan-700">
               Learn more →
             </p>

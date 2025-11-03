@@ -4,7 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { toast } from "react-toastify";
-import ServicePickerModal, { SERVICES } from "@/components/ServicePickerModal";
+import ServicePickerModal from "@/components/ServicePickerModal";
+import { SERVICES } from "@/lib/services";
 
 /* ------------------------- Google Ads / gtag setup ------------------------- */
 
@@ -22,9 +23,6 @@ declare global {
 
 const ADS_SEND_TO = "AW-10991191295/_1A7CLqc3LYbEP-Jgfko";
 
-
-
-
 /** Promise-based conversion fire. Resolves on event_callback or after timeout. */
 function reportConversionAwait(
   params?: { value?: number; currency?: string },
@@ -32,7 +30,6 @@ function reportConversionAwait(
 ): Promise<void> {
   return new Promise((resolve) => {
     if (typeof window === "undefined" || typeof window.gtag === "undefined") {
-      // gtag not ready; don't block UX
       setTimeout(resolve, 0);
       return;
     }
@@ -57,7 +54,7 @@ function reportConversionAwait(
           done();
         },
       });
-    } catch  {
+    } catch {
       clearTimeout(t);
       done();
     }
@@ -87,6 +84,12 @@ const ALIASES: Record<string, string> = {
   "tap-repair": "tap-replacement",
   "washing-machine-install": "fit-washing-dishwasher",
   "dishwasher-install": "fit-washing-dishwasher",
+  // extras you may want:
+  "tv-install": "tv-assembly",
+  "tv-mount": "tv-assembly",
+  curtains: "curtain-installation",
+  blinds: "curtain-installation",
+  "shower-fix": "shower-repair",
 };
 
 function normalize(v: string) {
@@ -98,10 +101,11 @@ function findServiceSlug(input: string | null): string {
   const q = normalize(input);
   if (SERVICES.some((s) => s.slug === q)) return q;
   if (ALIASES[q]) return ALIASES[q];
-  const byTitle = SERVICES.find((s) =>
-    s.title.toLowerCase().includes(q.replace(/-/g, " "))
-  );
+
+  const qWords = q.replace(/-/g, " ");
+  const byTitle = SERVICES.find((s) => s.title.toLowerCase().includes(qWords));
   if (byTitle) return byTitle.slug;
+
   const bySlug = SERVICES.find((s) => s.slug.includes(q));
   return bySlug ? bySlug.slug : "";
 }
@@ -140,7 +144,7 @@ export default function BookingClient() {
       "image/heic",
       "image/heif",
     ];
-    const maxEach = 5 * 1024 * 1024; // 5MB (adjust to infra limits if needed)
+    const maxEach = 5 * 1024 * 1024; // 5MB
     const maxCount = 5;
 
     const next: LocalPhoto[] = [];
@@ -192,19 +196,18 @@ export default function BookingClient() {
 
       // Submit to API
       const res = await fetch("/api/booking", { method: "POST", body: fd });
+      if (!res.ok) throw new Error("Failed to submit booking.");
 
-      if (!res.ok) {
-        throw new Error("Failed to submit booking.");
-      }
-
-      // Keep the button pending until conversion finishes (or timeout)
+      // Wait for conversion (non-blocking with timeout)
       await reportConversionAwait({ value: 1.0, currency: "EUR" }, 2000);
 
       toast.success("Booking request sent! We'll confirm shortly.");
       form.reset();
       setPhotos([]);
     } catch (err: unknown) {
-      toast.error(getErrorMessage(err) || "Something went wrong. Please try again.");
+      toast.error(
+        getErrorMessage(err) || "Something went wrong. Please try again."
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -215,7 +218,9 @@ export default function BookingClient() {
   return (
     <main className="mx-auto max-w-3xl px-6 py-10 space-y-8">
       <header className="space-y-3">
-        <h1 className="text-3xl font-extrabold text-slate-900">Book a Service</h1>
+        <h1 className="text-3xl font-extrabold text-slate-900">
+          Book a Service
+        </h1>
 
         {/* Selected pill */}
         <div className="flex items-center gap-3">
@@ -243,7 +248,9 @@ export default function BookingClient() {
       >
         {/* Date */}
         <div className="grid gap-2">
-          <label className="text-sm font-medium text-slate-700">Preferred date</label>
+          <label className="text-sm font-medium text-slate-700">
+            Preferred date
+          </label>
           <input
             type="date"
             name="date"
@@ -254,7 +261,9 @@ export default function BookingClient() {
 
         {/* Details */}
         <div className="grid gap-2">
-          <label className="text-sm font-medium text-slate-700">Your details</label>
+          <label className="text-sm font-medium text-slate-700">
+            Your details
+          </label>
           <input
             name="name"
             placeholder="Full name"
@@ -286,7 +295,9 @@ export default function BookingClient() {
 
         {/* Problem description */}
         <div className="grid gap-2">
-          <label className="text-sm font-medium text-slate-700">Describe the issue</label>
+          <label className="text-sm font-medium text-slate-700">
+            Describe the issue
+          </label>
           <textarea
             name="description"
             rows={4}
@@ -297,7 +308,9 @@ export default function BookingClient() {
 
         {/* Photos */}
         <div className="grid gap-2">
-          <label className="text-sm font-medium text-slate-700">Add photos (optional)</label>
+          <label className="text-sm font-medium text-slate-700">
+            Add photos (optional)
+          </label>
           <input
             type="file"
             accept="image/jpeg,image/png,image/webp,image/heic,image/heif"

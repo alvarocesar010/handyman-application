@@ -2,76 +2,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import {
-  DoorOpen,
-  Heater,
-  Wrench,
-  ShowerHead,
-  WashingMachine,
-  Droplet,
-  Lightbulb,
-  Zap,
-  Search,
-  X,
-} from "lucide-react";
-
-type ServiceItem = {
-  slug: string;
-  title: string;
-  description: string;
-  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
-};
-
-export const SERVICES: ServiceItem[] = [
-  {
-    slug: "door-replacement",
-    title: "Door Replacement",
-    description: "Replace & fit doors, locks, hinges.",
-    icon: DoorOpen,
-  },
-  {
-    slug: "heater-maintenance",
-    title: "Heater Maintenance",
-    description: "Annual checks, cleaning, diagnostics.",
-    icon: Heater,
-  },
-  {
-    slug: "furniture-assembly",
-    title: "Furniture Assembly",
-    description: "Flat-pack assembly done right.",
-    icon: Wrench,
-  },
-  {
-    slug: "fit-shower",
-    title: "Fit Shower",
-    description: "Install showers & bathroom fittings.",
-    icon: ShowerHead,
-  },
-  {
-    slug: "fit-washing-dishwasher",
-    title: "Fit Washing Machine & Dishwasher",
-    description: "Safe appliance installation.",
-    icon: WashingMachine,
-  },
-  {
-    slug: "tap-replacement",
-    title: "Tap Replacement",
-    description: "Fix leaks & replace taps.",
-    icon: Droplet,
-  },
-  {
-    slug: "lights-replacement",
-    title: "Lights Replacement",
-    description: "Swap old fittings & bulbs.",
-    icon: Lightbulb,
-  },
-  {
-    slug: "electrical-repairs",
-    title: "Electrical Repairs",
-    description: "Minor electrical fixes.",
-    icon: Zap,
-  },
-];
+import { Search, X } from "lucide-react";
+import { SERVICES, type Service } from "@/lib/services";
 
 type Props = {
   value?: string; // selected slug
@@ -105,12 +37,13 @@ export default function ServicePickerModal({
     if (open) setTimeout(() => firstFocusRef.current?.focus(), 0);
   }, [open]);
 
-  const filtered = SERVICES.filter((s) => {
+  const filtered: Service[] = SERVICES.filter((s) => {
     const q = query.trim().toLowerCase();
     if (!q) return true;
     return (
       s.title.toLowerCase().includes(q) ||
-      s.description.toLowerCase().includes(q)
+      s.summary.toLowerCase().includes(q) ||
+      s.slug.toLowerCase().includes(q)
     );
   });
 
@@ -179,7 +112,7 @@ export default function ServicePickerModal({
             {/* List */}
             <div className="max-h-[70vh] overflow-y-auto px-5 pb-5">
               <div className="grid gap-3 sm:grid-cols-2">
-                {filtered.map(({ slug, title, description, icon: Icon }) => {
+                {filtered.map(({ slug, title, summary, icon: Icon }) => {
                   const selected = value === slug;
                   return (
                     <button
@@ -205,7 +138,7 @@ export default function ServicePickerModal({
                             {title}
                           </div>
                           <div className="text-sm text-slate-600">
-                            {description}
+                            {summary}
                           </div>
                         </div>
                       </div>
