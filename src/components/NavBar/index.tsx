@@ -4,6 +4,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
+import Image from "next/image";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -19,8 +20,18 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 bg-white shadow-sm">
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         {/* Brand / Logo */}
-        <Link href="/" className="text-xl font-bold text-cyan-700">
-          Dublin Handyman
+        <Link
+          href="/"
+          className="text-xl font-bold text-cyan-700 flex flex-row items-center"
+        >
+          <Image
+            height={40}
+            src={"/images/logo.png"}
+            alt="Logo Dubliner Handyman"
+            width={40}
+            className="rounded-lg mr-4 "
+          />
+          Dubliner Handyman
         </Link>
 
         {/* Desktop nav */}
@@ -47,7 +58,11 @@ export default function Navbar() {
           onClick={() => setMobileOpen(!mobileOpen)}
           className="md:hidden inline-flex items-center justify-center rounded p-2 text-slate-700 hover:bg-slate-100"
         >
-          {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          {mobileOpen ? (
+            <X className="h-6 w-6" />
+          ) : (
+            <Menu className="h-6 w-6" />
+          )}
         </button>
       </nav>
 
