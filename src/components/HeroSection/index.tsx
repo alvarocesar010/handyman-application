@@ -1,10 +1,8 @@
-import { handleConversionClick } from "@/lib/ads";
 import Image from "next/image";
 import Link from "next/link";
+import TrackedCallButton from "../TrackedCallButton";
 
 const HeroSection = () => {
-  const href = "tel:+353894924563";
-
   return (
     <section
       aria-labelledby="hero-title"
@@ -34,13 +32,10 @@ const HeroSection = () => {
               Book a Repair
             </Link>
 
-            <a
-              href={`tel:${process.env.PHONE_NUMBER?.replace(/\s/g, "")}`}
+            <TrackedCallButton
+              phone={process.env.PHONE_NUMBER || "+353894924563"}
               className="inline-flex h-11 items-center justify-center rounded-lg bg-slate-900 px-5 text-white font-medium shadow hover:bg-black focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-700 focus-visible:ring-offset-2"
-              onClick={(e) => handleConversionClick(e, href)}
-            >
-              Call Now
-            </a>
+            />
           </div>
         </div>
 
