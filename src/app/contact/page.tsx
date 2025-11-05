@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Phone, Mail, MessageCircle, Clock, MapPin, Send } from "lucide-react";
+import { handleConversionClick } from "@/lib/ads";
 
 type Status = "idle" | "loading" | "ok" | "error";
 // src/app/contact/page.tsx
@@ -10,9 +11,7 @@ type Status = "idle" | "loading" | "ok" | "error";
 export default function ContactPage() {
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string>("");
-
-  const phoneNumber = process.env.PHONE_NUMBER || "";
-  const phoneHref = `tel:${phoneNumber.replace(/\s/g, "")}`;
+  const href = "tel:+353894924563";
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -60,10 +59,11 @@ export default function ContactPage() {
           </div>
           <div className="mt-2">
             <a
-              href={`tel:${phoneHref?.replace(/\s/g, "")}`}
+              href="tel:+353894924563"
               className="text-cyan-700 hover:underline"
+              onClick={(e) => handleConversionClick(e, href)}
             >
-              {phoneHref}
+              +353 (89) 492 4563
             </a>
             <p className="text-sm text-slate-600">Best for urgent callouts</p>
           </div>
@@ -94,13 +94,11 @@ export default function ContactPage() {
           </div>
           <div className="mt-2">
             <a
-              href={`https://wa.me/${phoneHref?.replace(
-                /\D/g,
-                ""
-              )}?text=Hi%2C%20I%27d%20like%20to%20book%20a%20repair`}
+              href={`https://wa.me/353894924563?text=Hi%2C%20I%27d%20like%20to%20book%20a%20repair`}
               target="_blank"
               rel="noopener noreferrer"
               className="text-cyan-700 hover:underline"
+              onClick={(e) => handleConversionClick(e, href)}
             >
               Chat on WhatsApp
             </a>
