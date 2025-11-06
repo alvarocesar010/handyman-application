@@ -1,4 +1,3 @@
-// src/lib/services.ts
 import {
   DoorOpen,
   Heater,
@@ -23,41 +22,138 @@ export type Service = {
   inclusions: string[];
   exclusions?: string[];
   faqs?: { q: string; a: string }[];
-  icon: LucideIcon; // lucide-react component type
+  icon: LucideIcon;
+
+  // Tópicos por categoria + imagem por categoria
+  categories?: Record<string, string[]>;
+  categoryImages?: Record<string, { src: string; alt: string }>;
 };
 
 export const SERVICES: Service[] = [
   {
-    slug: "door-replacement",
-    title: "Door Replacement",
+    slug: "door-services",
+    title: "Door Installation & Replacement Services",
     summary:
-      "Internal/external doors replaced with hinges aligned and locks fitted.",
+      "Professional fitting, repair, and replacement of all types of doors — internal, external, furniture, enclosure, and more.",
     longDescription:
-      "We replace internal and external doors including frames when required. We measure, plane for a perfect fit, align hinges, and install or reuse handles and locks. Ideal when doors are swollen, damaged, or you want an upgrade. We can advise on suitable fire-rated or moisture-resistant doors for kitchens and bathrooms.",
+      "We provide a complete door fitting and replacement service for homes and businesses. Whether it's an interior, exterior, or furniture door, we ensure a perfect fit, smooth operation, and a clean finish. We handle everything from wooden and composite doors to glass enclosures, wardrobes, and appliance doors. We measure, align, plane when necessary, and fit or reuse hinges, handles, and locks. Suitable for damaged, swollen, or misaligned doors — or if you simply want an upgrade. We can also advise on fire-rated, moisture-resistant, or acoustic options depending on your needs.",
     startingPrice: 5500,
-    durationHint: "Usually 1–2 hours",
+    durationHint: "Usually 1–2 hours per door",
+
+    categories: {
+      "Internal Doors": [
+        "Bedroom doors",
+        "Living room doors",
+        "Hallway doors",
+        "Closet and storage doors",
+      ],
+      "External Doors": [
+        "Front and back entry doors",
+        "Patio and balcony doors",
+        "Garage side doors",
+        "Garden and shed doors",
+      ],
+      "Furniture & Cabinet Doors": [
+        "Wardrobe doors (sliding or hinged)",
+        "Kitchen cabinet doors",
+        "Cupboard doors",
+        "TV and media unit doors",
+      ],
+      "Bathroom & Enclosure Doors": [
+        "Shower enclosure doors",
+        "Glass partition doors",
+        "Toilet cubicle doors",
+      ],
+      "Appliance Doors": [
+        "Dishwasher panel doors",
+        "Fridge integrated doors",
+        "Laundry cabinet doors",
+      ],
+      "Specialty & Custom Doors": [
+        "Fire-rated doors",
+        "Acoustic/soundproof doors",
+        "Moisture-resistant doors",
+        "Custom-sized or bespoke joinery doors",
+      ],
+    },
+
+    // Imagem por categoria (usada dentro dos cards de tópicos)
+    // Ajuste os paths conforme suas imagens em /public
+    categoryImages: {
+      "Internal Doors": {
+        src: "/images/services/doors/door-internal.jpg",
+        alt: "Internal wooden door being fitted",
+      },
+      "External Doors": {
+        src: "/images/services/doors/door-external.jpg",
+        alt: "External composite front door",
+      },
+      "Furniture & Cabinet Doors": {
+        src: "/images/services/doors/door-kitchen-cabinet.jpg",
+        alt: "Kitchen cabinet door alignment",
+      },
+      "Bathroom & Enclosure Doors": {
+        src: "/images/services/doors/door-shower.jpg",
+        alt: "Shower enclosure glass door",
+      },
+      "Appliance Doors": {
+        src: "/images/services/doors/door-appliance.jpg",
+        alt: "Integrated appliance door fitted",
+      },
+      "Specialty & Custom Doors": {
+        src: "/images/services/doors/door-fire-rated.jpg",
+        alt: "Fire-rated door with label",
+      },
+    },
+
     inclusions: [
-      "Remove old door",
-      "Fit new door & hinges",
-      "Plane & align",
-      "Fit handle/lock",
+      "Remove and dispose of old door if required",
+      "Measure and ensure perfect alignment",
+      "Fit new door, hinges, handles, and locks",
+      "Plane door edges for smooth operation",
+      "Adjust frames and ensure proper clearance",
+      "Supply of standard spare parts (hinges, locks, handles, screws, etc.) if needed",
+      "Customer can also supply their own materials",
     ],
     exclusions: [
-      "Supply of door/ironmongery unless agreed",
-      "Painting/varnishing",
+      "Custom painting, varnishing, or staining (available upon request)",
+      "Glass cutting or design engraving",
+      "Supply of non-standard or bespoke doors unless pre-agreed",
     ],
     faqs: [
       {
-        q: "Can you supply the door?",
-        a: "Yes, we can source standard sizes. For custom sizes we’ll measure and advise.",
+        q: "Can you supply the doors and parts?",
+        a: "Yes, we can provide all the required spare parts like hinges, handles, and locks, as well as supply standard-sized doors. However, customers are also free to provide their own materials if preferred.",
       },
       {
-        q: "Do you install fire doors?",
-        a: "Yes, including intumescent strips and compliant hardware where required.",
+        q: "Do you repair or adjust existing doors?",
+        a: "Absolutely. We can repair swollen, misaligned, or sticking doors, as well as rehang or plane them for a smoother fit.",
+      },
+      {
+        q: "Do you install bathroom or glass doors?",
+        a: "Yes, we fit bathroom and shower enclosure doors, including glass and aluminium models with waterproof sealing.",
+      },
+      {
+        q: "Do you work on wardrobe and kitchen cabinet doors?",
+        a: "Yes, we can replace or repair furniture and cabinet doors, adjust hinges, and install new fittings.",
+      },
+      {
+        q: "Do you offer fire or moisture-resistant doors?",
+        a: "Yes, we can advise and install certified fire-rated and moisture-resistant doors suitable for kitchens, bathrooms, or commercial use.",
+      },
+      {
+        q: "Can you fix broken hinges or loose handles?",
+        a: "Yes, we replace or reinforce hinges, handles, locks, and any other fittings that are damaged or worn out.",
+      },
+      {
+        q: "Do you offer painting or finishing?",
+        a: "We don’t usually paint or varnish as part of the standard service, but it can be arranged if required.",
       },
     ],
+
     icon: DoorOpen,
   },
+
   {
     slug: "heater-maintenance",
     title: "Heater Maintenance",
