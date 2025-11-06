@@ -10,6 +10,7 @@ import {
   LucideIcon,
   Tv,
   Ruler,
+  Drill,
 } from "lucide-react";
 
 export type Service = {
@@ -179,18 +180,108 @@ export const SERVICES: Service[] = [
   },
   {
     slug: "furniture-assembly",
-    title: "Furniture Assembly",
-    summary: "Flat-pack furniture assembled correctly and safely.",
+    title: "Furniture Assembly & Installation",
+    summary:
+      "Flat-pack furniture assembled neatly and securely — for bedrooms, living rooms, offices, and more.",
     longDescription:
-      "We assemble flat-pack furniture from popular retailers and secure tall items to walls when needed for safety. We tidy packaging and ensure doors, drawers and hinges are aligned.",
+      "We assemble flat-pack furniture from major retailers like IKEA, JYSK, and Argos. From wardrobes and beds to office desks and TV units, we ensure everything is level, safe, and cleanly installed. Tall or heavy items are secured to walls when required for safety. Ideal for new homes, offices, or anyone who wants a tidy, professional finish.",
     startingPrice: 6000,
-    durationHint: "Varies by item",
+    durationHint: "Varies by item size and complexity",
+
+    categories: {
+      "Bedroom Furniture": [
+        "Wardrobes (hinged or sliding)",
+        "Bed frames and headboards",
+        "Chest of drawers and dressers",
+        "Bedside tables",
+      ],
+      "Living Room Furniture": [
+        "TV stands and entertainment units",
+        "Bookcases and shelving",
+        "Coffee tables and side tables",
+        "Storage cabinets",
+      ],
+      "Office & Study Furniture": [
+        "Desks and computer tables",
+        "Office chairs",
+        "Filing cabinets",
+        "Shelving units",
+      ],
+      "Dining Area": [
+        "Dining tables and chairs",
+        "Bar stools",
+        "Sideboards and display units",
+      ],
+      "Children’s Room": [
+        "Kids’ beds and bunk beds",
+        "Toy storage units",
+        "Study desks and shelves",
+      ],
+      "Outdoor Furniture": [
+        "Garden tables and chairs",
+        "Benches and loungers",
+        "Patio sets and storage boxes",
+      ],
+    },
+
+    categoryImages: {
+      "Bedroom Furniture": {
+        src: "/images/services/furniture/bedroom-furniture.jpg",
+        alt: "Wardrobe and bed assembly in a bedroom",
+      },
+      "Living Room Furniture": {
+        src: "/images/services/furniture/livingroom-furniture.jpg",
+        alt: "TV unit and bookshelf assembled in living room",
+      },
+      "Office & Study Furniture": {
+        src: "/images/services/furniture/office-furniture.jpg",
+        alt: "Office desk and chair assembly",
+      },
+      "Dining Area": {
+        src: "/images/services/furniture/dining-furniture.jpg",
+        alt: "Dining table and chairs assembled",
+      },
+      "Children’s Room": {
+        src: "/images/services/furniture/kids-furniture.jpg",
+        alt: "Bunk bed and toy storage assembly",
+      },
+      "Outdoor Furniture": {
+        src: "/images/services/furniture/outdoor-furniture.jpg",
+        alt: "Garden furniture assembled on patio",
+      },
+    },
+
     inclusions: [
-      "Assembly per instructions",
-      "Fixings checked",
-      "Area left tidy",
+      "Assemble flat-pack furniture per instructions",
+      "Check and tighten all fixings/connectors",
+      "Secure tall items to walls when required",
+      "Align doors, drawers, and hinges",
+      "Tidy up packaging and leave the area clean",
     ],
-    icon: Wrench,
+    exclusions: [
+      "Furniture supply (we assemble what you provide)",
+      "Electrical or plumbing connections within units",
+      "Custom carpentry or wall modifications",
+    ],
+    faqs: [
+      {
+        q: "Can you assemble furniture from any brand?",
+        a: "Yes, we work with IKEA, JYSK, Argos, Wayfair and others, plus unbranded flat-packs.",
+      },
+      {
+        q: "Do you fix wardrobes to the wall?",
+        a: "Yes, we secure tall/heavy items to walls if suitable fixings are available.",
+      },
+      {
+        q: "Can you dismantle old furniture?",
+        a: "Yes, we can dismantle existing items before assembling new ones if requested.",
+      },
+      {
+        q: "Do you remove packaging?",
+        a: "We tidy the area and can remove/dispose of packaging on request.",
+      },
+    ],
+    icon: Drill,
   },
   {
     slug: "fit-shower",
