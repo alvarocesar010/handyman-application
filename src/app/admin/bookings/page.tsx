@@ -11,7 +11,7 @@ type DbBooking = {
   service: string;
   date: string;
   name: string;
-  phone: string;
+  phoneRaw: string;
   address: string;
   eircode: string;
   description: string;
@@ -54,7 +54,7 @@ export default async function AdminBookingsPage() {
     service: d.service,
     date: d.date,
     name: d.name,
-    phone: d.phone,
+    phoneRaw: d.phoneRaw,
     address: d.address,
     eircode: d.eircode,
     description: d.description,

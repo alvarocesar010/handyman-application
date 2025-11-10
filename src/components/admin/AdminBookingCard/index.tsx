@@ -8,7 +8,7 @@ export type AdminBooking = {
   service: string;
   date: string;
   name: string;
-  phone: string;
+  phoneRaw: string;
   address: string;
   eircode: string;
   description: string;
@@ -114,8 +114,8 @@ export default function AdminBookingCard({
           <div className="text-sm text-slate-600">
             <div>
               <span className="font-medium">Phone:</span>{" "}
-              <a className="underline" href={`tel:${booking.phone}`}>
-                {booking.phone}
+              <a className="underline" href={`tel:${booking.phoneRaw}`}>
+                {booking.phoneRaw}
               </a>
             </div>
             <div>
