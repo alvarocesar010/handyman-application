@@ -1,37 +1,20 @@
-// app/api/admin/login/route.ts
 import { NextResponse } from "next/server";
-import { signAdminJwt } from "@/lib/auth";
+import { ObjectId } from "mongodb";
+import { getDb } from "@/lib/mongodb";
 
 export async function POST(req: Request) {
   const form = await req.formData();
-  const username = String(form.get("username") ?? "");
-  const password = String(form.get("password") ?? "");
+  const id = String(form.get("id") ?? "");
 
-  if (
-    username !== process.env.ADMIN_USER ||
-    password !== process.env.ADMIN_PASS
-  ) {
-    const url = new URL("/admin/login", req.url);
-    url.searchParams.set("error", "1");
-    return NextResponse.redirect(url);
+  const baseUrl = process.env.SITE_URL ?? req.url;
+
+  if (!id) {
+    return NextResponse.json({ error: "Invalid id" }, { status: 400 });
   }
 
-  const token = await signAdminJwt({
-    sub: "admin",
-    username,
-    role: "admin",
-  });
+  const db = await getDb();
+  await db.collection("bookings").deleteOne({ _id: new ObjectId(id) });
 
-  // fixed redirect target
-  const res = NextResponse.redirect(new URL("/admin/bookings", req.url));
-
-  res.cookies.set("admin_token", token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: 60 * 60 * 8, // 8h
-  });
-
-  return res;
+  // Back to the list
+  return NextResponse.redirect(new URL("/admin/bookings", baseUrl));
 }
