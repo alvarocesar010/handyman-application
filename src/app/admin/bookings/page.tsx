@@ -18,6 +18,10 @@ type DbBooking = {
   status: "pending" | "confirmed" | "done" | "cancelled";
   photos?: { fileId: ObjectId; filename: string }[];
   createdAt: Date | string;
+  budget?: number;
+  adminNotes?: string;
+  startTime?: string;
+  durationMinutes?: number;
 };
 
 function Section({ title, items }: { title: string; items: AdminBooking[] }) {

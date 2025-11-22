@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Trash } from "lucide-react";
+import { Pencil, Trash } from "lucide-react";
+import Link from "next/link";
 
 export type AdminPhoto = { id: string; filename: string };
 export type AdminBooking = {
@@ -15,6 +16,10 @@ export type AdminBooking = {
   description: string;
   status: "pending" | "confirmed" | "done" | "cancelled";
   photos?: AdminPhoto[];
+  budget?: number;
+  adminNotes?: string;
+  startTime?: string;
+  durationMinutes?: number;
 };
 
 function StatusBadge({ s }: { s: AdminBooking["status"] }) {
@@ -40,6 +45,7 @@ export default function AdminBookingCard({
 }) {
   const storageKey = `admin:booking:collapsed:${booking._id}`;
   const [open, setOpen] = useState<boolean>(true);
+  const [editing, setEditing] = useState<boolean>(false);
 
   // remember per booking
   useEffect(() => {
@@ -64,12 +70,12 @@ export default function AdminBookingCard({
           </div>
           <p className="truncate text-sm text-slate-600"></p>
           <div className="">
-            <div className="flex gap-2">
+            <div className="flex gap-2 text-sm ">
               <p className="font-semibold">Service:</p>
               {booking.service}
             </div>
-            <div className="flex gap-2">
-              <p className="font-semibold ">When:</p>
+            <div className="text-sm flex gap-2">
+              <p className=" font-semibold ">When:</p>
               {booking.date}
             </div>
           </div>
@@ -127,11 +133,32 @@ export default function AdminBookingCard({
               </a>
             </div>
             <div>
-              <span className="font-medium">Address:</span> {booking.address} ·{" "}
-              {booking.eircode}
+              <Link
+                href={`http://maps.google.co.uk/maps?q=${booking.eircode}`}
+                className="font-medium"
+              >
+                Address: {booking.address} · {booking.eircode}
+                {booking.budget}
+              </Link>
             </div>
           </div>
 
+          {(booking.budget ||
+            booking.startTime ||
+            booking.durationMinutes ||
+            booking.adminNotes) && (
+            <div className="mt-3 rounded-lg bg-slate-50 p-3 text-sm text-slate-700">
+              <p className="font-semibold mb-1">Job details</p>
+              {booking.budget && <p>Budget: €{booking.budget}</p>}
+              {booking.startTime && <p>Time: {booking.startTime}</p>}
+              {booking.durationMinutes && (
+                <p>Estimated duration: {booking.durationMinutes} min</p>
+              )}
+              {booking.adminNotes && (
+                <p className="mt-1 whitespace-pre-line">{booking.adminNotes}</p>
+              )}
+            </div>
+          )}
           <p className="mt-3 whitespace-pre-line text-slate-700">
             {booking.description}
           </p>
@@ -158,7 +185,83 @@ export default function AdminBookingCard({
               ))}
             </div>
           )}
+          {editing && (
+            <form
+              action="/api/admin/bookings/update"
+              method="post"
+              className="mt-4 space-y-3 rounded-lg border border-slate-200 bg-slate-50 p-3"
+            >
+              <input type="hidden" name="id" value={booking._id} />
 
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-slate-700">
+                    Budget (€)
+                  </label>
+                  <input
+                    type="number"
+                    step="1"
+                    name="budget"
+                    defaultValue={booking.budget ?? ""}
+                    className="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-slate-700">
+                    Time (start)
+                  </label>
+                  <input
+                    type="time"
+                    name="startTime"
+                    defaultValue={booking.startTime ?? ""}
+                    className="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-slate-700">
+                    Estimated duration (min)
+                  </label>
+                  <input
+                    type="number"
+                    step="15"
+                    name="durationMinutes"
+                    defaultValue={booking.durationMinutes ?? ""}
+                    className="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-slate-700">
+                  Notes about the service
+                </label>
+                <textarea
+                  name="adminNotes"
+                  rows={3}
+                  defaultValue={booking.adminNotes ?? ""}
+                  className="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setEditing(false)}
+                  className="rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-100"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="rounded-md bg-cyan-700 px-3 py-1.5 text-sm text-white hover:bg-cyan-800"
+                >
+                  Save details
+                </button>
+              </div>
+            </form>
+          )}
           {/* Mobile inline status controls */}
           <form
             action="/api/admin/bookings/status"
@@ -183,7 +286,14 @@ export default function AdminBookingCard({
               Save
             </button>
           </form>
-          <div className="flex justify-center mt-5">
+          <div className="flex justify-center mt-5 gap-4">
+            <button
+              type="button"
+              onClick={() => setEditing((v) => !v)}
+              className="rounded-4xl border border-yellow-300 px-1 py-1 text- text-yellow-500 hover:bg-red-50"
+            >
+              <Pencil />
+            </button>
             <form
               action="/api/admin/bookings/delete"
               method="post"
