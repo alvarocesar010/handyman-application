@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Trash } from "lucide-react";
 
 export type AdminPhoto = { id: string; filename: string };
 export type AdminBooking = {
@@ -61,10 +62,17 @@ export default function AdminBookingCard({
             </h3>
             <StatusBadge s={booking.status} />
           </div>
-          <p className="truncate text-sm text-slate-600">
-            <span className="font-medium">Service:</span> {booking.service} ·{" "}
-            <span className="font-medium">When:</span> {booking.date}
-          </p>
+          <p className="truncate text-sm text-slate-600"></p>
+          <div className="">
+            <div className="flex gap-2">
+              <p className="font-semibold">Service:</p>
+              {booking.service}
+            </div>
+            <div className="flex gap-2">
+              <p className="font-semibold ">When:</p>
+              {booking.date}
+            </div>
+          </div>
         </div>
 
         <div className="flex items-center gap-2">
@@ -175,6 +183,24 @@ export default function AdminBookingCard({
               Save
             </button>
           </form>
+          <div className="flex justify-center mt-5">
+            <form
+              action="/api/admin/bookings/delete"
+              method="post"
+              onSubmit={(e) => {
+                if (!confirm("Delete this booking?")) e.preventDefault();
+              }}
+            >
+              <input type="hidden" name="id" value={booking._id} />
+              <button
+                type="submit"
+                className="rounded-4xl border border-red-300 px-1 py-1 text- text-red-500 hover:bg-red-50"
+                title="Delete booking"
+              >
+                <Trash />
+              </button>
+            </form>
+          </div>
         </div>
       )}
     </article>
