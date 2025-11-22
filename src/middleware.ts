@@ -1,31 +1,46 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { jwtVerify } from "jose";
 
-function unauthorized() {
-  const res = new NextResponse("Auth required", { status: 401 });
-  res.headers.set("WWW-Authenticate", 'Basic realm="Admin Area"');
-  return res;
+const secret = new TextEncoder().encode(process.env.ADMIN_JWT_SECRET);
+const alg = "HS256";
+
+async function isAuthenticated(req: NextRequest) {
+  const token = req.cookies.get("admin_token")?.value;
+  if (!token) return false;
+
+  try {
+    const { payload } = await jwtVerify(token, secret, { algorithms: [alg] });
+    return payload.role === "admin";
+  } catch {
+    return false;
+  }
 }
 
-export function middleware(req: NextRequest) {
+export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // Only guard admin pages and admin APIs
   const isAdminPath =
     pathname.startsWith("/admin") || pathname.startsWith("/api/admin");
 
   if (!isAdminPath) return NextResponse.next();
 
-  const header = req.headers.get("authorization");
-  if (!header?.startsWith("Basic ")) return unauthorized();
-
-  const base64 = header.split(" ")[1] ?? "";
-  const [user, pass] = Buffer.from(base64, "base64").toString().split(":");
-
-  if (user === process.env.ADMIN_USER && pass === process.env.ADMIN_PASS) {
+  // allow login page and login API without token
+  if (
+    pathname.startsWith("/admin/login") ||
+    pathname.startsWith("/api/admin/login")
+  ) {
     return NextResponse.next();
   }
-  return unauthorized();
+
+  if (await isAuthenticated(req)) {
+    return NextResponse.next();
+  }
+
+  const loginUrl = req.nextUrl.clone();
+  loginUrl.pathname = "/admin/login"; // no query params
+
+  return NextResponse.redirect(loginUrl);
 }
 
 export const config = {

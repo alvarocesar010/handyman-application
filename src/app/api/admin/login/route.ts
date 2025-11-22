@@ -1,4 +1,3 @@
-// app/api/admin/login/route.ts
 import { NextResponse } from "next/server";
 import { signAdminJwt } from "@/lib/auth";
 
@@ -22,7 +21,7 @@ export async function POST(req: Request) {
     role: "admin",
   });
 
-  // fixed redirect target
+  // ⬇⬇⬇ redirect to the route that actually exists
   const res = NextResponse.redirect(new URL("/admin/bookings", req.url));
 
   res.cookies.set("admin_token", token, {

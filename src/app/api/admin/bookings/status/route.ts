@@ -6,7 +6,7 @@ export async function POST(req: Request) {
   const form = await req.formData();
   const id = String(form.get("id") ?? "");
   const status = String(form.get("status") ?? "");
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? req.url;
+  const baseUrl = process.env.SITE_URL;
 
   if (!id || !["pending", "confirmed", "done", "cancelled"].includes(status)) {
     return NextResponse.json(
