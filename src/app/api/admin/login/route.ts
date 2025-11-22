@@ -5,8 +5,8 @@ export async function POST(req: Request) {
   const form = await req.formData();
   const username = String(form.get("username") ?? "");
   const password = String(form.get("password") ?? "");
-  const baseUrl = process.env.SITE_URL
 
+  // wrong user/pass -> back to /admin/login with ?error=1
   if (
     username !== process.env.ADMIN_USER ||
     password !== process.env.ADMIN_PASS
@@ -22,8 +22,9 @@ export async function POST(req: Request) {
     role: "admin",
   });
 
-  // ⬇⬇⬇ redirect to the route that actually exists
-  const res = NextResponse.redirect(new URL("/admin/bookings", baseUrl));
+  // use the same origin as the current request
+  const { origin } = new URL(req.url);
+  const res = NextResponse.redirect(`${origin}/admin/bookings`);
 
   res.cookies.set("admin_token", token, {
     httpOnly: true,
