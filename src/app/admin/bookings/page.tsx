@@ -63,6 +63,7 @@ export default async function AdminBookingsPage() {
     eircode: d.eircode,
     description: d.description,
     status: d.status,
+    createdAt: d.createdAt,
     photos:
       d.photos?.map((p) => ({
         id: p.fileId.toString(),

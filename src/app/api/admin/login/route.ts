@@ -7,7 +7,7 @@ export async function POST(req: Request) {
     const username = String(form.get("username") ?? "");
     const password = String(form.get("password") ?? "");
 
-    // Wrong user/pass → back to login with ?error=1
+    // [Authentication logic remains the same]
     if (
       username !== process.env.ADMIN_USER ||
       password !== process.env.ADMIN_PASS
@@ -16,15 +16,29 @@ export async function POST(req: Request) {
       url.searchParams.set("error", "1");
       return NextResponse.redirect(url);
     }
-
+    // [JWT signing logic remains the same]
     const token = await signAdminJwt({
       sub: "admin",
       username,
       role: "admin",
     });
 
-    // IMPORTANT: use an absolute URL based on the request
-    const redirectUrl = new URL("/admin/bookings", req.url);
+    // --- 🎯 MODIFIED CODE HERE ---
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+    let baseUrl: string;
+
+    if (siteUrl) {
+      // Use the external domain if available (best for production/Cloud Run)
+      baseUrl = siteUrl;
+    } else {
+      // Fallback to req.url for local development (or if NEXT_PUBLIC_SITE_URL is not set)
+      baseUrl = req.url;
+    }
+
+    // Use the determined base URL to construct the redirect URL
+    const redirectUrl = new URL("/admin/bookings", baseUrl);
+    // -----------------------------
+
     const res = NextResponse.redirect(redirectUrl);
 
     res.cookies.set("admin_token", token, {

@@ -14,6 +14,7 @@ export type AdminBooking = {
   address: string;
   eircode: string;
   description: string;
+  createdAt:  string;
   status: "pending" | "confirmed" | "done" | "cancelled";
   photos?: AdminPhoto[];
   budget?: number;
@@ -138,8 +139,11 @@ export default function AdminBookingCard({
                 className="font-medium"
               >
                 Address: {booking.address} · {booking.eircode}
-                {booking.budget}
               </Link>
+            </div>
+            <div>
+              <span>Created at:</span>
+              <p>{booking.createdAt}</p>
             </div>
           </div>
 
