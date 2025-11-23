@@ -2,40 +2,35 @@ import { NextResponse } from "next/server";
 import { signAdminJwt } from "@/lib/auth";
 
 export async function POST(req: Request) {
-  try {
-    const form = await req.formData();
-    const username = String(form.get("username") ?? "");
-    const password = String(form.get("password") ?? "");
+  const form = await req.formData();
+  const username = String(form.get("username") ?? "");
+  const password = String(form.get("password") ?? "");
 
-    if (
-      username !== process.env.ADMIN_USER ||
-      password !== process.env.ADMIN_PASS
-    ) {
-      const url = new URL("/admin/login", req.url);
-      url.searchParams.set("error", "1");
-      return NextResponse.redirect(url);
-    }
-
-    const token = await signAdminJwt({
-      sub: "admin",
-      username,
-      role: "admin",
-    });
-
-    const { origin } = new URL(req.url);
-    const res = NextResponse.redirect(`${origin}/admin/bookings`);
-
-    res.cookies.set("admin_token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      maxAge: 60 * 60 * 8,
-    });
-
-    return res;
-  } catch (err) {
-    console.error("LOGIN API ERROR", err);
-    return new NextResponse("Internal error", { status: 500 });
+  if (
+    username !== process.env.ADMIN_USER ||
+    password !== process.env.ADMIN_PASS
+  ) {
+    const url = new URL("/admin/login", req.url);
+    url.searchParams.set("error", "1");
+    return NextResponse.redirect(url);
   }
+
+  const token = await signAdminJwt({
+    sub: "admin",
+    username,
+    role: "admin",
+  });
+
+  // ⬇⬇⬇ PATH ONLY – **no origin, no localhost**
+  const res = NextResponse.redirect("/admin/bookings");
+
+  res.cookies.set("admin_token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 60 * 60 * 8,
+  });
+
+  return res;
 }
