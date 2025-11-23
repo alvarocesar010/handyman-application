@@ -160,7 +160,7 @@ export default function AdminBookingCard({
             booking.startTime ||
             booking.durationMinutes ||
             booking.adminNotes) && (
-            <div className="mt-3 rounded-lg bg-slate-100 p-3 text-sm text-slate-800 border-slate-400">
+            <div className="mt-3 border-solid border-1 border-slate-400 rounded-lg bg-slate-100 p-3 text-sm text-slate-800">
               <p className="font-semibold mb-1">Job details</p>
               {booking.budget && <p>Budget: €{booking.budget}</p>}
               {booking.startTime && <p>Time: {booking.startTime}</p>}

@@ -6,7 +6,6 @@ export async function POST(req: Request) {
   const form = await req.formData();
   const id = String(form.get("id") ?? "");
   const status = String(form.get("status") ?? "");
-  const baseUrl = process.env.SITE_URL;
 
   if (!id || !["pending", "confirmed", "done", "cancelled"].includes(status)) {
     return NextResponse.json(
@@ -23,6 +22,20 @@ export async function POST(req: Request) {
       { $set: { status, updatedAt: new Date() } }
     );
 
-  // Redirect back to the list
-  return NextResponse.redirect(new URL("/admin/bookings", baseUrl));
+  const siteUrl = process.env.SITE_URL;
+  let baseUrl: string;
+
+  if (siteUrl === req.url) {
+    // Use the external domain if available (best for production/Cloud Run)
+    baseUrl = siteUrl;
+  } else {
+    // Fallback to req.url for local development (or if NEXT_PUBLIC_SITE_URL is not set)
+    baseUrl = req.url;
+  }
+
+  // Use the determined base URL to construct the redirect URL
+  const redirectUrl = new URL("/admin/bookings", baseUrl);
+  const res = NextResponse.redirect(redirectUrl);
+
+  return res;
 }

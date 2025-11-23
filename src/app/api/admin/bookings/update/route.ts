@@ -57,6 +57,20 @@ export async function POST(req: Request) {
     .collection("bookings")
     .updateOne({ _id: new ObjectId(id) }, { $set: update });
 
-  const { origin } = new URL(req.url);
-  return NextResponse.redirect(`${origin}/admin/bookings`);
+  const siteUrl = process.env.SITE_URL;
+  let baseUrl: string;
+
+  if (siteUrl === req.url) {
+    // Use the external domain if available (best for production/Cloud Run)
+    baseUrl = siteUrl;
+  } else {
+    // Fallback to req.url for local development (or if NEXT_PUBLIC_SITE_URL is not set)
+    baseUrl = req.url;
+  }
+
+  // Use the determined base URL to construct the redirect URL
+  const redirectUrl = new URL("/admin/bookings", baseUrl);
+  const res = NextResponse.redirect(redirectUrl);
+
+  return res;
 }

@@ -27,7 +27,7 @@ export async function POST(req: Request) {
     const siteUrl = process.env.SITE_URL;
     let baseUrl: string;
 
-    if (siteUrl) {
+    if (siteUrl === req.url) {
       // Use the external domain if available (best for production/Cloud Run)
       baseUrl = siteUrl;
     } else {
