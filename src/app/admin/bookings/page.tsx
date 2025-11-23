@@ -69,6 +69,10 @@ export default async function AdminBookingsPage() {
         id: p.fileId.toString(),
         filename: p.filename,
       })) ?? [],
+    adminNotes: d.adminNotes,
+    budget: d.budget,
+    durationMinutes: d.durationMinutes,
+    startTime: d.startTime,
   });
 
   const byStatus = {

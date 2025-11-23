@@ -79,7 +79,7 @@ export default function AdminBookingCard({
             <StatusBadge s={booking.status} />
           </div>
           <p className="truncate text-sm text-slate-600"></p>
-          <div className="">
+          <div className=" text-slate-800">
             <div className="flex gap-2 text-sm ">
               <p className="font-semibold">Service:</p>
               {booking.service}
@@ -135,7 +135,7 @@ export default function AdminBookingCard({
           id={`booking-body-${booking._id}`}
           className="px-4 pb-4 pt-2 border-t border-slate-100"
         >
-          <div className="text-sm text-slate-600">
+          <div className="text-sm text-slate-800">
             <div>
               <span className="font-medium">Phone:</span>{" "}
               <a className="underline" href={`tel:${booking.phoneRaw}`}>
@@ -151,7 +151,7 @@ export default function AdminBookingCard({
               </Link>
             </div>
             <div className="flex gap-2">
-              <span>Created at:</span>
+              <span className="font-medium">Created at:</span>
               <p>{created}</p>
             </div>
           </div>
@@ -160,7 +160,7 @@ export default function AdminBookingCard({
             booking.startTime ||
             booking.durationMinutes ||
             booking.adminNotes) && (
-            <div className="mt-3 rounded-lg bg-slate-50 p-3 text-sm text-slate-700">
+            <div className="mt-3 rounded-lg bg-slate-100 p-3 text-sm text-slate-800 border-slate-400">
               <p className="font-semibold mb-1">Job details</p>
               {booking.budget && <p>Budget: €{booking.budget}</p>}
               {booking.startTime && <p>Time: {booking.startTime}</p>}
