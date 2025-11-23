@@ -14,7 +14,7 @@ export type AdminBooking = {
   address: string;
   eircode: string;
   description: string;
-  createdAt:  string;
+  createdAt: string;
   status: "pending" | "confirmed" | "done" | "cancelled";
   photos?: AdminPhoto[];
   budget?: number;
@@ -47,6 +47,15 @@ export default function AdminBookingCard({
   const storageKey = `admin:booking:collapsed:${booking._id}`;
   const [open, setOpen] = useState<boolean>(true);
   const [editing, setEditing] = useState<boolean>(false);
+
+  const created = new Date(booking.createdAt).toLocaleString("en-IE", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true, // <-- ensures am/pm
+  });
 
   // remember per booking
   useEffect(() => {
@@ -141,9 +150,9 @@ export default function AdminBookingCard({
                 Address: {booking.address} · {booking.eircode}
               </Link>
             </div>
-            <div>
+            <div className="flex gap-2">
               <span>Created at:</span>
-              <p>{booking.createdAt}</p>
+              <p>{created}</p>
             </div>
           </div>
 

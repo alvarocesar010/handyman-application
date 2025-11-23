@@ -24,7 +24,7 @@ export async function POST(req: Request) {
     });
 
     // --- 🎯 MODIFIED CODE HERE ---
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+    const siteUrl = process.env.SITE_URL;
     let baseUrl: string;
 
     if (siteUrl) {
