@@ -11,6 +11,7 @@ import {
   Tv,
   Ruler,
   Drill,
+  Bath,
 } from "lucide-react";
 
 export type Service = {
@@ -282,6 +283,125 @@ export const SERVICES: Service[] = [
       },
     ],
     icon: Drill,
+  },
+  {
+    slug: "bathroom-renovation",
+    title: "Bathroom Renovation & Upgrades",
+    summary:
+      "Clean, modern bathroom makeovers for Dublin homes – from small refreshes to full renovations.",
+    longDescription:
+      "We renovate bathrooms in Dublin houses, apartments and rentals – from quick updates to full rip-out and refit. Whether you need a new shower enclosure, updated tiles, better storage or a complete new layout, we manage the work neatly and efficiently. We take care of tiling, fixtures, minor plumbing adjustments, sealing and finishing details so you’re left with a clean, fresh bathroom that’s ready to use. Ideal for landlords, new homeowners and anyone tired of a dated bathroom.",
+    startingPrice: 25000, // €250 – adjust to whatever matches your pricing
+    durationHint:
+      "From 1 day for small updates, up to several days for full renovations",
+
+    categories: {
+      "Full Bathroom Renovation": [
+        "Strip-out of old tiles, fixtures and units",
+        "Preparation of walls and floors for new finishes",
+        "Installation of new bath or walk-in shower",
+        "Fitting new toilet, basin and vanity unit",
+      ],
+      "Partial Upgrades & Refresh": [
+        "Replacing old vanity, basin or toilet",
+        "Upgrading taps, shower mixers and accessories",
+        "New mirrors, cabinets and storage units",
+        "Fresh silicone and sealing around wet areas",
+      ],
+      "Tiling & Wall Finishes": [
+        "Wall and floor tiling in showers and full bathrooms",
+        "Replacing broken or loose tiles",
+        "Re-grouting and grout repairs",
+        "Tiling around baths, basins and splashbacks",
+      ],
+      "Shower & Bath Upgrades": [
+        "Fitting new shower enclosures and doors",
+        "Replacing shower trays and screens",
+        "Upgrading electric or mixer showers (plumber/electrician may be required)",
+        "Finishing with neat sealing and trims",
+      ],
+      "Small Bathrooms & Ensuites": [
+        "Layout tweaks for tight Dublin bathrooms",
+        "Slimline vanity and compact toilet solutions",
+        "Wall-hung storage to free up floor space",
+        "Bright finishes to make small spaces feel larger",
+      ],
+      "Accessibility & Safety": [
+        "Grab rails and support bars fitted securely",
+        "Low-step or walk-in shower options",
+        "Non-slip flooring options",
+        "Comfort-height WC and easy-reach storage",
+      ],
+    },
+
+    categoryImages: {
+      "Full Bathroom Renovation": {
+        src: "/images/services/bathroom/full-renovation.jpg",
+        alt: "Newly renovated modern bathroom in a Dublin home",
+      },
+      "Partial Upgrades & Refresh": {
+        src: "/images/services/bathroom/partial-upgrade.jpg",
+        alt: "Updated bathroom vanity and mirror after a small renovation",
+      },
+      "Tiling & Wall Finishes": {
+        src: "/images/services/bathroom/tiling-waterproofing.jpg",
+        alt: "Bathroom wall and floor tiling being installed",
+      },
+      "Shower & Bath Upgrades": {
+        src: "/images/services/bathroom/shower-upgrade.jpg",
+        alt: "Glass shower enclosure with modern shower tray",
+      },
+      "Small Bathrooms & Ensuites": {
+        src: "/images/services/bathroom/small-bathroom.jpg",
+        alt: "Compact bathroom with bright tiles and clever storage",
+      },
+      "Accessibility & Safety": {
+        src: "/images/services/bathroom/accessibility.jpg",
+        alt: "Walk-in shower with grab rails installed for safety",
+      },
+    },
+
+    inclusions: [
+      "On-site assessment and planning for your bathroom upgrade",
+      "Installation of new fixtures and fittings as requested",
+      "Tile installation, repair and finishing",
+      "Clean and precise silicone sealing",
+      "Final tidy-up and basic clean after completion",
+      "Material supply unless agreed in advance",
+    ],
+
+    // ⚠️ Removed exclusions for plumbing, tiling, accessories, electrical — at your request
+    exclusions: [
+      "Work that requires planning permission or major structural alterations (moving walls, enlarging rooms, etc.)",
+      "Specialised certification-required works outside the agreed renovation scope (e.g., new electrical circuits, boiler relocation, or full re-piping if not included in the quote)",
+      "Hidden problems that require separate approval (e.g., severe mould behind walls, rotten floors, or leaks discovered during demolition)",
+    ],
+
+    faqs: [
+      {
+        q: "Can you help choose bathroom materials and fixtures?",
+        a: "Yes. If you prefer, we can recommend or supply suitable options for tiles, fixtures, cabinets and finishes.",
+      },
+      {
+        q: "Do you work on small bathrooms and ensuites?",
+        a: "Absolutely. Many Dublin bathrooms are compact, and we specialise in making the most of limited space.",
+      },
+      {
+        q: "How long does a bathroom renovation take?",
+        a: "Small upgrades can be completed in a day. Full renovations typically take several days depending on size and complexity.",
+      },
+      {
+        q: "Can you replace only the shower or vanity?",
+        a: "Yes, we also offer partial bathroom upgrades — shower replacement, tiling, vanity installation and more.",
+      },
+      {
+        q: "Do you work with rentals or landlords?",
+        a: "Yes, we regularly renovate bathrooms in rental properties with landlord approval.",
+      },
+    ],
+
+    // use whatever icon set you already have; example with a wrench icon:
+    icon: Bath, // or Bathroom, ShowerHead, etc. from your icon library
   },
   {
     slug: "fit-shower",
