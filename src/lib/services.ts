@@ -12,6 +12,7 @@ import {
   Ruler,
   Drill,
   Bath,
+  Layers,
 } from "lucide-react";
 
 export type Service = {
@@ -32,6 +33,7 @@ export type Service = {
 };
 
 export const SERVICES: Service[] = [
+  // door-service
   {
     slug: "door-services",
     title: "Door Installation & Replacement Services",
@@ -156,29 +158,7 @@ export const SERVICES: Service[] = [
     icon: DoorOpen,
   },
 
-  {
-    slug: "heater-maintenance",
-    title: "Heater Maintenance",
-    summary: "Annual check, cleaning and performance diagnostics (non-gas).",
-    longDescription:
-      "Keep your heating running efficiently. We perform visual safety checks, clean dust/debris, inspect connections, test controls and thermostats, and produce a short report with recommendations. For gas appliances requiring RGII certification we coordinate with a registered gas installer.",
-    startingPrice: 9000,
-    durationHint: "60–90 minutes",
-    inclusions: [
-      "Safety & visual checks",
-      "Cleaning",
-      "Controls tested",
-      "Report",
-    ],
-    exclusions: ["RGII gas certification", "Parts not included"],
-    faqs: [
-      {
-        q: "Do you work on all brands?",
-        a: "Yes—most common household brands. For out-of-support units we’ll advise options.",
-      },
-    ],
-    icon: Heater,
-  },
+  // furniture-assembly
   {
     slug: "furniture-assembly",
     title: "Furniture Assembly & Installation",
@@ -284,6 +264,25 @@ export const SERVICES: Service[] = [
     ],
     icon: Drill,
   },
+  // curtain-installation
+  {
+    slug: "curtain-installation",
+    title: "Curtain & Blinds Installation",
+    summary: "Professional fitting of curtains and blinds, safely and neatly.",
+    longDescription:
+      "Our experts can install all types of curtains and blinds, ensuring a perfect fit and secure fixings. We measure and mark positions accurately, drill and fit brackets, hang curtains or blinds, and make sure everything is level and smooth. We’ll also tidy up the area and remove any packaging when finished.",
+    startingPrice: 5000,
+    durationHint: "Varies by number of windows",
+    inclusions: [
+      "Accurate measurement and marking",
+      "Secure bracket installation",
+      "Curtains or blinds fitted and aligned",
+      "Safety check of all fittings",
+      "Area cleaned and packaging removed",
+    ],
+    icon: Ruler,
+  },
+  // bathroom-renovation
   {
     slug: "bathroom-renovation",
     title: "Bathroom Renovation & Upgrades",
@@ -403,6 +402,102 @@ export const SERVICES: Service[] = [
     // use whatever icon set you already have; example with a wrench icon:
     icon: Bath, // or Bathroom, ShowerHead, etc. from your icon library
   },
+  // laminate-flooring
+  {
+    slug: "laminate-flooring-installation",
+    title: "Laminate Flooring Installation",
+    summary:
+      "Laminate flooring installed professionally — with old floor removal, subfloor prep, and finishing included.",
+    longDescription:
+      "We install laminate flooring in homes and apartments across Dublin — ideal for bedrooms, living rooms, hallways, and more. You can supply your own laminate and underlay, or we can recommend and provide durable, stylish options to suit your needs. Our service includes removal of old flooring, subfloor preparation, precise installation, fitting of trims and thresholds, and a tidy finish. Whether it’s a new home or a refresh of an existing space, we ensure a professional result.",
+    startingPrice: 2500, // €25/m²
+    durationHint: "1–2 days for most rooms; time depends on size and layout",
+
+    categories: {
+      "Living & Bedrooms": [
+        "Laminate flooring installation in bedrooms and lounges",
+        "Removal of old laminate, carpet, or vinyl",
+        "Underlay fitting and board layout planning",
+        "Thresholds and finishing trims included",
+      ],
+      "Hallways & Entryways": [
+        "Hard-wearing laminate installation for busy areas",
+        "Straight and angled layouts for tricky hallway shapes",
+        "Neat joins to adjacent flooring types",
+        "Durable trims and scuff protection",
+      ],
+      "Laminate Supply & Advice": [
+        "You can supply your own laminate and underlay",
+        "We can also supply high-quality laminate options",
+        "Advice on styles, colours, and water-resistant options",
+        "Delivery coordination for supplied materials",
+      ],
+      "Floor Prep & Finishing": [
+        "Inspection and basic levelling of subfloor",
+        "Vapour barrier and underlay fitting (if required)",
+        "Edge finishing with beading or scotia trims",
+        "Final clean-up and floor ready to walk on",
+      ],
+    },
+
+    categoryImages: {
+      "Living & Bedrooms": {
+        src: "/images/services/flooring/living-bedroom.jpg",
+        alt: "Laminate flooring installed in a bright living room",
+      },
+      "Hallways & Entryways": {
+        src: "/images/services/flooring/hallway-floor.jpg",
+        alt: "Laminate floor fitted neatly in a hallway with trims",
+      },
+      "Laminate Supply & Advice": {
+        src: "/images/services/flooring/floor-samples.jpg",
+        alt: "Selection of laminate flooring samples being reviewed",
+      },
+      "Floor Prep & Finishing": {
+        src: "/images/services/flooring/subfloor-prep.jpg",
+        alt: "Laminate flooring installation with underlay and trim",
+      },
+    },
+
+    inclusions: [
+      "Removal of old laminate or carpet (if required)",
+      "Inspection and basic subfloor preparation",
+      "Installation of underlay and laminate boards",
+      "Cutting and fitting of trims and thresholds",
+      "Final tidy-up and area ready for use",
+    ],
+    exclusions: [
+      "Major subfloor repairs (e.g., concrete levelling or rot repair)",
+      "Skirting board removal or replacement unless agreed",
+      "Custom stair nosings or step work unless quoted separately",
+    ],
+
+    faqs: [
+      {
+        q: "Can I supply my own laminate and underlay?",
+        a: "Yes, you're welcome to supply your own. We’ll confirm compatibility and let you know if anything else is needed.",
+      },
+      {
+        q: "Do you remove the old flooring?",
+        a: "Yes, we can remove old laminate, carpet, or vinyl as part of the service. Please mention this when booking.",
+      },
+      {
+        q: "Do you level the floor before laying laminate?",
+        a: "We handle basic levelling to ensure a clean installation. If major levelling is required, we’ll discuss it during the quote.",
+      },
+      {
+        q: "Can you supply the laminate flooring?",
+        a: "Yes – we can recommend and supply good quality laminate and underlay to match your budget and needs.",
+      },
+      {
+        q: "What areas of the home can you install laminate in?",
+        a: "We install laminate in bedrooms, living rooms, hallways, home offices and more – anywhere dry and suitable for laminate.",
+      },
+    ],
+
+    icon: Layers, // or Flooring, Ruler, Home – depending on your icon set
+  },
+  // fit-shower
   {
     slug: "fit-shower",
     title: "Fit Shower",
@@ -433,6 +528,31 @@ export const SERVICES: Service[] = [
     ],
     icon: ShowerHead,
   },
+  // heater-maintenance
+  {
+    slug: "heater-maintenance",
+    title: "Heater Maintenance",
+    summary: "Annual check, cleaning and performance diagnostics (non-gas).",
+    longDescription:
+      "Keep your heating running efficiently. We perform visual safety checks, clean dust/debris, inspect connections, test controls and thermostats, and produce a short report with recommendations. For gas appliances requiring RGII certification we coordinate with a registered gas installer.",
+    startingPrice: 9000,
+    durationHint: "60–90 minutes",
+    inclusions: [
+      "Safety & visual checks",
+      "Cleaning",
+      "Controls tested",
+      "Report",
+    ],
+    exclusions: ["RGII gas certification", "Parts not included"],
+    faqs: [
+      {
+        q: "Do you work on all brands?",
+        a: "Yes—most common household brands. For out-of-support units we’ll advise options.",
+      },
+    ],
+    icon: Heater,
+  },
+  // fit-washing-dishwasher
   {
     slug: "fit-washing-dishwasher",
     title: "Fit Washing Machine & Dishwasher",
@@ -450,6 +570,7 @@ export const SERVICES: Service[] = [
     ],
     icon: WashingMachine,
   },
+  // tap-replacement
   {
     slug: "tap-replacement",
     title: "Tap Replacement",
@@ -465,6 +586,7 @@ export const SERVICES: Service[] = [
     ],
     icon: Droplet,
   },
+  // lights-replacement
   {
     slug: "lights-replacement",
     title: "Lights Replacement",
@@ -476,6 +598,7 @@ export const SERVICES: Service[] = [
     inclusions: ["Remove old fitting", "Install new fitting", "Basic testing"],
     icon: Lightbulb,
   },
+  // eletrical-repairs
   {
     slug: "electrical-repairs",
     title: "Electrical Repairs",
@@ -491,6 +614,7 @@ export const SERVICES: Service[] = [
     ],
     icon: Zap,
   },
+  // tv-assembly
   {
     slug: "tv-assembly",
     title: "TV Assembly & Installation",
@@ -509,23 +633,8 @@ export const SERVICES: Service[] = [
     ],
     icon: Tv,
   },
-  {
-    slug: "curtain-installation",
-    title: "Curtain & Blinds Installation",
-    summary: "Professional fitting of curtains and blinds, safely and neatly.",
-    longDescription:
-      "Our experts can install all types of curtains and blinds, ensuring a perfect fit and secure fixings. We measure and mark positions accurately, drill and fit brackets, hang curtains or blinds, and make sure everything is level and smooth. We’ll also tidy up the area and remove any packaging when finished.",
-    startingPrice: 5000,
-    durationHint: "Varies by number of windows",
-    inclusions: [
-      "Accurate measurement and marking",
-      "Secure bracket installation",
-      "Curtains or blinds fitted and aligned",
-      "Safety check of all fittings",
-      "Area cleaned and packaging removed",
-    ],
-    icon: Ruler,
-  },
+
+  // shower-repair
   {
     slug: "shower-repair",
     title: "Shower Repair & Maintenance",

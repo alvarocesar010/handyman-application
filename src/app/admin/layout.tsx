@@ -13,6 +13,9 @@ export default function AdminLayout({
           <Link className="hover:underline" href="/admin/bookings">
             Bookings
           </Link>
+          <Link className="hover:underline" href="/admin/create-booking">
+            Create Book
+          </Link>
           <Link className="hover:underline" href="/">
             ← Site
           </Link>
