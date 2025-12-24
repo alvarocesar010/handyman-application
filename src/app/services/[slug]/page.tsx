@@ -6,6 +6,7 @@ import { SERVICE_MAP, SERVICES } from "@/lib/services";
 import type { Metadata } from "next";
 import { absUrl, pageTitle, SITE } from "@/lib/seo";
 import { CalendarCheck, Phone } from "lucide-react";
+import ReviewsBox from "@/components/ReviewsBox";
 
 type Params = { slug: string };
 
@@ -176,6 +177,9 @@ export default function ServiceDetailPage({ params }: { params: Params }) {
             </ul>
           </div>
         </section>
+
+        {/* Reviews */}
+        <ReviewsBox serviceSlug={svc.slug} />
 
         {/* FAQs */}
         {svc.faqs && svc.faqs.length > 0 && (
