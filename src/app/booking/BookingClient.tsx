@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { toast } from "react-toastify";
@@ -119,6 +119,10 @@ export default function BookingClient() {
   const [error, setError] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // NEW: refs for hidden inputs
+  const cameraInputRef = useRef<HTMLInputElement | null>(null);
+  const galleryInputRef = useRef<HTMLInputElement | null>(null);
+
   useEffect(() => {
     const raw = search.get("service") ?? search.get("type");
     const chosen = findServiceSlug(raw);
@@ -173,6 +177,14 @@ export default function BookingClient() {
     });
   }
 
+  // NEW: cleanup helper to avoid leaking object URLs
+  function clearPhotos() {
+    setPhotos((prev) => {
+      prev.forEach((p) => URL.revokeObjectURL(p.url));
+      return [];
+    });
+  }
+
   /* --------------------------------- Submit ---------------------------------- */
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -203,7 +215,7 @@ export default function BookingClient() {
 
       toast.success("Booking request sent! We'll confirm shortly.");
       form.reset();
-      setPhotos([]);
+      clearPhotos();
     } catch (err: unknown) {
       toast.error(
         getErrorMessage(err) || "Something went wrong. Please try again."
@@ -311,13 +323,54 @@ export default function BookingClient() {
           <label className="text-sm font-medium text-slate-700">
             Add photos (optional)
           </label>
+
+          {/* Hidden inputs */}
           <input
+            ref={cameraInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
+            capture="environment"
+            onChange={onFilesChange}
+            className="hidden"
+          />
+
+          <input
+            ref={galleryInputRef}
             type="file"
             accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
             multiple
             onChange={onFilesChange}
-            className="block w-full rounded-md border border-slate-300 file:mr-3 file:rounded-md file:border-0 file:bg-cyan-700 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-cyan-800"
+            className="hidden"
           />
+
+          {/* Visible buttons */}
+          <div className="flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={() => cameraInputRef.current?.click()}
+              className="inline-flex items-center justify-center rounded-md bg-cyan-700 px-4 py-2 text-sm font-medium text-white hover:bg-cyan-800"
+            >
+              Take photo
+            </button>
+
+            <button
+              type="button"
+              onClick={() => galleryInputRef.current?.click()}
+              className="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+            >
+              Choose from gallery
+            </button>
+
+            {photos.length > 0 && (
+              <button
+                type="button"
+                onClick={clearPhotos}
+                className="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+              >
+                Clear
+              </button>
+            )}
+          </div>
 
           {photos.length > 0 && (
             <div className="mt-2 grid grid-cols-3 gap-3 sm:grid-cols-4">
