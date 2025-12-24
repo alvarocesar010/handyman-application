@@ -8,6 +8,6 @@ export type Review = {
   rating: number; // 1..5
   opinion: string;
 
-  photoUrls: string[];
-  createdAtISO: string; // ISO string stored in DB
+  photoUrls: string[]; // GCS public URLs
+  createdAtISO: string; // ISO stored in DB
 };

@@ -65,19 +65,16 @@ export default function ReviewsBox({ serviceSlug }: { serviceSlug: string }) {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // form
   const [customerName, setCustomerName] = useState("");
   const [rating, setRating] = useState(5);
-  const [opinion, setOpinion] = useState(""); // ✅ NEW
+  const [opinion, setOpinion] = useState("");
   const [photos, setPhotos] = useState<LocalPhoto[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  // camera/gallery inputs
   const cameraRef = useRef<HTMLInputElement | null>(null);
   const galleryRef = useRef<HTMLInputElement | null>(null);
 
-  // lightbox
   const [lightbox, setLightbox] = useState<{
     open: boolean;
     reviewIndex: number;
@@ -154,19 +151,10 @@ export default function ReviewsBox({ serviceSlug }: { serviceSlug: string }) {
     if (submitting) return;
     setError("");
 
-    if (!customerName.trim()) {
-      setError("Please enter your name.");
-      return;
-    }
-
-    if (!opinion.trim()) {
-      setError("Please write your review.");
-      return;
-    }
-
+    if (!customerName.trim()) return setError("Please enter your name.");
+    if (!opinion.trim()) return setError("Please write your review.");
     if (opinion.trim().length > MAX_OPINION_LEN) {
-      setError(`Review must be ${MAX_OPINION_LEN} characters or less.`);
-      return;
+      return setError(`Review must be ${MAX_OPINION_LEN} characters or less.`);
     }
 
     setSubmitting(true);
@@ -175,7 +163,7 @@ export default function ReviewsBox({ serviceSlug }: { serviceSlug: string }) {
       fd.set("serviceSlug", serviceSlug);
       fd.set("customerName", customerName.trim());
       fd.set("rating", String(rating));
-      fd.set("opinion", opinion.trim()); // ✅ NEW
+      fd.set("opinion", opinion.trim());
       photos.forEach((p) => fd.append("photos", p.file));
 
       const res = await fetch("/api/reviews", { method: "POST", body: fd });
@@ -184,9 +172,8 @@ export default function ReviewsBox({ serviceSlug }: { serviceSlug: string }) {
 
       setCustomerName("");
       setRating(5);
-      setOpinion(""); // ✅ NEW
+      setOpinion("");
       clearLocalPhotos();
-
       await load();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to submit review.");
@@ -202,7 +189,6 @@ export default function ReviewsBox({ serviceSlug }: { serviceSlug: string }) {
   function nextPhoto(delta: number) {
     const r = reviews[lightbox.reviewIndex];
     if (!r?.photoUrls?.length) return;
-
     const total = r.photoUrls.length;
     const next = (lightbox.photoIndex + delta + total) % total;
     setLightbox((s) => ({ ...s, photoIndex: next }));
@@ -228,7 +214,7 @@ export default function ReviewsBox({ serviceSlug }: { serviceSlug: string }) {
               value={customerName}
               onChange={(e) => setCustomerName(e.target.value)}
               className="rounded-md border border-slate-300 px-3 py-2"
-              placeholder="e.g., John"
+              placeholder="e.g., Aoife"
             />
           </div>
 
@@ -240,7 +226,7 @@ export default function ReviewsBox({ serviceSlug }: { serviceSlug: string }) {
           </div>
         </div>
 
-        {/* ✅ NEW: opinion textarea */}
+        {/* Opinion */}
         <div className="grid gap-1">
           <label className="text-sm font-medium text-slate-700">
             Your review
@@ -346,7 +332,7 @@ export default function ReviewsBox({ serviceSlug }: { serviceSlug: string }) {
         {error && <p className="text-sm text-rose-700">{error}</p>}
       </div>
 
-      {/* Reviews list (fixed height + scroll) */}
+      {/* Reviews list */}
       <div className="space-y-3">
         {loading ? (
           <p className="text-sm text-slate-500">Loading reviews…</p>
@@ -371,7 +357,6 @@ export default function ReviewsBox({ serviceSlug }: { serviceSlug: string }) {
                   <Stars value={r.rating} />
                 </div>
 
-                {/* ✅ NEW: show opinion */}
                 <p className="mt-2 text-slate-700 whitespace-pre-line">
                   {r.opinion}
                 </p>
@@ -428,7 +413,6 @@ export default function ReviewsBox({ serviceSlug }: { serviceSlug: string }) {
             </button>
           </div>
 
-          {/* also show opinion near big photo */}
           <p className="text-slate-700 whitespace-pre-line">
             {reviews[lightbox.reviewIndex]?.opinion}
           </p>
