@@ -1,10 +1,20 @@
 import { Storage } from "@google-cloud/storage";
 
-const bucketName = process.env.GCS_BUCKET_NAME;
-if (!bucketName) throw new Error("Missing GCS_BUCKET_NAME");
+let cachedStorage: Storage | null = null;
 
-const storage = new Storage();
-const bucket = storage.bucket(bucketName);
+function getStorage() {
+  if (!cachedStorage) cachedStorage = new Storage();
+  return cachedStorage;
+}
+
+function getBucketName(): string {
+  const name = process.env.GCS_BUCKET_NAME;
+  if (!name) {
+    // IMPORTANT: only throw at runtime (when a request happens)
+    throw new Error("Missing GCS_BUCKET_NAME");
+  }
+  return name;
+}
 
 function safeSlug(slug: string) {
   return slug.toLowerCase().replace(/[^a-z0-9-_]/g, "");
@@ -16,11 +26,15 @@ function inferExt(mime: string) {
   return "webp";
 }
 
+/** Uploads image and returns object path (not URL) */
 export async function uploadReviewImage(opts: {
   serviceSlug: string;
   file: File;
 }) {
   const { serviceSlug, file } = opts;
+
+  const storage = getStorage();
+  const bucket = storage.bucket(getBucketName());
 
   const slug = safeSlug(serviceSlug);
   const ext = inferExt(file.type);
@@ -29,20 +43,21 @@ export async function uploadReviewImage(opts: {
     .toString(16)
     .slice(2)}.${ext}`;
 
-  const gcsFile = bucket.file(objectPath);
   const buffer = Buffer.from(await file.arrayBuffer());
 
-  await gcsFile.save(buffer, {
+  await bucket.file(objectPath).save(buffer, {
     resumable: false,
     contentType: file.type,
-    metadata: { cacheControl: "public, max-age=31536000, immutable" },
   });
 
-  // ⬅️ return ONLY the object path
   return objectPath;
 }
 
+/** Generates a temporary signed URL */
 export async function signImage(objectPath: string, expiresSeconds = 3600) {
+  const storage = getStorage();
+  const bucket = storage.bucket(getBucketName());
+
   const [url] = await bucket.file(objectPath).getSignedUrl({
     version: "v4",
     action: "read",
