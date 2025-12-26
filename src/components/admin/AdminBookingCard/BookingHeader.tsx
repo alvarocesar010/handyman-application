@@ -77,7 +77,7 @@ export default function BookingHeader({
             </div>
 
             {/* Short description visible even minimized */}
-            <p className="mt-2 line-clamp-3 whitespace-pre-line text-slate-700">
+            <p className="my-4 line-clamp-3 whitespace-pre-line text-slate-800">
               {booking.description}
             </p>
           </div>

@@ -14,10 +14,6 @@ export default function BookingBody({ booking }: { booking: AdminBooking }) {
     <div className="px-4 pb-4 pt-2 border-t border-slate-100">
       <BookingDonePanel booking={booking} />
 
-      <p className="mt-3 whitespace-pre-line text-slate-700">
-        {booking.description}
-      </p>
-
       <BookingPhotos photos={booking.photos} />
 
       {editing && (

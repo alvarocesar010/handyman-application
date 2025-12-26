@@ -5,14 +5,19 @@ import type { AdminBooking } from "./types";
 import { calcDurationMinutes, formatEuro, minutesToHM } from "./utils";
 
 type EditorValues = {
+  serviceDate: string;
+
   budget: string;
   startTime: string;
   durationMinutes: string;
+
   amountReceived: string;
   tipReceived: string;
   finishTime: string;
+
   adminNotes: string;
-  serviceDate: string;
+
+  status: AdminBooking["status"];
 };
 
 export default function BookingDetailsEditor({
@@ -28,10 +33,14 @@ export default function BookingDetailsEditor({
     budget: booking.budget?.toString() ?? "",
     startTime: booking.startTime ?? "",
     durationMinutes: booking.durationMinutes?.toString() ?? "",
+
     amountReceived: booking.amountReceived?.toString() ?? "",
     tipReceived: booking.tipReceived?.toString() ?? "",
     finishTime: booking.finishTime ?? "",
+
     adminNotes: booking.adminNotes ?? "",
+
+    status: booking.status,
   });
 
   const actualMinutes = useMemo(() => {
@@ -47,7 +56,7 @@ export default function BookingDetailsEditor({
   const avgPerHour = useMemo(() => {
     const received = Number(values.amountReceived);
     if (!Number.isFinite(received) || received <= 0) return "—";
-    if (!actualMinutes || actualMinutes <= 0) return "—";
+    if (actualMinutes == null || actualMinutes <= 0) return "—";
     const hours = actualMinutes / 60;
     return `${formatEuro(received / hours)}/h`;
   }, [values.amountReceived, actualMinutes]);
@@ -59,13 +68,46 @@ export default function BookingDetailsEditor({
       className="mt-4 space-y-3 rounded-lg border border-slate-200 bg-slate-50 p-3"
     >
       <input type="hidden" name="id" value={booking._id} />
+
+      {/* ✅ save computed duration */}
       <input
         type="hidden"
         name="actualDurationMinutes"
-        value={actualMinutes ?? ""}
+        value={actualMinutes == null ? "" : String(actualMinutes)}
       />
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <Field label="Status">
+          <select
+            name="status"
+            value={values.status}
+            onChange={(e) =>
+              setValues((p) => ({
+                ...p,
+                status: e.target.value as AdminBooking["status"],
+              }))
+            }
+            className="w-full rounded-md border border-slate-300 px-2 py-2 text-sm"
+          >
+            <option value="pending">pending</option>
+            <option value="confirmed">confirmed</option>
+            <option value="done">done</option>
+            <option value="cancelled">cancelled</option>
+          </select>
+        </Field>
+
+        <Field label="Service date (real)">
+          <input
+            type="date"
+            name="serviceDate"
+            value={values.serviceDate}
+            onChange={(e) =>
+              setValues((p) => ({ ...p, serviceDate: e.target.value }))
+            }
+            className="w-full rounded-md border border-slate-300 px-2 py-2 text-sm"
+          />
+        </Field>
+
         <Field label="Budget (€)">
           <input
             type="number"
@@ -75,7 +117,8 @@ export default function BookingDetailsEditor({
             onChange={(e) =>
               setValues((p) => ({ ...p, budget: e.target.value }))
             }
-            className="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+            className="w-full rounded-md border border-slate-300 px-2 py-2 text-sm"
+            min={0}
           />
         </Field>
 
@@ -87,7 +130,7 @@ export default function BookingDetailsEditor({
             onChange={(e) =>
               setValues((p) => ({ ...p, startTime: e.target.value }))
             }
-            className="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+            className="w-full rounded-md border border-slate-300 px-2 py-2 text-sm"
           />
         </Field>
 
@@ -100,18 +143,8 @@ export default function BookingDetailsEditor({
             onChange={(e) =>
               setValues((p) => ({ ...p, durationMinutes: e.target.value }))
             }
-            className="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
-          />
-        </Field>
-        <Field label="Service date (real)">
-          <input
-            type="date"
-            name="serviceDate"
-            value={values.serviceDate}
-            onChange={(e) =>
-              setValues((p) => ({ ...p, serviceDate: e.target.value }))
-            }
-            className="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+            className="w-full rounded-md border border-slate-300 px-2 py-2 text-sm"
+            min={0}
           />
         </Field>
 
@@ -124,7 +157,7 @@ export default function BookingDetailsEditor({
             onChange={(e) =>
               setValues((p) => ({ ...p, amountReceived: e.target.value }))
             }
-            className="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+            className="w-full rounded-md border border-slate-300 px-2 py-2 text-sm"
             min={0}
           />
         </Field>
@@ -138,7 +171,7 @@ export default function BookingDetailsEditor({
             onChange={(e) =>
               setValues((p) => ({ ...p, tipReceived: e.target.value }))
             }
-            className="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+            className="w-full rounded-md border border-slate-300 px-2 py-2 text-sm"
             min={0}
           />
         </Field>
@@ -151,7 +184,7 @@ export default function BookingDetailsEditor({
             onChange={(e) =>
               setValues((p) => ({ ...p, finishTime: e.target.value }))
             }
-            className="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+            className="w-full rounded-md border border-slate-300 px-2 py-2 text-sm"
           />
         </Field>
 
@@ -176,7 +209,7 @@ export default function BookingDetailsEditor({
           onChange={(e) =>
             setValues((p) => ({ ...p, adminNotes: e.target.value }))
           }
-          className="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+          className="w-full rounded-md border border-slate-300 px-2 py-2 text-sm"
         />
       </Field>
 
@@ -184,13 +217,13 @@ export default function BookingDetailsEditor({
         <button
           type="button"
           onClick={onClose}
-          className="rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-100"
+          className="rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-700 hover:bg-slate-100"
         >
           Cancel
         </button>
         <button
           type="submit"
-          className="rounded-md bg-cyan-700 px-3 py-1.5 text-sm text-white hover:bg-cyan-800"
+          className="rounded-md bg-cyan-700 px-3 py-2 text-sm text-white hover:bg-cyan-800"
         >
           Save details
         </button>
