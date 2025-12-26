@@ -1,23 +1,24 @@
 import { getDb } from "@/lib/mongodb";
-import { ObjectId, type Filter } from "mongodb";
-
-import AdminBookingsFilters from "@/components/admin/AdminBookingCard/AdminBookingsFilters";
+import { ObjectId } from "mongodb";
 import AdminBookingsSection from "@/components/admin/AdminBookingCard/AdminBookingsSection";
+import AdminBookingsFilters from "@/components/admin/AdminBookingCard/AdminBookingsFilters";
 import type { AdminBooking } from "@/components/admin/AdminBookingCard/types";
 
 export const dynamic = "force-dynamic";
 
+type Preset = "today" | "week" | "month" | "custom";
+type Bucket = "day" | "week" | "month";
+
 type DbBooking = {
   _id: ObjectId;
   service: string;
-  date: string; // YYYY-MM-DD
+  date: string; // preferred YYYY-MM-DD
+  serviceDate?: string; // real YYYY-MM-DD
   name: string;
   phoneRaw: string;
   address: string;
   eircode: string;
   description: string;
-  serviceDate?: string;
-
   status: "pending" | "confirmed" | "done" | "cancelled";
   photos?: { fileId: ObjectId; filename: string }[];
   createdAt: Date | string;
@@ -33,154 +34,102 @@ type DbBooking = {
   actualDurationMinutes?: number;
 };
 
-type Range = "day" | "week" | "month" | "all";
+function isISODate(s: string): boolean {
+  return /^\d{4}-\d{2}-\d{2}$/.test(s);
+}
 
-function toISODateOnly(d: Date) {
+function toISODateOnly(d: Date): string {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, "0");
   const day = String(d.getDate()).padStart(2, "0");
   return `${y}-${m}-${day}`;
 }
 
-// Monday-start week (current week)
-function getWeekRange(now: Date) {
-  const day = now.getDay(); // 0..6 (Sun..Sat)
-  const diff = day === 0 ? 6 : day - 1;
-  const start = new Date(now);
-  start.setHours(0, 0, 0, 0);
-  start.setDate(now.getDate() - diff);
+function resolveRange(sp: Record<string, string | string[] | undefined>) {
+  const preset = (
+    typeof sp.preset === "string" ? sp.preset : "month"
+  ) as Preset;
+  const bucket = (typeof sp.bucket === "string" ? sp.bucket : "day") as Bucket;
 
-  const end = new Date(start);
-  end.setDate(start.getDate() + 6);
-
-  return { from: toISODateOnly(start), to: toISODateOnly(end) };
-}
-
-function getMonthRange(now: Date) {
-  const start = new Date(now.getFullYear(), now.getMonth(), 1);
-  const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-  return { from: toISODateOnly(start), to: toISODateOnly(end) };
-}
-
-function getDayRange(now: Date) {
-  const d = toISODateOnly(now);
-  return { from: d, to: d };
-}
-
-// ---------- Week-of-month helpers (3.2) ----------
-
-function addDaysISO(iso: string, days: number) {
-  // Use UTC to avoid timezone shifting day
-  const d = new Date(`${iso}T00:00:00.000Z`);
-  d.setUTCDate(d.getUTCDate() + days);
-  const y = d.getUTCFullYear();
-  const m = String(d.getUTCMonth() + 1).padStart(2, "0");
-  const day = String(d.getUTCDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
-}
-
-function getMonthRangeISO(now: Date) {
-  const start = new Date(Date.UTC(now.getFullYear(), now.getMonth(), 1));
-  const end = new Date(Date.UTC(now.getFullYear(), now.getMonth() + 1, 0));
-
-  const toISO = (d: Date) => {
-    const y = d.getUTCFullYear();
-    const m = String(d.getUTCMonth() + 1).padStart(2, "0");
-    const day = String(d.getUTCDate()).padStart(2, "0");
-    return `${y}-${m}-${day}`;
-  };
-
-  return { from: toISO(start), to: toISO(end) };
-}
-
-/**
- * Week-of-month = 1..5
- * Week 1 = days 1-7
- * Week 2 = days 8-14
- * Week 3 = days 15-21
- * Week 4 = days 22-28
- * Week 5 = days 29-end
- */
-function getWeekOfMonthRange(now: Date, weekOfMonth: number) {
-  const { from: monthFrom, to: monthTo } = getMonthRangeISO(now);
-  const startDayOffset = (weekOfMonth - 1) * 7; // 0,7,14,21,28
-
-  const from = addDaysISO(monthFrom, startDayOffset);
-  const toCandidate = addDaysISO(from, 6);
-  const to = toCandidate > monthTo ? monthTo : toCandidate;
-
-  return { from, to };
-}
-
-// ---------- End week-of-month helpers ----------
-
-function getRange(range: Range) {
   const now = new Date();
-  if (range === "day") return { range, ...getDayRange(now) };
-  if (range === "week") return { range, ...getWeekRange(now) };
-  if (range === "month") return { range, ...getMonthRange(now) };
-  return { range: "all" as const, from: "", to: "" };
+  let from = typeof sp.from === "string" ? sp.from : "";
+  let to = typeof sp.to === "string" ? sp.to : "";
+
+  if (preset === "today") {
+    const iso = toISODateOnly(now);
+    from = iso;
+    to = iso;
+  }
+
+  if (preset === "week") {
+    const day = now.getDay();
+    const diff = day === 0 ? 6 : day - 1;
+    const f = new Date(now);
+    f.setDate(now.getDate() - diff);
+    from = toISODateOnly(f);
+    to = toISODateOnly(now);
+  }
+
+  if (preset === "month") {
+    const f = new Date(now.getFullYear(), now.getMonth(), 1);
+    from = toISODateOnly(f);
+    to = toISODateOnly(now);
+  }
+
+  if (preset === "custom") {
+    // keep from/to from url, but ensure valid
+    if (!isISODate(from) || !isISODate(to)) {
+      const f = new Date(now.getFullYear(), now.getMonth(), 1);
+      from = toISODateOnly(f);
+      to = toISODateOnly(now);
+    }
+  }
+
+  const safeBucket: Bucket =
+    bucket === "day" || bucket === "week" || bucket === "month"
+      ? bucket
+      : "day";
+
+  return { preset, bucket: safeBucket, from, to };
+}
+
+function effectiveISO(d: DbBooking): string {
+  return d.serviceDate && isISODate(d.serviceDate) ? d.serviceDate : d.date;
+}
+
+function inRange(dateISO: string, from: string, to: string): boolean {
+  return dateISO >= from && dateISO <= to;
 }
 
 export default async function AdminBookingsPage({
   searchParams,
 }: {
-  searchParams?: Record<string, string | string[] | undefined>;
+  searchParams: Record<string, string | string[] | undefined>;
 }) {
-  const rangeParam = (searchParams?.range ?? "month") as Range;
-
-  const wRaw = searchParams?.w;
-  const weekOfMonth =
-    typeof wRaw === "string"
-      ? Number(wRaw)
-      : Array.isArray(wRaw)
-      ? Number(wRaw[0])
-      : 0;
-
-  let rangeInfo = getRange(rangeParam);
-
-  // Apply week-of-month only when range=month and w is 1..5
-  if (
-    rangeParam === "month" &&
-    Number.isFinite(weekOfMonth) &&
-    weekOfMonth >= 1 &&
-    weekOfMonth <= 5
-  ) {
-    const now = new Date();
-    const weekRange = getWeekOfMonthRange(now, weekOfMonth);
-    rangeInfo = {
-      range: "month" as const,
-      from: weekRange.from,
-      to: weekRange.to,
-    };
-  }
+  const range = resolveRange(searchParams);
 
   const db = await getDb();
-
-  const query: Filter<DbBooking> =
-    rangeInfo.range === "all"
-      ? {}
-      : { date: { $gte: rangeInfo.from, $lte: rangeInfo.to } };
-
   const docs = (await db
     .collection<DbBooking>("bookings")
-    .find(query)
-    // ✅ most recent first
-    .sort({ date: -1, createdAt: -1 })
-    .limit(600)
+    .find({})
+    .sort({ createdAt: -1 }) // ✅ most recent first
+    .limit(2000)
     .toArray()) as DbBooking[];
+
+  const filtered = docs.filter((d) =>
+    inRange(effectiveISO(d), range.from, range.to)
+  );
 
   const toView = (d: DbBooking): AdminBooking => ({
     _id: d._id.toString(),
     service: d.service,
     date: d.date,
+    serviceDate: d.serviceDate,
     name: d.name,
     phoneRaw: d.phoneRaw,
     address: d.address,
     eircode: d.eircode,
     description: d.description,
-    serviceDate: d.serviceDate,
-
     status: d.status,
     createdAt: d.createdAt ? d.createdAt.toString() : "",
     photos:
@@ -200,41 +149,31 @@ export default async function AdminBookingsPage({
     actualDurationMinutes: d.actualDurationMinutes,
   });
 
-  const byStatus = {
-    confirmed: [] as AdminBooking[],
-    pending: [] as AdminBooking[],
-    done: [] as AdminBooking[],
-    cancelled: [] as AdminBooking[],
+  const byStatus: Record<AdminBooking["status"], AdminBooking[]> = {
+    confirmed: [],
+    pending: [],
+    done: [],
+    cancelled: [],
   };
 
-  docs.forEach((d) => {
+  for (const d of filtered) {
     const v = toView(d);
     byStatus[v.status].push(v);
-  });
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold text-slate-900">Bookings</h2>
-        <form action="/api/admin/bookings/reindex" method="post">
-          <button className="rounded-md border px-3 py-1.5 text-sm">
-            Reindex
-          </button>
-        </form>
       </div>
 
-      <AdminBookingsFilters
-        currentRange={rangeInfo.range}
-        from={rangeInfo.from}
-        to={rangeInfo.to}
-      />
+      {/* ✅ exactly like dashboard controls */}
+      <AdminBookingsFilters />
 
-      <div className="grid gap-6">
-        <AdminBookingsSection title="Confirmed" items={byStatus.confirmed} />
-        <AdminBookingsSection title="Pending" items={byStatus.pending} />
-        <AdminBookingsSection title="Done" items={byStatus.done} />
-        <AdminBookingsSection title="Cancelled" items={byStatus.cancelled} />
-      </div>
+      <AdminBookingsSection title="Confirmed" items={byStatus.confirmed} />
+      <AdminBookingsSection title="Pending" items={byStatus.pending} />
+      <AdminBookingsSection title="Done" items={byStatus.done} />
+      <AdminBookingsSection title="Cancelled" items={byStatus.cancelled} />
     </div>
   );
 }

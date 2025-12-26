@@ -18,7 +18,7 @@ export default function AdminBookingsSection({
 
       {/* full width + scroll sem borda pesada */}
       <div className="w-full">
-        <div className="max-h-[520px] overflow-y-auto pr-1">
+        <div className="max-h-[8git 0vh] overflow-y-auto pr-1">
           <div className="grid gap-4">
             {items.map((b) => (
               <AdminBookingCard key={b._id} booking={b} />
