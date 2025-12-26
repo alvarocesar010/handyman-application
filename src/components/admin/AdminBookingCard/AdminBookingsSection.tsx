@@ -9,20 +9,20 @@ export default function AdminBookingsSection({
   items: AdminBooking[];
 }) {
   return (
-    <section className="space-y-3">
+    <section className="space-y-2">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-slate-900">
           {title} <span className="text-slate-500">({items.length})</span>
         </h3>
       </div>
 
-      {/* full width + scroll sem borda pesada */}
-      <div className="w-full">
-        <div className="max-h-[8git 0vh] overflow-y-auto pr-1">
+      <div className="w-full ">
+        <div className="h-[85vh] overflow-y-auto p-0.5 md:p-4">
           <div className="grid gap-4">
             {items.map((b) => (
               <AdminBookingCard key={b._id} booking={b} />
             ))}
+
             {items.length === 0 && (
               <p className="text-sm text-slate-500">No items.</p>
             )}

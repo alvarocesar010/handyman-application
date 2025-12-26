@@ -24,7 +24,7 @@ export default function AdminBookingCard({
   }, [open, storageKey]);
 
   return (
-    <article className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <article className="w-full rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
       <BookingHeader
         booking={booking}
         open={open}

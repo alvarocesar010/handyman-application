@@ -106,7 +106,7 @@ export default function AdminDashboardClient() {
 
     if (preset === "month") {
       f = new Date(now.getFullYear(), now.getMonth(), 1);
-      t = new Date(now);
+      t = new Date(now.getFullYear(), now.getMonth() + 1, 0);
       setBucket("day");
     }
 

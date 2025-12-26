@@ -24,7 +24,7 @@ export default function BookingDonePanel({
   if (!has) return null;
 
   return (
-    <div className="mt-3 grid gap-2 rounded-lg border bg-white p-3 text-sm sm:grid-cols-3">
+    <div className="mt-3 grid grid-cols-3 gap-2 rounded-lg border bg-white p-3 text-sm sm:grid-cols-3">
       <div>
         <div className="text-slate-500">Received</div>
         <div className="font-medium text-slate-900">
@@ -42,12 +42,9 @@ export default function BookingDonePanel({
             : "—"}
         </div>
       </div>
-
       <div>
-        <div className="text-slate-500">Finish</div>
-        <div className="font-medium text-slate-900">
-          {booking.finishTime || "—"}
-        </div>
+        <div className="text-slate-500">Avg / hour</div>
+        <div className="font-medium text-slate-900">{avgPerHour}</div>
       </div>
 
       <div>
@@ -58,10 +55,11 @@ export default function BookingDonePanel({
             : "—"}
         </div>
       </div>
-
       <div>
-        <div className="text-slate-500">Avg / hour</div>
-        <div className="font-medium text-slate-900">{avgPerHour}</div>
+        <div className="text-slate-500">Finish</div>
+        <div className="font-medium text-slate-900">
+          {booking.finishTime || "—"}
+        </div>
       </div>
     </div>
   );

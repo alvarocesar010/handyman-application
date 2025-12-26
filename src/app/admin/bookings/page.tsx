@@ -1,26 +1,37 @@
 import { getDb } from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
-import AdminBookingsSection from "@/components/admin/AdminBookingCard/AdminBookingsSection";
+
 import AdminBookingsFilters from "@/components/admin/AdminBookingCard/AdminBookingsFilters";
-import type { AdminBooking } from "@/components/admin/AdminBookingCard/types";
+import AdminBookingsSection from "@/components/admin/AdminBookingCard/AdminBookingsSection";
+import StatusTabs from "@/components/admin/AdminBookingCard/StatusTabs";
+
+import type {
+  AdminBooking,
+  AdminBookingStatus,
+} from "@/components/admin/AdminBookingCard/types";
 
 export const dynamic = "force-dynamic";
 
-type Preset = "today" | "week" | "month" | "custom";
-type Bucket = "day" | "week" | "month";
-
 type DbBooking = {
   _id: ObjectId;
+
   service: string;
-  date: string; // preferred YYYY-MM-DD
-  serviceDate?: string; // real YYYY-MM-DD
+
+  // preferred date (user chosen)
+  date: string; // YYYY-MM-DD
+
+  // real service date (optional)
+  serviceDate?: string; // YYYY-MM-DD
+
   name: string;
   phoneRaw: string;
   address: string;
   eircode: string;
   description: string;
-  status: "pending" | "confirmed" | "done" | "cancelled";
+
+  status: AdminBookingStatus;
   photos?: { fileId: ObjectId; filename: string }[];
+
   createdAt: Date | string;
 
   budget?: number;
@@ -34,6 +45,16 @@ type DbBooking = {
   actualDurationMinutes?: number;
 };
 
+type Bucket = "day" | "week" | "month";
+type Preset = "today" | "week" | "month" | "all" | "custom";
+
+type RangeInfo = {
+  preset: Preset;
+  bucket: Bucket;
+  from: string;
+  to: string;
+};
+
 function isISODate(s: string): boolean {
   return /^\d{4}-\d{2}-\d{2}$/.test(s);
 }
@@ -45,82 +66,81 @@ function toISODateOnly(d: Date): string {
   return `${y}-${m}-${day}`;
 }
 
-function resolveRange(sp: Record<string, string | string[] | undefined>) {
-  const preset = (
-    typeof sp.preset === "string" ? sp.preset : "month"
-  ) as Preset;
-  const bucket = (typeof sp.bucket === "string" ? sp.bucket : "day") as Bucket;
+function getThisWeekRange(now: Date): { from: string; to: string } {
+  const n = new Date(now);
+  const day = n.getDay(); // 0..6 (Sun..Sat)
+  const diff = day === 0 ? 6 : day - 1; // Monday start
+  const start = new Date(n);
+  start.setDate(n.getDate() - diff);
+  const end = new Date(start);
+  end.setDate(start.getDate() + 6);
+  return { from: toISODateOnly(start), to: toISODateOnly(end) };
+}
 
+function getThisMonthRange(now: Date): { from: string; to: string } {
+  const start = new Date(now.getFullYear(), now.getMonth(), 1);
+  const end = new Date(now.getFullYear(), now.getMonth() + 1, 0); // last day
+  return { from: toISODateOnly(start), to: toISODateOnly(end) };
+}
+
+function parseRange(
+  sp: Record<string, string | string[] | undefined>
+): RangeInfo {
   const now = new Date();
-  let from = typeof sp.from === "string" ? sp.from : "";
-  let to = typeof sp.to === "string" ? sp.to : "";
+
+  const presetRaw = typeof sp.preset === "string" ? sp.preset : "month";
+  const preset: Preset =
+    presetRaw === "today" ||
+    presetRaw === "week" ||
+    presetRaw === "month" ||
+    presetRaw === "all" ||
+    presetRaw === "custom"
+      ? presetRaw
+      : "month";
+
+  const bucketRaw = typeof sp.bucket === "string" ? sp.bucket : "day";
+  const bucket: Bucket =
+    bucketRaw === "day" || bucketRaw === "week" || bucketRaw === "month"
+      ? bucketRaw
+      : "day";
+
+  const fromQ = typeof sp.from === "string" ? sp.from : "";
+  const toQ = typeof sp.to === "string" ? sp.to : "";
+
+  if (preset === "custom" && isISODate(fromQ) && isISODate(toQ)) {
+    return { preset, bucket, from: fromQ, to: toQ };
+  }
 
   if (preset === "today") {
-    const iso = toISODateOnly(now);
-    from = iso;
-    to = iso;
+    const today = toISODateOnly(now);
+    return { preset, bucket: "day", from: today, to: today };
   }
 
   if (preset === "week") {
-    const day = now.getDay();
-    const diff = day === 0 ? 6 : day - 1;
-    const f = new Date(now);
-    f.setDate(now.getDate() - diff);
-    from = toISODateOnly(f);
-    to = toISODateOnly(now);
+    const r = getThisWeekRange(now);
+    return { preset, bucket: "day", ...r };
   }
 
   if (preset === "month") {
-    const f = new Date(now.getFullYear(), now.getMonth(), 1);
-    from = toISODateOnly(f);
-    to = toISODateOnly(now);
+    const r = getThisMonthRange(now);
+    return { preset, bucket: "day", ...r };
   }
 
-  if (preset === "custom") {
-    // keep from/to from url, but ensure valid
-    if (!isISODate(from) || !isISODate(to)) {
-      const f = new Date(now.getFullYear(), now.getMonth(), 1);
-      from = toISODateOnly(f);
-      to = toISODateOnly(now);
-    }
-  }
-
-  const safeBucket: Bucket =
-    bucket === "day" || bucket === "week" || bucket === "month"
-      ? bucket
-      : "day";
-
-  return { preset, bucket: safeBucket, from, to };
-}
-
-function effectiveISO(d: DbBooking): string {
-  return d.serviceDate && isISODate(d.serviceDate) ? d.serviceDate : d.date;
+  // all
+  return { preset: "all", bucket, from: "0000-01-01", to: "9999-12-31" };
 }
 
 function inRange(dateISO: string, from: string, to: string): boolean {
   return dateISO >= from && dateISO <= to;
 }
 
-export default async function AdminBookingsPage({
-  searchParams,
-}: {
-  searchParams: Record<string, string | string[] | undefined>;
-}) {
-  const range = resolveRange(searchParams);
+function effectiveServiceDateISO(b: DbBooking): string {
+  if (b.serviceDate && isISODate(b.serviceDate)) return b.serviceDate;
+  return b.date;
+}
 
-  const db = await getDb();
-  const docs = (await db
-    .collection<DbBooking>("bookings")
-    .find({})
-    .sort({ createdAt: -1 }) // ✅ most recent first
-    .limit(2000)
-    .toArray()) as DbBooking[];
-
-  const filtered = docs.filter((d) =>
-    inRange(effectiveISO(d), range.from, range.to)
-  );
-
-  const toView = (d: DbBooking): AdminBooking => ({
+function toView(d: DbBooking): AdminBooking {
+  return {
     _id: d._id.toString(),
     service: d.service,
     date: d.date,
@@ -137,43 +157,120 @@ export default async function AdminBookingsPage({
         id: p.fileId.toString(),
         filename: p.filename,
       })) ?? [],
-
-    budget: d.budget,
     adminNotes: d.adminNotes,
-    startTime: d.startTime,
+    budget: d.budget,
     durationMinutes: d.durationMinutes,
-
+    startTime: d.startTime,
     amountReceived: d.amountReceived,
     tipReceived: d.tipReceived,
     finishTime: d.finishTime,
     actualDurationMinutes: d.actualDurationMinutes,
+  };
+}
+
+function makeHrefWith(current: URLSearchParams, patch: Record<string, string>) {
+  const next = new URLSearchParams(current.toString());
+  for (const [k, v] of Object.entries(patch)) next.set(k, v);
+  return `/admin/bookings?${next.toString()}`;
+}
+
+export default async function AdminBookingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const sp = await searchParams;
+  const range = parseRange(sp);
+
+  const statusRaw = typeof sp.status === "string" ? sp.status : "pending";
+  const activeStatus: AdminBookingStatus =
+    statusRaw === "pending" ||
+    statusRaw === "confirmed" ||
+    statusRaw === "done" ||
+    statusRaw === "cancelled"
+      ? statusRaw
+      : "pending";
+
+  const db = await getDb();
+  const docs = (await db
+    .collection<DbBooking>("bookings")
+    .find({})
+    .sort({ createdAt: -1 }) // most recent first
+    .limit(2000)
+    .toArray()) as DbBooking[];
+
+  // NEW RULE:
+  // - pending + confirmed: always visible (ignore range)
+  // - done + cancelled: respect range using effective service date
+  const filtered = docs.filter((d) => {
+    if (d.status === "pending" || d.status === "confirmed") return true;
+    const dateISO = effectiveServiceDateISO(d);
+    return inRange(dateISO, range.from, range.to);
   });
 
-  const byStatus: Record<AdminBooking["status"], AdminBooking[]> = {
-    confirmed: [],
+  const byStatus: Record<AdminBookingStatus, AdminBooking[]> = {
     pending: [],
+    confirmed: [],
     done: [],
     cancelled: [],
   };
 
   for (const d of filtered) {
-    const v = toView(d);
-    byStatus[v.status].push(v);
+    byStatus[d.status].push(toView(d));
   }
+
+  const counts: Record<AdminBookingStatus, number> = {
+    pending: byStatus.pending.length,
+    confirmed: byStatus.confirmed.length,
+    done: byStatus.done.length,
+    cancelled: byStatus.cancelled.length,
+  };
+
+  const currentParams = new URLSearchParams();
+  for (const [k, v] of Object.entries(sp)) {
+    if (typeof v === "string") currentParams.set(k, v);
+  }
+
+  const makeTabHref = (status: AdminBookingStatus) =>
+    makeHrefWith(currentParams, { status });
+
+  const title =
+    activeStatus === "pending"
+      ? "Pending"
+      : activeStatus === "confirmed"
+      ? "Confirmed"
+      : activeStatus === "done"
+      ? "Done"
+      : "Cancelled";
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-4">
         <h2 className="text-xl font-semibold text-slate-900">Bookings</h2>
+
+        <form action="/api/admin/bookings/reindex" method="post">
+          <button className="rounded-md border px-3 py-1.5 text-sm">
+            Reindex
+          </button>
+        </form>
       </div>
 
-      {/* ✅ exactly like dashboard controls */}
-      <AdminBookingsFilters />
+      {/* dashboard-like filters */}
+      <AdminBookingsFilters initialRange={range} />
 
-      <AdminBookingsSection title="Confirmed" items={byStatus.confirmed} />
-      <AdminBookingsSection title="Pending" items={byStatus.pending} />
-      <AdminBookingsSection title="Done" items={byStatus.done} />
-      <AdminBookingsSection title="Cancelled" items={byStatus.cancelled} />
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <StatusTabs
+          active={activeStatus}
+          counts={counts}
+          makeHref={makeTabHref}
+        />
+
+        <div className="text-sm text-slate-600">
+          Showing: {range.from} → {range.to}
+        </div>
+      </div>
+
+      <AdminBookingsSection title={title} items={byStatus[activeStatus]} />
     </div>
   );
 }

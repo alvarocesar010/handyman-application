@@ -14,7 +14,7 @@ export default function BookingBasicsPanel({
   if (!hasBasics) return null;
 
   return (
-    <div className="grid gap-2 rounded-lg border bg-slate-50 p-3 text-sm sm:grid-cols-3">
+    <div className="grid grid-cols-3 gap-2 rounded-lg border bg-slate-50 p-3 text-sm sm:grid-cols-3">
       <div>
         <div className="text-slate-500">Budget</div>
         <div className="font-medium text-slate-900">
@@ -30,7 +30,7 @@ export default function BookingBasicsPanel({
       </div>
 
       <div>
-        <div className="text-slate-500">Estimated duration</div>
+        <div className="text-slate-500">Duration</div>
         <div className="font-medium text-slate-900">
           {typeof booking.durationMinutes === "number"
             ? `${booking.durationMinutes} min (${minutesToHM(

@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import type { Bucket, Preset, RangeInfo } from "./types";
 
-type Preset = "today" | "week" | "month" | "custom";
-type Bucket = "day" | "week" | "month";
+type Props = {
+  initialRange: RangeInfo;
+};
 
 function toISODateOnly(d: Date): string {
   const y = d.getFullYear();
@@ -13,114 +14,90 @@ function toISODateOnly(d: Date): string {
   return `${y}-${m}-${day}`;
 }
 
-function isISODate(s: string): boolean {
-  return /^\d{4}-\d{2}-\d{2}$/.test(s);
+function monthRange(now: Date): { from: string; to: string } {
+  const from = new Date(now.getFullYear(), now.getMonth(), 1);
+  const to = new Date(now.getFullYear(), now.getMonth() + 1, 0); // last day of month
+  return { from: toISODateOnly(from), to: toISODateOnly(to) };
 }
 
-export default function AdminBookingsFilters() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const sp = useSearchParams();
+function weekRange(now: Date): { from: string; to: string } {
+  const d = new Date(now);
+  const day = d.getDay(); // 0..6 (Sun..Sat)
+  const diff = day === 0 ? 6 : day - 1; // Monday start
+  d.setDate(d.getDate() - diff);
+  const from = new Date(d);
+  const to = new Date(d);
+  to.setDate(from.getDate() + 6);
+  return { from: toISODateOnly(from), to: toISODateOnly(to) };
+}
 
-  const presetFromUrl = (sp.get("preset") ?? "month") as Preset;
-  const bucketFromUrl = (sp.get("bucket") ?? "day") as Bucket;
+function todayRange(now: Date): { from: string; to: string } {
+  const iso = toISODateOnly(now);
+  return { from: iso, to: iso };
+}
 
-  const fromUrl = sp.get("from") ?? "";
-  const toUrl = sp.get("to") ?? "";
+export default function AdminBookingsFilters({ initialRange }: Props) {
+  const [preset, setPreset] = useState<Preset>(initialRange.preset);
+  const [bucket, setBucket] = useState<Bucket>(initialRange.bucket);
+  const [from, setFrom] = useState<string>(initialRange.from);
+  const [to, setTo] = useState<string>(initialRange.to);
 
-  const [preset, setPreset] = useState<Preset>(
-    presetFromUrl === "today" ||
-      presetFromUrl === "week" ||
-      presetFromUrl === "month" ||
-      presetFromUrl === "custom"
-      ? presetFromUrl
-      : "month"
-  );
-
-  const [bucket, setBucket] = useState<Bucket>(
-    bucketFromUrl === "day" ||
-      bucketFromUrl === "week" ||
-      bucketFromUrl === "month"
-      ? bucketFromUrl
-      : "day"
-  );
-
-  const [from, setFrom] = useState<string>(
-    isISODate(fromUrl)
-      ? fromUrl
-      : toISODateOnly(new Date(Date.now() - 30 * 86400000))
-  );
-  const [to, setTo] = useState<string>(
-    isISODate(toUrl) ? toUrl : toISODateOnly(new Date())
-  );
-
-  // Sync when user navigates back/forward
-  useEffect(() => {
-    const p = (sp.get("preset") ?? "month") as Preset;
-    const b = (sp.get("bucket") ?? "day") as Bucket;
-    const f = sp.get("from") ?? "";
-    const t = sp.get("to") ?? "";
-
-    if (p === "today" || p === "week" || p === "month" || p === "custom")
-      setPreset(p);
-    if (b === "day" || b === "week" || b === "month") setBucket(b);
-    if (isISODate(f)) setFrom(f);
-    if (isISODate(t)) setTo(t);
-  }, [sp]);
-
-  // Same preset behaviour as dashboard
+  // Update dates when preset changes (dashboard behaviour)
   useEffect(() => {
     const now = new Date();
-    let f = new Date(now);
-    let t = new Date(now);
 
     if (preset === "today") {
-      f = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      t = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const r = todayRange(now);
+      setFrom(r.from);
+      setTo(r.to);
       setBucket("day");
+      return;
     }
 
     if (preset === "week") {
-      const day = now.getDay(); // 0..6 (Sun..Sat)
-      const diff = day === 0 ? 6 : day - 1; // monday-start
-      f = new Date(now);
-      f.setDate(now.getDate() - diff);
-      t = new Date(now);
+      const r = weekRange(now);
+      setFrom(r.from);
+      setTo(r.to);
       setBucket("day");
+      return;
     }
 
     if (preset === "month") {
-      f = new Date(now.getFullYear(), now.getMonth(), 1);
-      t = new Date(now);
+      const r = monthRange(now);
+      setFrom(r.from);
+      setTo(r.to);
       setBucket("day");
+      return;
     }
 
-    if (preset !== "custom") {
-      setFrom(toISODateOnly(f));
-      setTo(toISODateOnly(t));
+    if (preset === "all") {
+      // Keep from/to but you can ignore them server-side when preset=all
+      // Still render something meaningful
+      // No auto change needed
+      return;
     }
+
+    // custom: user edits dates
   }, [preset]);
 
-  function pushParams(next: {
-    preset: Preset;
-    bucket: Bucket;
-    from: string;
-    to: string;
-  }) {
-    const params = new URLSearchParams(sp.toString());
-    params.set("preset", next.preset);
-    params.set("bucket", next.bucket);
-    params.set("from", next.from);
-    params.set("to", next.to);
+  const queryString = useMemo(() => {
+    const sp = new URLSearchParams();
+    sp.set("preset", preset);
+    sp.set("bucket", bucket);
 
-    router.push(`${pathname}?${params.toString()}`);
-  }
+    if (preset === "custom") {
+      sp.set("from", from);
+      sp.set("to", to);
+    }
 
-  function onRefresh() {
-    // ensures URL has the latest chosen values
-    pushParams({ preset, bucket, from, to });
-    router.refresh();
-  }
+    // optional: keep from/to visible even for month/week/today
+    if (preset !== "custom" && preset !== "all") {
+      sp.set("from", from);
+      sp.set("to", to);
+    }
+
+    return sp.toString();
+  }, [preset, bucket, from, to]);
 
   return (
     <div className="flex flex-wrap items-center gap-3">
@@ -132,6 +109,7 @@ export default function AdminBookingsFilters() {
         <option value="today">Today</option>
         <option value="week">This week</option>
         <option value="month">This month</option>
+        <option value="all">All</option>
         <option value="custom">Custom range</option>
       </select>
 
@@ -162,17 +140,16 @@ export default function AdminBookingsFilters() {
         <option value="month">Group by month</option>
       </select>
 
-      <button
-        type="button"
-        onClick={onRefresh}
+      <a
+        href={`/admin/bookings?${queryString}`}
         className="rounded-md border px-3 py-1.5 text-sm"
       >
         Refresh
-      </button>
+      </a>
 
-      <span className="text-sm text-slate-600">
+      <div className="text-sm text-slate-600">
         Showing: {from} → {to}
-      </span>
+      </div>
     </div>
   );
 }
