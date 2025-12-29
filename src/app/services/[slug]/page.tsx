@@ -7,20 +7,21 @@ import type { Metadata } from "next";
 import { absUrl, pageTitle, SITE } from "@/lib/seo";
 import { CalendarCheck, Phone } from "lucide-react";
 import ReviewsBox from "@/components/ReviewsBox";
+import ServiceSteps from "@/components/Services/ServiceSteps";
 
 type Params = { slug: string };
+type PageProps = { params: Promise<Params> };
 
 export async function generateStaticParams() {
   return SERVICES.map((s) => ({ slug: s.slug }));
 }
 
-// Next.js 15: params podem ser assíncronos em APIs; em pages é sync.
 export async function generateMetadata({
   params,
-}: {
-  params: Params;
-}): Promise<Metadata> {
-  const svc = SERVICE_MAP.get(params.slug);
+}: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const svc = SERVICE_MAP.get(slug);
+
   if (!svc)
     return {
       title: pageTitle("Service not found"),
@@ -53,8 +54,10 @@ export async function generateMetadata({
   };
 }
 
-export default function ServiceDetailPage({ params }: { params: Params }) {
-  const svc = SERVICE_MAP.get(params.slug);
+export default async function ServiceDetailPage({ params }: PageProps) {
+  const { slug } = await params;
+
+  const svc = SERVICE_MAP.get(slug);
   if (!svc) return notFound();
 
   const price = svc.startingPrice
@@ -68,7 +71,6 @@ export default function ServiceDetailPage({ params }: { params: Params }) {
 
   return (
     <>
-      {/* padding-bottom extra para não ficar sob a barra fixa */}
       <main className="mx-auto max-w-3xl px-6 py-10 pb-28 space-y-8">
         {/* Header */}
         <header className="space-y-2">
@@ -85,7 +87,6 @@ export default function ServiceDetailPage({ params }: { params: Params }) {
             Price: {price}
           </p>
 
-          {/* CTA inline (mantido) */}
           <div className="flex gap-3 pt-2">
             <Link
               href={`/booking?service=${svc.slug}`}
@@ -102,13 +103,11 @@ export default function ServiceDetailPage({ params }: { params: Params }) {
           </div>
         </header>
 
-        {/* Descrição longa */}
         <section className="prose prose-slate max-w-none">
           <h2>What we do</h2>
           <p>{svc.longDescription}</p>
         </section>
 
-        {/* Tópicos com imagens (sem galeria separada) */}
         {svc.categories && (
           <section className="space-y-4">
             <h3 className="text-lg font-semibold text-slate-900">
@@ -120,7 +119,6 @@ export default function ServiceDetailPage({ params }: { params: Params }) {
                   key={group}
                   className="rounded-xl border border-slate-200 bg-white p-0 shadow-sm overflow-hidden"
                 >
-                  {/* Cabeçalho com imagem (pega da lib via categoryImages) */}
                   {svc.categoryImages?.[group] && (
                     <div className="relative w-full aspect-[16/9] bg-slate-50">
                       <Image
@@ -148,7 +146,6 @@ export default function ServiceDetailPage({ params }: { params: Params }) {
           </section>
         )}
 
-        {/* Inclusões / exclusões */}
         <section className="grid gap-6 md:grid-cols-2">
           <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
             <h3 className="text-lg font-semibold text-slate-900 mb-2">
@@ -178,10 +175,15 @@ export default function ServiceDetailPage({ params }: { params: Params }) {
           </div>
         </section>
 
-        {/* Reviews */}
+        {svc.steps && svc.steps.length > 0 && (
+          <ServiceSteps
+            title="How we install curtains and blinds"
+            steps={svc.steps}
+          />
+        )}
+
         <ReviewsBox serviceSlug={svc.slug} />
 
-        {/* FAQs */}
         {svc.faqs && svc.faqs.length > 0 && (
           <section className="space-y-3">
             <h3 className="text-lg font-semibold text-slate-900">FAQs</h3>
@@ -198,7 +200,6 @@ export default function ServiceDetailPage({ params }: { params: Params }) {
           </section>
         )}
 
-        {/* CTA inferior inline */}
         <div className="flex flex-wrap gap-3 pt-2">
           <Link
             href={`/booking?service=${svc.slug}`}
@@ -214,10 +215,8 @@ export default function ServiceDetailPage({ params }: { params: Params }) {
           </Link>
         </div>
 
-        {/* SEO: JSON-LD */}
         <script
           type="application/ld+json"
-          // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
@@ -248,7 +247,6 @@ export default function ServiceDetailPage({ params }: { params: Params }) {
         />
       </main>
 
-      {/* Barra fixa de CTA — ícones, arredondada, sem texto */}
       <div className="fixed inset-x-0 bottom-0 z-40  print:hidden">
         <div className="fixed bottom-6 right-6 z-50 flex flex-col items-center gap-3 print:hidden">
           <Link

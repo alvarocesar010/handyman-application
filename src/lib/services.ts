@@ -15,6 +15,12 @@ import {
   Layers,
 } from "lucide-react";
 
+export type ServiceStep = {
+  title: string;
+  description: string;
+  image: { src: string; alt: string };
+};
+
 export type Service = {
   slug: string;
   title: string;
@@ -30,6 +36,7 @@ export type Service = {
   // Tópicos por categoria + imagem por categoria
   categories?: Record<string, string[]>;
   categoryImages?: Record<string, { src: string; alt: string }>;
+  steps?: ServiceStep[];
 };
 
 export const SERVICES: Service[] = [
@@ -281,6 +288,45 @@ export const SERVICES: Service[] = [
       "Area cleaned and packaging removed",
     ],
     icon: Ruler,
+
+    steps: [
+      {
+        title: "Measure and confirm the position",
+        description:
+          "We confirm the window measurements, choose the correct height, and mark the fixing points so everything sits straight and symmetrical.",
+        image: {
+          src: "/images/services/curtains/step-1-measure.jpg",
+          alt: "Measuring a window for curtain rail placement",
+        },
+      },
+      {
+        title: "Mark and drill safely",
+        description:
+          "We locate solid fixing points, check for hidden cables/pipes where relevant, and drill clean holes for secure mounting.",
+        image: {
+          src: "/images/services/curtains/step-2-drill.jpg",
+          alt: "Drilling holes for a curtain rail bracket",
+        },
+      },
+      {
+        title: "Fit brackets and rail/track",
+        description:
+          "Brackets are mounted securely and the rail or track is installed. We ensure it’s level and correctly spaced.",
+        image: {
+          src: "/images/services/curtains/step-3-fit.jpg",
+          alt: "Bracket and rail installed and being aligned",
+        },
+      },
+      {
+        title: "Hang, align, and finish",
+        description:
+          "Curtains or blinds are fitted, aligned, and tested. We tidy up and remove any packaging once everything is working smoothly.",
+        image: {
+          src: "/images/services/curtains/step-4-hang.jpg",
+          alt: "Curtains hung and aligned neatly on the rail",
+        },
+      },
+    ],
   },
   // bathroom-renovation
   {
