@@ -280,7 +280,7 @@ export const SERVICES: Service[] = [
     summary: "Professional fitting of curtains and blinds, safely and neatly.",
     longDescription:
       "Our experts can install all types of curtains and blinds, ensuring a perfect fit and secure fixings. We measure and mark positions accurately, drill and fit brackets, hang curtains or blinds, and make sure everything is level and smooth. We’ll also tidy up the area and remove any packaging when finished.",
-    startingPrice: 5000,
+    startingPrice: 11000,
     durationHint: "Varies by number of windows",
     inclusions: [
       "Accurate measurement and marking",
@@ -549,11 +549,60 @@ export const SERVICES: Service[] = [
   {
     slug: "fit-shower",
     title: "Fit Shower",
-    summary: "Professional installation of showers and bathroom fittings.",
+    summary:
+      "Professional shower installation in Dublin — neat finish, properly sealed, and leak-tested.",
     longDescription:
-      "We install electric and mixer showers (plumbing only), mount the unit and rail, seal where required and test for leaks. If electrical work is needed, a Safe Electric registered electrician will handle the connection.",
+      "We install electric and mixer showers (plumbing only), mount the unit and rail, seal where required, and test for leaks. If electrical work is needed, a Safe Electric registered electrician can handle the connection.",
     startingPrice: 14000,
     durationHint: "2–3 hours",
+
+    categoriesTitle: "Shower installations we handle",
+    categories: {
+      "Electric showers (mount & plumbing)": [
+        "Replace like-for-like electric shower",
+        "Mount unit and riser rail",
+        "Connect water supply and test",
+        "Seal edges where required",
+      ],
+      "Mixer showers": [
+        "Mixer shower replacement (where plumbing is ready)",
+        "Shower rail and handset setup",
+        "Leak test and pressure check",
+        "Neat silicone finish",
+      ],
+      "Common add-ons": [
+        "Replace shower hose/handset",
+        "Replace shower rail",
+        "Replace isolation valve (if needed)",
+        "Replace shower head holder",
+      ],
+      "We also do": [
+        "New electrical wiring/circuits",
+        "Major plumbing changes",
+        "Re-tiling or wall repairs",
+        "Moving the shower location",
+      ],
+    },
+
+    categoryImages: {
+      "Electric showers (mount & plumbing)": {
+        src: "/images/services/showers/electric-shower.jpg",
+        alt: "Electric shower mounted and sealed neatly",
+      },
+      "Mixer showers": {
+        src: "/images/services/showers/mixer-shower.jpg",
+        alt: "Mixer shower installation with rail and handset",
+      },
+      "Common add-ons": {
+        src: "/images/services/showers/shower-accessories.jpg",
+        alt: "Shower accessories like hose, handset and rail",
+      },
+      "Not included (separate quote)": {
+        src: "/images/services/showers/bathroom-tiling.jpg",
+        alt: "Bathroom wall with tiles and fittings",
+      },
+    },
+
     inclusions: [
       "Mount unit & rail",
       "Connect water supply",
@@ -572,6 +621,10 @@ export const SERVICES: Service[] = [
       {
         q: "Do you do tiling?",
         a: "Minor sealing is included; re-tiling is a separate service.",
+      },
+      {
+        q: "Do you install electric showers fully?",
+        a: "We install the unit and plumbing. If a new electrical connection is required, a Safe Electric registered electrician can complete it.",
       },
     ],
     icon: ShowerHead,
