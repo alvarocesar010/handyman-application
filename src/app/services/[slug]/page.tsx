@@ -1,6 +1,5 @@
 // app/services/[slug]/page.tsx
 import Link from "next/link";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import { SERVICE_MAP, SERVICES } from "@/lib/services";
 import type { Metadata } from "next";
@@ -8,6 +7,7 @@ import { absUrl, pageTitle, SITE } from "@/lib/seo";
 import { CalendarCheck, Phone } from "lucide-react";
 import ReviewsBox from "@/components/ReviewsBox";
 import ServiceSteps from "@/components/Services/ServiceSteps";
+import { CategoriesGrid } from "@/components/Services/CategoriesGrid";
 
 type Params = { slug: string };
 type PageProps = { params: Promise<Params> };
@@ -109,41 +109,11 @@ export default async function ServiceDetailPage({ params }: PageProps) {
         </section>
 
         {svc.categories && (
-          <section className="space-y-4">
-            <h3 className="text-lg font-semibold text-slate-900">
-              Door types & topics we handle
-            </h3>
-            <div className="grid gap-4 sm:grid-cols-2">
-              {Object.entries(svc.categories).map(([group, items]) => (
-                <div
-                  key={group}
-                  className="rounded-xl border border-slate-200 bg-white p-0 shadow-sm overflow-hidden"
-                >
-                  {svc.categoryImages?.[group] && (
-                    <div className="relative w-full aspect-[16/9] bg-slate-50">
-                      <Image
-                        src={svc.categoryImages[group].src}
-                        alt={svc.categoryImages[group].alt}
-                        fill
-                        sizes="(max-width:768px) 100vw, 50vw"
-                        className="object-cover"
-                        priority={false}
-                      />
-                    </div>
-                  )}
-
-                  <div className="p-5">
-                    <h4 className="font-medium text-slate-900">{group}</h4>
-                    <ul className="mt-2 list-disc pl-5 text-slate-700 space-y-1">
-                      {items.map((x) => (
-                        <li key={x}>{x}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
+          <CategoriesGrid
+            title={svc.categoriesTitle ?? "What we handle"}
+            categories={svc.categories}
+            categoryImages={svc.categoryImages}
+          />
         )}
 
         <section className="grid gap-6 md:grid-cols-2">

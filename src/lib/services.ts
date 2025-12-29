@@ -34,6 +34,7 @@ export type Service = {
   icon: LucideIcon;
 
   // Tópicos por categoria + imagem por categoria
+  categoriesTitle?: string;
   categories?: Record<string, string[]>;
   categoryImages?: Record<string, { src: string; alt: string }>;
   steps?: ServiceStep[];
@@ -50,6 +51,7 @@ export const SERVICES: Service[] = [
       "We provide a complete door fitting and replacement service for homes and businesses. Whether it's an interior, exterior, or furniture door, we ensure a perfect fit, smooth operation, and a clean finish. We handle everything from wooden and composite doors to glass enclosures, wardrobes, and appliance doors. We measure, align, plane when necessary, and fit or reuse hinges, handles, and locks. Suitable for damaged, swollen, or misaligned doors — or if you simply want an upgrade. We can also advise on fire-rated, moisture-resistant, or acoustic options depending on your needs.",
     startingPrice: 5500,
     durationHint: "Usually 1–2 hours per door",
+    categoriesTitle: "Door types & topics we handle",
 
     categories: {
       "Internal Doors": [
@@ -164,7 +166,6 @@ export const SERVICES: Service[] = [
 
     icon: DoorOpen,
   },
-
   // furniture-assembly
   {
     slug: "furniture-assembly",
@@ -175,6 +176,7 @@ export const SERVICES: Service[] = [
       "We assemble flat-pack furniture from major retailers like IKEA, JYSK, and Argos. From wardrobes and beds to office desks and TV units, we ensure everything is level, safe, and cleanly installed. Tall or heavy items are secured to walls when required for safety. Ideal for new homes, offices, or anyone who wants a tidy, professional finish.",
     startingPrice: 6000,
     durationHint: "Varies by item size and complexity",
+    categoriesTitle: "Furniture types & tasks we handle",
 
     categories: {
       "Bedroom Furniture": [
@@ -667,11 +669,10 @@ export const SERVICES: Service[] = [
     summary:
       "Professional TV installation, setup, and connection to your equipment.",
     longDescription:
-      "Our experts deliver and install your new TV so you can start watching your favourite shows as soon as possible. We’ll set up your TV, connect it to any existing equipment, hook up soundbars or speakers, connect smart TVs to your WiFi, give you a full demo, and clear up all packaging when we’re done.",
+      "Our experts install your new TV so you can start watching your favourite shows as soon as possible. We’ll set up your TV, connect it to any existing equipment, hook up soundbars or speakers, connect smart TVs to your WiFi, give you a full demo, and clear up all packaging when we’re done.",
     startingPrice: 6000,
     durationHint: "Varies by TV size and setup",
     inclusions: [
-      "TV delivery and installation on the same day, at a time that suits you",
       "Set up your TV on a stand or mount it to a wall (wall bracket required)",
       "Connect to home cinema, soundbar, or speakers",
       "Connect to WiFi and demonstrate smart features",
