@@ -51,6 +51,13 @@ export default function Navbar() {
           >
             Book a Repair
           </Link>
+          <Link
+            href="/customer/bookings"
+            onClick={() => setMobileOpen(false)}
+            className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-emerald-800 transition-colors"
+          >
+            Access My Bookings
+          </Link>
         </div>
 
         {/* Mobile button */}
@@ -86,6 +93,13 @@ export default function Navbar() {
               className="block rounded bg-cyan-700 px-3 py-2 text-white font-medium text-center hover:bg-cyan-800"
             >
               Book a Repair
+            </Link>
+            <Link
+              href="/customer/bookings"
+              onClick={() => setMobileOpen(false)}
+              className="block rounded bg-emerald-600 px-3 py-2 text-white font-medium text-center hover:bg-cyan-800"
+            >
+              Access My Bookings
             </Link>
           </div>
         </div>
