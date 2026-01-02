@@ -198,6 +198,12 @@ export async function POST(req: Request) {
       createdAt: now,
       updatedAt: now,
     };
+    if (time < "09:00" || time > "18:00") {
+      return NextResponse.json(
+        { error: "Preferred time must be between 09:00 and 18:00." },
+        { status: 400 }
+      );
+    }
 
     // Upload images to GridFS
     if (files.length > 0) {

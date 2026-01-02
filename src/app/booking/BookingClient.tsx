@@ -241,6 +241,17 @@ export default function BookingClient() {
       setIsSubmitting(false);
     }
   }
+  const [timeError, setTimeError] = useState<string | null>(null);
+
+  function handleTimeChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const value = e.target.value;
+
+    if (value < "09:00" || value > "18:00") {
+      setTimeError("Please choose a time between 9:00 and 18:00.");
+    } else {
+      setTimeError(null);
+    }
+  }
 
   /* ---------------------------------- UI ------------------------------------ */
 
@@ -296,14 +307,22 @@ export default function BookingClient() {
                 <label className="text-sm font-medium text-slate-700">
                   Preferred time
                 </label>
+
                 <input
                   type="time"
                   name="time"
                   required
+                  min="09:00"
+                  max="18:00"
+                  step="900" // 15-minute intervals
+                  onChange={handleTimeChange}
                   className="rounded-md border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-cyan-600"
                 />
+                {timeError && (
+                  <p className="text-xs text-red-600">{timeError}</p>
+                )}
                 <p className="text-xs text-slate-500">
-                  We’ll confirm availability before arrival.
+                  We’ll confirm availability before arrival
                 </p>
               </div>
             </div>
