@@ -9,6 +9,7 @@ export type AdminBooking = {
 
   // preferred date (customer picked)
   date: string; // YYYY-MM-DD
+  time: string;
 
   // real service date (you did / will do the job)
   serviceDate?: string; // YYYY-MM-DD
@@ -17,6 +18,9 @@ export type AdminBooking = {
   phoneRaw: string;
   address: string;
   eircode: string;
+  distanceKm?: string;
+  distanceDuration?: number;
+  distanceCost?: number;
   description: string;
 
   createdAt: string;

@@ -50,7 +50,7 @@ export default function DistanceInfo({ eircode }: DistanceInfoProps) {
       } finally {
         setLoading(false);
       }
-    }, 500); // debounce
+    }, 1500); // debounce
 
     return () => clearTimeout(timer);
   }, [eircode]);

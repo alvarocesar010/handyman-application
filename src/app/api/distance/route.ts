@@ -76,8 +76,7 @@ export async function POST(request: Request) {
 
     const hours = (durationMinutes * 2) / 60; // convert minutes -> hours
     const baseCost = hours * 50; // €50 per hour
-    const cost = Number((baseCost * 1.3).toFixed(2)); // +30% margin of error
-
+    const cost = Math.ceil(baseCost * 1.1);
     // -------------------------
 
     const result: DistanceApiResult = {

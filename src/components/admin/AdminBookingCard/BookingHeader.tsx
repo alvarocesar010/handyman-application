@@ -3,6 +3,7 @@ import { AdminBooking } from "./types";
 import StatusBadge from "./StatusBadge";
 import { formatWhenDate } from "./utils";
 import BookingBasicsPanel from "./BookingBasicsPanel";
+import { Image as ImageIcon } from "lucide-react";
 
 export default function BookingHeader({
   booking,
@@ -21,7 +22,8 @@ export default function BookingHeader({
     minute: "2-digit",
     hour12: true,
   });
-
+  const photosCount = booking.photos?.length ?? 0;
+console.log(booking)
   return (
     <div className="px-4 py-3">
       <div className="flex items-start justify-between gap-3">
@@ -42,6 +44,7 @@ export default function BookingHeader({
             <div className="flex gap-2">
               <span className="font-semibold">When (preferred):</span>
               <span>{formatWhenDate(booking.date)}</span>
+              <span>{booking.time}</span>
             </div>
 
             <div className="flex gap-2">
@@ -70,17 +73,36 @@ export default function BookingHeader({
                   Address: {booking.address} · {booking.eircode}
                 </Link>
               </div>
-
+              {booking.distanceCost != null && (
+                <div className="mt-1 text-sm text-slate-700">
+                  <span className="font-semibold">Estimated travel cost:</span>{" "}
+                  €{booking.distanceCost.toFixed(2)}
+                  {booking.distanceKm && (
+                    <span className="text-slate-500">
+                      {" "}
+                      ({booking.distanceKm})
+                    </span>
+                  )}
+                </div>
+              )}
               <div>
                 <span className="font-semibold">Created at:</span> {created}
               </div>
             </div>
 
             {/* Short description visible even minimized */}
-            <p className="my-4 line-clamp-3 whitespace-pre-line text-slate-800">
+            <p className="my-4 whitespace-normal text-slate-800">
               {booking.description}
             </p>
           </div>
+          {photosCount > 0 && (
+            <div className="flex items-center gap-2 text-xs text-slate-500">
+              <ImageIcon className="h-4 w-4" />
+              <span>
+                {photosCount} photo{photosCount > 1 ? "s" : ""} attached
+              </span>
+            </div>
+          )}
         </div>
 
         <button

@@ -19,6 +19,7 @@ type DbBooking = {
 
   // preferred date (user chosen)
   date: string; // YYYY-MM-DD
+  time: string;
 
   // real service date (optional)
   serviceDate?: string; // YYYY-MM-DD
@@ -27,6 +28,9 @@ type DbBooking = {
   phoneRaw: string;
   address: string;
   eircode: string;
+  distanceKm?: string;
+  distanceDuration?: number;
+  distanceCost?: number;
   description: string;
 
   status: AdminBookingStatus;
@@ -144,11 +148,15 @@ function toView(d: DbBooking): AdminBooking {
     _id: d._id.toString(),
     service: d.service,
     date: d.date,
+    time: d.time,
     serviceDate: d.serviceDate,
     name: d.name,
     phoneRaw: d.phoneRaw,
     address: d.address,
     eircode: d.eircode,
+    distanceKm: d.distanceKm,
+    distanceDuration: d.distanceDuration,
+    distanceCost: d.distanceCost,
     description: d.description,
     status: d.status,
     createdAt: d.createdAt ? d.createdAt.toString() : "",

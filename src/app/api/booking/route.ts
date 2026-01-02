@@ -124,6 +124,32 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
+    let distanceCost: number | null = null;
+    let distanceKm: string | null = null;
+    let distanceDuration: number | null = null;
+
+    try {
+      const distanceRes = await fetch(
+        `${
+          process.env.NEXT_PUBLIC_BASE_URL ?? "https://dublinerhandyman.ie"
+        }/api/distance`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ eircode }),
+        }
+      );
+
+      if (distanceRes.ok) {
+        const distanceData = await distanceRes.json();
+
+        distanceCost = distanceData.cost;
+        distanceKm = distanceData.distance;
+        distanceDuration = distanceData.duration;
+      }
+    } catch {
+      // booking must NOT fail because of distance
+    }
 
     // Files (optional)
     const files = form.getAll("photos").filter(Boolean) as File[];
@@ -141,6 +167,9 @@ export async function POST(req: Request) {
       phoneE164: string;
       address: string;
       eircode: string;
+      distanceKm?: string | null;
+      distanceDuration?: number | null;
+      distanceCost?: number | null;
       description: string;
       photos: {
         fileId: ObjectId;
@@ -160,6 +189,9 @@ export async function POST(req: Request) {
       phoneE164,
       address,
       eircode,
+      distanceKm,
+      distanceDuration,
+      distanceCost,
       description,
       photos: [],
       status: "pending",
