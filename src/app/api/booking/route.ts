@@ -91,6 +91,7 @@ export async function POST(req: Request) {
     // Required fields
     const service = String(form.get("service") ?? "");
     const date = String(form.get("date") ?? "");
+    const time = String(form.get("time") ?? "");
     const name = String(form.get("name") ?? "");
     const phoneRaw = String(form.get("phone") ?? "");
     const address = String(form.get("address") ?? "");
@@ -100,6 +101,7 @@ export async function POST(req: Request) {
     if (
       !service ||
       !date ||
+      !time ||
       !name ||
       !phoneRaw ||
       !address ||
@@ -133,6 +135,7 @@ export async function POST(req: Request) {
       _id?: ObjectId;
       service: string;
       date: string;
+      time: string;
       name: string;
       phoneRaw: string;
       phoneE164: string;
@@ -151,6 +154,7 @@ export async function POST(req: Request) {
     } = {
       service,
       date,
+      time,
       name,
       phoneRaw,
       phoneE164,

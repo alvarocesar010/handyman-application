@@ -24,7 +24,6 @@ declare global {
 
 const ADS_SEND_TO = "AW-10991191295/_1A7CLqc3LYbEP-Jgfko";
 
-/** Promise-based conversion fire. Resolves on event_callback or after timeout. */
 function reportConversionAwait(
   params?: { value?: number; currency?: string },
   timeoutMs = 2000
@@ -85,7 +84,6 @@ const ALIASES: Record<string, string> = {
   "tap-repair": "tap-replacement",
   "washing-machine-install": "fit-washing-dishwasher",
   "dishwasher-install": "fit-washing-dishwasher",
-  // extras you may want:
   "tv-install": "tv-assembly",
   "tv-mount": "tv-assembly",
   curtains: "curtain-installation",
@@ -121,14 +119,15 @@ export default function BookingClient() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [confirmedBooking, setConfirmedBooking] = useState<null | {
+    bookingId: string;
     service: string;
     date: string;
+    time: string;
     name: string;
     address: string;
     eircode: string;
   }>(null);
 
-  // NEW: refs for hidden inputs
   const cameraInputRef = useRef<HTMLInputElement | null>(null);
   const galleryInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -157,7 +156,7 @@ export default function BookingClient() {
       "image/heic",
       "image/heif",
     ];
-    const maxEach = 5 * 1024 * 1024; // 5MB
+    const maxEach = 5 * 1024 * 1024;
     const maxCount = 5;
 
     const next: LocalPhoto[] = [];
@@ -186,7 +185,6 @@ export default function BookingClient() {
     });
   }
 
-  // NEW: cleanup helper to avoid leaking object URLs
   function clearPhotos() {
     setPhotos((prev) => {
       prev.forEach((p) => URL.revokeObjectURL(p.url));
@@ -206,38 +204,39 @@ export default function BookingClient() {
     try {
       if (!selected) {
         toast.error("Please choose a service first.");
-        setIsSubmitting(false);
         return;
       }
 
-      const form = e.currentTarget as HTMLFormElement;
+      const form = e.currentTarget;
       const fd = new FormData(form);
       fd.set("service", selected.slug);
       photos.forEach((p) => fd.append("photos", p.file));
 
-      // Submit to API
       const res = await fetch("/api/booking", { method: "POST", body: fd });
       if (!res.ok) throw new Error("Failed to submit booking.");
 
-      // Wait for conversion (non-blocking with timeout)
+      const data: { id?: string } = await res.json();
+      if (!data.id) throw new Error("Booking ID not returned.");
+
       await reportConversionAwait({ value: 1.0, currency: "EUR" }, 2000);
 
       toast.success("Booking request sent! We'll confirm shortly.");
-      const bookingData = {
+
+      setConfirmedBooking({
+        bookingId: data.id,
         service: selected.slug,
         date: fd.get("date") as string,
+        time: fd.get("time") as string,
         name: fd.get("name") as string,
         address: fd.get("address") as string,
         eircode: fd.get("eircode") as string,
-      };
-
-      setConfirmedBooking(bookingData);
+      });
 
       clearPhotos();
     } catch (err: unknown) {
-      toast.error(
-        getErrorMessage(err) || "Something went wrong. Please try again."
-      );
+      const message = getErrorMessage(err);
+      setError(message);
+      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -256,7 +255,6 @@ export default function BookingClient() {
               Book a Service
             </h1>
 
-            {/* Selected pill */}
             <div className="flex items-center gap-3">
               <span className="text-slate-600">Selected:</span>
               {selected ? (
@@ -280,17 +278,34 @@ export default function BookingClient() {
             onSubmit={handleSubmit}
             className="space-y-6 rounded-xl border border-slate-200 bg-slate-50 p-6 shadow-sm"
           >
-            {/* Date */}
-            <div className="grid gap-2">
-              <label className="text-sm font-medium text-slate-700">
-                Preferred date
-              </label>
-              <input
-                type="date"
-                name="date"
-                required
-                className="rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-600"
-              />
+            {/* Date & Time */}
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-2">
+                <label className="text-sm font-medium text-slate-700">
+                  Preferred date
+                </label>
+                <input
+                  type="date"
+                  name="date"
+                  required
+                  className="rounded-md border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-cyan-600"
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <label className="text-sm font-medium text-slate-700">
+                  Preferred time
+                </label>
+                <input
+                  type="time"
+                  name="time"
+                  required
+                  className="rounded-md border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-cyan-600"
+                />
+                <p className="text-xs text-slate-500">
+                  We’ll confirm availability before arrival.
+                </p>
+              </div>
             </div>
 
             {/* Details */}
@@ -327,7 +342,7 @@ export default function BookingClient() {
               </div>
             </div>
 
-            {/* Problem description */}
+            {/* Description */}
             <div className="grid gap-2">
               <label className="text-sm font-medium text-slate-700">
                 Describe the issue
@@ -336,7 +351,7 @@ export default function BookingClient() {
                 name="description"
                 rows={4}
                 required
-                className="rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-600"
+                className="rounded-md border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-cyan-600"
               />
             </div>
 
@@ -346,71 +361,55 @@ export default function BookingClient() {
                 Add photos (optional)
               </label>
 
-              {/* Hidden inputs */}
               <input
                 ref={cameraInputRef}
                 type="file"
-                accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
+                accept="image/*"
                 capture="environment"
                 onChange={onFilesChange}
                 className="hidden"
               />
-
               <input
                 ref={galleryInputRef}
                 type="file"
-                accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
+                accept="image/*"
                 multiple
                 onChange={onFilesChange}
                 className="hidden"
               />
 
-              {/* Visible buttons */}
-              <div className="flex flex-wrap gap-3">
+              <div className="flex gap-3">
                 <button
                   type="button"
                   onClick={() => cameraInputRef.current?.click()}
-                  className="inline-flex items-center justify-center rounded-md bg-cyan-700 px-4 py-2 text-sm font-medium text-white hover:bg-cyan-800"
+                  className="rounded-md bg-cyan-700 px-4 py-2 text-white"
                 >
                   Take photo
                 </button>
-
                 <button
                   type="button"
                   onClick={() => galleryInputRef.current?.click()}
-                  className="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                  className="rounded-md border px-4 py-2"
                 >
-                  Choose from gallery
+                  Choose photos
                 </button>
-
-                {photos.length > 0 && (
-                  <button
-                    type="button"
-                    onClick={clearPhotos}
-                    className="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
-                  >
-                    Clear
-                  </button>
-                )}
               </div>
 
               {photos.length > 0 && (
                 <div className="mt-2 grid grid-cols-3 gap-3 sm:grid-cols-4">
-                  {photos.map((p, idx) => (
+                  {photos.map((p, i) => (
                     <div key={p.url} className="relative aspect-square">
                       <Image
                         src={p.url}
-                        alt={`Upload ${idx + 1}`}
+                        alt=""
                         fill
-                        sizes="(max-width: 640px) 33vw, 25vw"
-                        className="rounded-md object-cover ring-1 ring-slate-200"
+                        className="rounded-md object-cover"
                         unoptimized
                       />
                       <button
                         type="button"
-                        onClick={() => removePhoto(idx)}
-                        className="absolute right-1 top-1 rounded bg-black/60 px-1.5 py-0.5 text-xs text-white"
-                        aria-label="Remove image"
+                        onClick={() => removePhoto(i)}
+                        className="absolute top-1 right-1 bg-black/60 text-white text-xs px-1 rounded"
                       >
                         ✕
                       </button>
@@ -418,20 +417,15 @@ export default function BookingClient() {
                   ))}
                 </div>
               )}
-
-              <p className="text-xs text-slate-500">
-                Up to 5 images, 5MB each. JPG/PNG/WEBP/HEIC supported.
-              </p>
             </div>
-
-            <input type="hidden" name="service" value={selected?.slug ?? ""} />
-
-            {error && <p className="text-sm text-rose-700">{error}</p>}
+            {error && (
+              <p className="text-sm text-rose-700 font-medium">{error}</p>
+            )}
 
             <button
               type="submit"
               disabled={isSubmitting}
-              className="inline-flex h-11 items-center justify-center rounded-lg bg-cyan-700 px-5 text-white font-medium hover:bg-cyan-800 focus:outline-none focus:ring-2 focus:ring-cyan-600 disabled:opacity-60"
+              className="w-full rounded-lg bg-cyan-700 py-3 text-white font-bold hover:bg-cyan-800"
             >
               {isSubmitting ? "Sending..." : "Request booking"}
             </button>
