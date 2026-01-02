@@ -6,6 +6,7 @@ import Image from "next/image";
 import { toast } from "react-toastify";
 import ServicePickerModal from "@/components/ServicePickerModal";
 import { SERVICES } from "@/lib/services";
+import BookingConfirmationCard from "@/components/booking/BookingConfirmationCard";
 
 /* ------------------------- Google Ads / gtag setup ------------------------- */
 
@@ -119,6 +120,14 @@ export default function BookingClient() {
   const [error, setError] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [confirmedBooking, setConfirmedBooking] = useState<null | {
+    service: string;
+    date: string;
+    name: string;
+    address: string;
+    eircode: string;
+  }>(null);
+
   // NEW: refs for hidden inputs
   const cameraInputRef = useRef<HTMLInputElement | null>(null);
   const galleryInputRef = useRef<HTMLInputElement | null>(null);
@@ -214,7 +223,16 @@ export default function BookingClient() {
       await reportConversionAwait({ value: 1.0, currency: "EUR" }, 2000);
 
       toast.success("Booking request sent! We'll confirm shortly.");
-      form.reset();
+      const bookingData = {
+        service: selected.slug,
+        date: fd.get("date") as string,
+        name: fd.get("name") as string,
+        address: fd.get("address") as string,
+        eircode: fd.get("eircode") as string,
+      };
+
+      setConfirmedBooking(bookingData);
+
       clearPhotos();
     } catch (err: unknown) {
       toast.error(
@@ -229,191 +247,197 @@ export default function BookingClient() {
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-10 space-y-8">
-      <header className="space-y-3">
-        <h1 className="text-3xl font-extrabold text-slate-900">
-          Book a Service
-        </h1>
+      {confirmedBooking ? (
+        <BookingConfirmationCard booking={confirmedBooking} />
+      ) : (
+        <>
+          <header className="space-y-3">
+            <h1 className="text-3xl font-extrabold text-slate-900">
+              Book a Service
+            </h1>
 
-        {/* Selected pill */}
-        <div className="flex items-center gap-3">
-          <span className="text-slate-600">Selected:</span>
-          {selected ? (
-            <span className="inline-flex items-center gap-2 rounded-full bg-cyan-50 px-3 py-1.5 text-cyan-800 ring-1 ring-cyan-200">
-              <selected.icon className="h-4 w-4" />
-              <span className="font-medium">{selected.title}</span>
-            </span>
-          ) : (
-            <span className="text-slate-400">— none —</span>
-          )}
-        </div>
+            {/* Selected pill */}
+            <div className="flex items-center gap-3">
+              <span className="text-slate-600">Selected:</span>
+              {selected ? (
+                <span className="inline-flex items-center gap-2 rounded-full bg-cyan-50 px-3 py-1.5 text-cyan-800 ring-1 ring-cyan-200">
+                  <selected.icon className="h-4 w-4" />
+                  <span className="font-medium">{selected.title}</span>
+                </span>
+              ) : (
+                <span className="text-slate-400">— none —</span>
+              )}
+            </div>
 
-        <ServicePickerModal
-          value={service}
-          onChange={setService}
-          ctaText={selected ? "Change service" : "Choose a service"}
-        />
-      </header>
-
-      <form
-        onSubmit={handleSubmit}
-        className="space-y-6 rounded-xl border border-slate-200 bg-slate-50 p-6 shadow-sm"
-      >
-        {/* Date */}
-        <div className="grid gap-2">
-          <label className="text-sm font-medium text-slate-700">
-            Preferred date
-          </label>
-          <input
-            type="date"
-            name="date"
-            required
-            className="rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-600"
-          />
-        </div>
-
-        {/* Details */}
-        <div className="grid gap-2">
-          <label className="text-sm font-medium text-slate-700">
-            Your details
-          </label>
-          <input
-            name="name"
-            placeholder="Full name"
-            required
-            className="rounded-md border border-slate-300 px-3 py-2"
-          />
-          <input
-            name="phone"
-            placeholder="Phone"
-            required
-            className="rounded-md border border-slate-300 px-3 py-2"
-          />
-
-          <div className="grid gap-3 sm:grid-cols-[1fr,200px]">
-            <input
-              name="address"
-              placeholder="Address (Dublin)"
-              required
-              className="rounded-md border border-slate-300 px-3 py-2"
+            <ServicePickerModal
+              value={service}
+              onChange={setService}
+              ctaText={selected ? "Change service" : "Choose a service"}
             />
-            <input
-              name="eircode"
-              placeholder="Eircode (e.g., D01 F5P2)"
-              required
-              className="rounded-md border border-slate-300 px-3 py-2 uppercase"
-            />
-          </div>
-        </div>
+          </header>
 
-        {/* Problem description */}
-        <div className="grid gap-2">
-          <label className="text-sm font-medium text-slate-700">
-            Describe the issue
-          </label>
-          <textarea
-            name="description"
-            rows={4}
-            required
-            className="rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-600"
-          />
-        </div>
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-6 rounded-xl border border-slate-200 bg-slate-50 p-6 shadow-sm"
+          >
+            {/* Date */}
+            <div className="grid gap-2">
+              <label className="text-sm font-medium text-slate-700">
+                Preferred date
+              </label>
+              <input
+                type="date"
+                name="date"
+                required
+                className="rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-600"
+              />
+            </div>
 
-        {/* Photos */}
-        <div className="grid gap-2">
-          <label className="text-sm font-medium text-slate-700">
-            Add photos (optional)
-          </label>
+            {/* Details */}
+            <div className="grid gap-2">
+              <label className="text-sm font-medium text-slate-700">
+                Your details
+              </label>
+              <input
+                name="name"
+                placeholder="Full name"
+                required
+                className="rounded-md border border-slate-300 px-3 py-2"
+              />
+              <input
+                name="phone"
+                placeholder="Phone"
+                required
+                className="rounded-md border border-slate-300 px-3 py-2"
+              />
 
-          {/* Hidden inputs */}
-          <input
-            ref={cameraInputRef}
-            type="file"
-            accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
-            capture="environment"
-            onChange={onFilesChange}
-            className="hidden"
-          />
+              <div className="grid gap-3 sm:grid-cols-[1fr,200px]">
+                <input
+                  name="address"
+                  placeholder="Address (Dublin)"
+                  required
+                  className="rounded-md border border-slate-300 px-3 py-2"
+                />
+                <input
+                  name="eircode"
+                  placeholder="Eircode (e.g., D01 F5P2)"
+                  required
+                  className="rounded-md border border-slate-300 px-3 py-2 uppercase"
+                />
+              </div>
+            </div>
 
-          <input
-            ref={galleryInputRef}
-            type="file"
-            accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
-            multiple
-            onChange={onFilesChange}
-            className="hidden"
-          />
+            {/* Problem description */}
+            <div className="grid gap-2">
+              <label className="text-sm font-medium text-slate-700">
+                Describe the issue
+              </label>
+              <textarea
+                name="description"
+                rows={4}
+                required
+                className="rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-600"
+              />
+            </div>
 
-          {/* Visible buttons */}
-          <div className="flex flex-wrap gap-3">
-            <button
-              type="button"
-              onClick={() => cameraInputRef.current?.click()}
-              className="inline-flex items-center justify-center rounded-md bg-cyan-700 px-4 py-2 text-sm font-medium text-white hover:bg-cyan-800"
-            >
-              Take photo
-            </button>
+            {/* Photos */}
+            <div className="grid gap-2">
+              <label className="text-sm font-medium text-slate-700">
+                Add photos (optional)
+              </label>
 
-            <button
-              type="button"
-              onClick={() => galleryInputRef.current?.click()}
-              className="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
-            >
-              Choose from gallery
-            </button>
+              {/* Hidden inputs */}
+              <input
+                ref={cameraInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
+                capture="environment"
+                onChange={onFilesChange}
+                className="hidden"
+              />
 
-            {photos.length > 0 && (
-              <button
-                type="button"
-                onClick={clearPhotos}
-                className="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
-              >
-                Clear
-              </button>
-            )}
-          </div>
+              <input
+                ref={galleryInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
+                multiple
+                onChange={onFilesChange}
+                className="hidden"
+              />
 
-          {photos.length > 0 && (
-            <div className="mt-2 grid grid-cols-3 gap-3 sm:grid-cols-4">
-              {photos.map((p, idx) => (
-                <div key={p.url} className="relative aspect-square">
-                  <Image
-                    src={p.url}
-                    alt={`Upload ${idx + 1}`}
-                    fill
-                    sizes="(max-width: 640px) 33vw, 25vw"
-                    className="rounded-md object-cover ring-1 ring-slate-200"
-                    unoptimized
-                  />
+              {/* Visible buttons */}
+              <div className="flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  onClick={() => cameraInputRef.current?.click()}
+                  className="inline-flex items-center justify-center rounded-md bg-cyan-700 px-4 py-2 text-sm font-medium text-white hover:bg-cyan-800"
+                >
+                  Take photo
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => galleryInputRef.current?.click()}
+                  className="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                >
+                  Choose from gallery
+                </button>
+
+                {photos.length > 0 && (
                   <button
                     type="button"
-                    onClick={() => removePhoto(idx)}
-                    className="absolute right-1 top-1 rounded bg-black/60 px-1.5 py-0.5 text-xs text-white"
-                    aria-label="Remove image"
+                    onClick={clearPhotos}
+                    className="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
                   >
-                    ✕
+                    Clear
                   </button>
+                )}
+              </div>
+
+              {photos.length > 0 && (
+                <div className="mt-2 grid grid-cols-3 gap-3 sm:grid-cols-4">
+                  {photos.map((p, idx) => (
+                    <div key={p.url} className="relative aspect-square">
+                      <Image
+                        src={p.url}
+                        alt={`Upload ${idx + 1}`}
+                        fill
+                        sizes="(max-width: 640px) 33vw, 25vw"
+                        className="rounded-md object-cover ring-1 ring-slate-200"
+                        unoptimized
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removePhoto(idx)}
+                        className="absolute right-1 top-1 rounded bg-black/60 px-1.5 py-0.5 text-xs text-white"
+                        aria-label="Remove image"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
+
+              <p className="text-xs text-slate-500">
+                Up to 5 images, 5MB each. JPG/PNG/WEBP/HEIC supported.
+              </p>
             </div>
-          )}
 
-          <p className="text-xs text-slate-500">
-            Up to 5 images, 5MB each. JPG/PNG/WEBP/HEIC supported.
-          </p>
-        </div>
+            <input type="hidden" name="service" value={selected?.slug ?? ""} />
 
-        <input type="hidden" name="service" value={selected?.slug ?? ""} />
+            {error && <p className="text-sm text-rose-700">{error}</p>}
 
-        {error && <p className="text-sm text-rose-700">{error}</p>}
-
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="inline-flex h-11 items-center justify-center rounded-lg bg-cyan-700 px-5 text-white font-medium hover:bg-cyan-800 focus:outline-none focus:ring-2 focus:ring-cyan-600 disabled:opacity-60"
-        >
-          {isSubmitting ? "Sending..." : "Request booking"}
-        </button>
-      </form>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="inline-flex h-11 items-center justify-center rounded-lg bg-cyan-700 px-5 text-white font-medium hover:bg-cyan-800 focus:outline-none focus:ring-2 focus:ring-cyan-600 disabled:opacity-60"
+            >
+              {isSubmitting ? "Sending..." : "Request booking"}
+            </button>
+          </form>
+        </>
+      )}
     </main>
   );
 }
