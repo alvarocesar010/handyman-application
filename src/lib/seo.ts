@@ -17,5 +17,5 @@ export function absUrl(path = "/") {
 }
 
 export function pageTitle(title?: string) {
-  return title ? `${title} | ${SITE.name}` : SITE.name;
+  return title ?? SITE.name;
 }

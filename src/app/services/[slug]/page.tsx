@@ -198,6 +198,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
           </Link>
         </div>
 
+        {/* Service schema */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -218,23 +219,37 @@ export default async function ServiceDetailPage({ params }: PageProps) {
               hasOfferCatalog: categoryNames
                 ? {
                     "@type": "OfferCatalog",
-                    name: "Door services",
+                    name: svc.categoriesTitle ?? `${svc.title} services`,
                     itemListElement: categoryNames.map((c) => ({
                       "@type": "OfferCatalog",
                       name: c,
                     })),
                   }
                 : undefined,
-              offers: svc.startingPrice
-                ? {
-                    "@type": "Offer",
-                    priceCurrency: "EUR",
-                    price: (svc.startingPrice / 100).toFixed(0),
-                  }
-                : undefined,
             }),
           }}
         />
+
+        {/* FAQ schema */}
+        {svc.faqs && svc.faqs.length > 0 && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "FAQPage",
+                mainEntity: svc.faqs.map(({ q, a }) => ({
+                  "@type": "Question",
+                  name: q,
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: a,
+                  },
+                })),
+              }),
+            }}
+          />
+        )}
       </main>
 
       <div className="fixed inset-x-0 bottom-0 z-40  print:hidden">

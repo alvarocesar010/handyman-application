@@ -290,6 +290,20 @@ export const SERVICES: Service[] = [
       "Area cleaned and packaging removed",
     ],
     icon: Ruler,
+    faqs: [
+      {
+        q: "Do you install both curtains and blinds?",
+        a: "Yes, we install all types of curtains and blinds, including rails, tracks, roller blinds and Venetian blinds.",
+      },
+      {
+        q: "Can you install curtains if I already have them?",
+        a: "Absolutely. You can supply your own curtains or blinds and we’ll install them securely.",
+      },
+      {
+        q: "Do you drill into concrete or plaster walls?",
+        a: "Yes, we use the correct fixings depending on the wall type to ensure a safe installation.",
+      },
+    ],
 
     steps: [
       {
@@ -541,6 +555,10 @@ export const SERVICES: Service[] = [
         q: "What areas of the home can you install laminate in?",
         a: "We install laminate in bedrooms, living rooms, hallways, home offices and more – anywhere dry and suitable for laminate.",
       },
+      {
+        q: "How long does laminate flooring installation take?",
+        a: "Most rooms are completed within one to two days depending on size and layout.",
+      },
     ],
 
     icon: Layers, // or Flooring, Ruler, Home – depending on your icon set
@@ -650,6 +668,14 @@ export const SERVICES: Service[] = [
         q: "Do you work on all brands?",
         a: "Yes—most common household brands. For out-of-support units we’ll advise options.",
       },
+      {
+        q: "What types of heaters do you service?",
+        a: "We service most electric and non-gas heaters commonly found in Irish homes.",
+      },
+      {
+        q: "Do you work on gas heaters?",
+        a: "For gas appliances, we coordinate with a registered RGII gas installer when required.",
+      },
     ],
     icon: Heater,
   },
@@ -662,6 +688,17 @@ export const SERVICES: Service[] = [
       "We fit new washing machines and dishwashers, connect water in/out, level the unit, and run a short test cycle to confirm there are no leaks. We can also replace old hoses and valves if needed.",
     startingPrice: 5500,
     durationHint: "60–90 minutes",
+    faqs: [
+      {
+        q: "Do you install both washing machines and dishwashers?",
+        a: "Yes, we install both appliances including water and waste connections.",
+      },
+      {
+        q: "Do you test the appliance after installation?",
+        a: "Yes, we run a short test cycle to ensure there are no leaks and everything works correctly.",
+      },
+    ],
+
     inclusions: [
       "Positioning your appliance",
       "Connect water & waste",
@@ -680,6 +717,17 @@ export const SERVICES: Service[] = [
       "We isolate water, remove the old tap, clean the seating, fit the new tap with fresh seals, and check for leaks. We can advise on suitable taps if your sink has a non-standard hole size.",
     startingPrice: 5000,
     durationHint: "45–60 minutes",
+    faqs: [
+      {
+        q: "Can you replace kitchen and bathroom taps?",
+        a: "Yes, we replace taps in kitchens, bathrooms and utility rooms.",
+      },
+      {
+        q: "Do I need to supply the tap?",
+        a: "You can supply your own tap or we can recommend suitable options.",
+      },
+    ],
+
     inclusions: [
       "Removal & install",
       "New flexi tails if needed",
@@ -696,6 +744,17 @@ export const SERVICES: Service[] = [
       "We replace ceiling and wall light fittings, check connections, and test operation. For new circuits or outdoor wiring we involve a registered electrician for compliance.",
     startingPrice: 5000,
     durationHint: "30–60 minutes",
+    faqs: [
+      {
+        q: "Do you replace ceiling and wall lights?",
+        a: "Yes, we replace most standard ceiling and wall light fittings.",
+      },
+      {
+        q: "Do you install new wiring?",
+        a: "Basic replacements are included. New circuits require a registered electrician.",
+      },
+    ],
+
     inclusions: ["Remove old fitting", "Install new fitting", "Basic testing"],
     icon: Lightbulb,
   },
@@ -708,6 +767,17 @@ export const SERVICES: Service[] = [
       "We troubleshoot common issues like broken switches, faulty sockets, and fixture replacements. For consumer unit work or new wiring we partner with a Safe Electric registered electrician.",
     startingPrice: 6000,
     durationHint: "Varies by issue",
+    faqs: [
+      {
+        q: "Do you replace ceiling and wall lights?",
+        a: "Yes, we replace most standard ceiling and wall light fittings.",
+      },
+      {
+        q: "Do you install new wiring?",
+        a: "Basic replacements are included. New circuits require a registered electrician.",
+      },
+    ],
+
     inclusions: [
       "Fault finding",
       "Replace defective parts (labour)",
@@ -725,6 +795,17 @@ export const SERVICES: Service[] = [
       "Our experts install your new TV so you can start watching your favourite shows as soon as possible. We’ll set up your TV, connect it to any existing equipment, hook up soundbars or speakers, connect smart TVs to your WiFi, give you a full demo, and clear up all packaging when we’re done.",
     startingPrice: 6000,
     durationHint: "Varies by TV size and setup",
+    faqs: [
+      {
+        q: "Do you mount TVs on walls?",
+        a: "Yes, we can mount TVs on walls if a suitable bracket is supplied.",
+      },
+      {
+        q: "Do you connect soundbars or other devices?",
+        a: "Yes, we connect soundbars, consoles and other equipment as part of the setup.",
+      },
+    ],
+
     inclusions: [
       "Set up your TV on a stand or mount it to a wall (wall bracket required)",
       "Connect to home cinema, soundbar, or speakers",
@@ -743,6 +824,17 @@ export const SERVICES: Service[] = [
       "Whether your shower is leaking, the temperature control is acting up, or you’re just not getting the pressure you used to, our technicians are on hand. We handle all types of shower repairs — from electric and mixer showers to digital systems. We work with the most trusted brands you’ll find around Dublin such as Mira, Triton and many more. You’ll receive a full diagnosis, parts replaced if needed, a demonstration of the fixed unit, and we’ll leave the area clean and tidy when we’re done.",
     startingPrice: 4500,
     durationHint: "Typically 1 to 3 hours (depends on fault & system)",
+    faqs: [
+      {
+        q: "What shower brands do you repair?",
+        a: "We repair most major brands including Mira, Triton and Aqualisa.",
+      },
+      {
+        q: "Do you replace shower parts?",
+        a: "Yes, worn or faulty parts can be replaced if available.",
+      },
+    ],
+
     inclusions: [
       "Inspection & fault diagnosis",
       "Replacement of worn or faulty parts",
