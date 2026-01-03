@@ -118,6 +118,7 @@ export default function BookingClient() {
   const [photos, setPhotos] = useState<LocalPhoto[]>([]);
   const [error, setError] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const topRef = useRef<HTMLDivElement | null>(null);
 
   const [confirmedBooking, setConfirmedBooking] = useState<null | {
     bookingId: string;
@@ -142,6 +143,11 @@ export default function BookingClient() {
     () => SERVICES.find((s) => s.slug === service),
     [service]
   );
+  useEffect(() => {
+    if (confirmedBooking) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [confirmedBooking]);
 
   /* ------------------------------ Photo handlers ----------------------------- */
 
@@ -246,7 +252,7 @@ export default function BookingClient() {
   /* ---------------------------------- UI ------------------------------------ */
 
   return (
-    <main className="mx-auto max-w-3xl px-6 py-10 space-y-8">
+    <main ref={topRef} className="mx-auto max-w-3xl px-6 py-10 space-y-8">
       {confirmedBooking ? (
         <BookingConfirmationCard booking={confirmedBooking} />
       ) : (
