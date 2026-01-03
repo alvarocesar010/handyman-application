@@ -1,6 +1,6 @@
 // src/lib/seo.ts
 export const SITE = {
-  name: "Dublin Handyman",
+  name: "Dubliner Handyman",
   url: process.env.SITE_URL || "http://localhost:3000",
   locale: "en_IE",
   twitter: "@yourhandle", // or "" if none

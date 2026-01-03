@@ -29,8 +29,14 @@ export async function generateMetadata({
     };
 
   const url = absUrl(`/services/${svc.slug}`);
-  const title = pageTitle(svc.title);
-  const desc = svc.summary;
+  const titleText = `${svc.title} in Dublin`;
+  const title = pageTitle(titleText);
+
+  const desc = `${
+    svc.summary
+  } Available across Dublin. Book ${svc.title.toLowerCase()} online with ${
+    SITE.name
+  }.`;
 
   return {
     title,
@@ -106,6 +112,13 @@ export default async function ServiceDetailPage({ params }: PageProps) {
         <section className="prose prose-slate max-w-none">
           <h2>What we do</h2>
           <p>{svc.longDescription}</p>
+          <p>
+            Ready to get started?{" "}
+            <Link href={`/booking?service=${svc.slug}`}>
+              Book your {svc.title.toLowerCase()} in Dublin today
+            </Link>
+            .
+          </p>
         </section>
 
         {svc.categories && (
@@ -193,8 +206,15 @@ export default async function ServiceDetailPage({ params }: PageProps) {
               "@type": "Service",
               name: svc.title,
               description: svc.summary,
-              areaServed: "Dublin, Ireland",
-              provider: { "@type": "LocalBusiness", name: "Dublin Handyman" },
+              areaServed: {
+                "@type": "AdministrativeArea",
+                name: "Dublin, Ireland",
+              },
+              provider: {
+                "@type": "LocalBusiness",
+                name: SITE.name,
+                url: SITE.url,
+              },
               hasOfferCatalog: categoryNames
                 ? {
                     "@type": "OfferCatalog",
