@@ -160,12 +160,6 @@ export default function Footer() {
             reserved.
           </p>
           <div className="flex gap-4">
-            <Link href="/privacy" className="hover:text-white">
-              Privacy
-            </Link>
-            <Link href="/terms" className="hover:text-white">
-              Terms
-            </Link>
             <span>Mon–Sat 08:00–20:00 · Emergencies by phone</span>
           </div>
         </div>
