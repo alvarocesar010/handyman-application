@@ -129,7 +129,6 @@ export async function POST(req: Request) {
     let distanceDuration: number | null = null;
 
     try {
-      console.log(eircode);
       const distanceRes = await fetch(
         `${
           process.env.NEXT_PUBLIC_BASE_URL ?? "https://dublinerhandyman.ie"

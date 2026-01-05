@@ -23,7 +23,6 @@ export default function BookingHeader({
     hour12: true,
   });
   const photosCount = booking.photos?.length ?? 0;
-console.log(booking)
   return (
     <div className="px-4 py-3">
       <div className="flex items-start justify-between gap-3">
