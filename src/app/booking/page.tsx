@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import BookingClient from "./BookingClient";
 import type { Metadata } from "next";
-import QuoteBuilder from "@/components/Quote/QuoteBuilder";
 
 export const metadata: Metadata = {
   title: "Book a Repair | Dubliner Handyman",
@@ -18,7 +17,6 @@ export default function BookingPage() {
       fallback={<div className="p-10 text-center">Loading booking form...</div>}
     >
       <BookingClient />
-      <QuoteBuilder />
     </Suspense>
   );
 }

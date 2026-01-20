@@ -5,6 +5,7 @@ import type { Bucket, Preset, RangeInfo } from "./types";
 
 type Props = {
   initialRange: RangeInfo;
+  status: string;
 };
 
 function toISODateOnly(d: Date): string {
@@ -14,35 +15,36 @@ function toISODateOnly(d: Date): string {
   return `${y}-${m}-${day}`;
 }
 
-function monthRange(now: Date): { from: string; to: string } {
+function monthRange(now: Date) {
   const from = new Date(now.getFullYear(), now.getMonth(), 1);
-  const to = new Date(now.getFullYear(), now.getMonth() + 1, 0); // last day of month
+  const to = new Date(now.getFullYear(), now.getMonth() + 1, 0);
   return { from: toISODateOnly(from), to: toISODateOnly(to) };
 }
 
-function weekRange(now: Date): { from: string; to: string } {
+function weekRange(now: Date) {
   const d = new Date(now);
-  const day = d.getDay(); // 0..6 (Sun..Sat)
-  const diff = day === 0 ? 6 : day - 1; // Monday start
+  const day = d.getDay();
+  const diff = day === 0 ? 6 : day - 1;
   d.setDate(d.getDate() - diff);
+
   const from = new Date(d);
   const to = new Date(d);
   to.setDate(from.getDate() + 6);
+
   return { from: toISODateOnly(from), to: toISODateOnly(to) };
 }
 
-function todayRange(now: Date): { from: string; to: string } {
+function todayRange(now: Date) {
   const iso = toISODateOnly(now);
   return { from: iso, to: iso };
 }
 
-export default function AdminBookingsFilters({ initialRange }: Props) {
+export default function AdminBookingsFilters({ initialRange, status }: Props) {
   const [preset, setPreset] = useState<Preset>(initialRange.preset);
   const [bucket, setBucket] = useState<Bucket>(initialRange.bucket);
-  const [from, setFrom] = useState<string>(initialRange.from);
-  const [to, setTo] = useState<string>(initialRange.to);
+  const [from, setFrom] = useState(initialRange.from);
+  const [to, setTo] = useState(initialRange.to);
 
-  // Update dates when preset changes (dashboard behaviour)
   useEffect(() => {
     const now = new Date();
 
@@ -51,7 +53,6 @@ export default function AdminBookingsFilters({ initialRange }: Props) {
       setFrom(r.from);
       setTo(r.to);
       setBucket("day");
-      return;
     }
 
     if (preset === "week") {
@@ -59,7 +60,6 @@ export default function AdminBookingsFilters({ initialRange }: Props) {
       setFrom(r.from);
       setTo(r.to);
       setBucket("day");
-      return;
     }
 
     if (preset === "month") {
@@ -67,37 +67,22 @@ export default function AdminBookingsFilters({ initialRange }: Props) {
       setFrom(r.from);
       setTo(r.to);
       setBucket("day");
-      return;
     }
-
-    if (preset === "all") {
-      // Keep from/to but you can ignore them server-side when preset=all
-      // Still render something meaningful
-      // No auto change needed
-      return;
-    }
-
-    // custom: user edits dates
   }, [preset]);
 
   const queryString = useMemo(() => {
     const sp = new URLSearchParams();
     sp.set("preset", preset);
     sp.set("bucket", bucket);
+    sp.set("status", status); // ✅ KEEP STATUS
 
-    if (preset === "custom") {
-      sp.set("from", from);
-      sp.set("to", to);
-    }
-
-    // optional: keep from/to visible even for month/week/today
-    if (preset !== "custom" && preset !== "all") {
+    if (preset !== "all") {
       sp.set("from", from);
       sp.set("to", to);
     }
 
     return sp.toString();
-  }, [preset, bucket, from, to]);
+  }, [preset, bucket, from, to, status]);
 
   return (
     <div className="flex flex-wrap items-center gap-3">

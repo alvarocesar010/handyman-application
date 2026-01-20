@@ -9,6 +9,7 @@ import type {
   AdminBooking,
   AdminBookingStatus,
 } from "@/components/admin/AdminBookingCard/types";
+import ConfirmedDayGroup from "@/components/admin/AdminBookingCard/ConfimedDayGroup";
 
 export const dynamic = "force-dynamic";
 
@@ -211,7 +212,7 @@ export default async function AdminBookingsPage({
   // - pending + confirmed: always visible (ignore range)
   // - done + cancelled: respect range using effective service date
   const filtered = docs.filter((d) => {
-    if (d.status === "pending" || d.status === "confirmed") return true;
+    if (d.status === "pending") return true;
     const dateISO = effectiveServiceDateISO(d);
     return inRange(dateISO, range.from, range.to);
   });
@@ -251,6 +252,38 @@ export default async function AdminBookingsPage({
       ? "Done"
       : "Cancelled";
 
+  function getDayKey(dateISO: string) {
+    const d = new Date(dateISO);
+    const weekday = d.toLocaleDateString("en-IE", { weekday: "long" });
+    const date = d.toLocaleDateString("en-IE", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+
+    return {
+      key: dateISO,
+      label: `${weekday} · ${date}`,
+    };
+  }
+  const confirmedByDay = new Map<
+    string,
+    { label: string; items: AdminBooking[] }
+  >();
+
+  if (activeStatus === "confirmed") {
+    for (const booking of byStatus.confirmed) {
+      const dateISO = booking.serviceDate ?? booking.date;
+      const { key, label } = getDayKey(dateISO);
+
+      if (!confirmedByDay.has(key)) {
+        confirmedByDay.set(key, { label, items: [] });
+      }
+
+      confirmedByDay.get(key)!.items.push(booking);
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-4">
@@ -264,7 +297,7 @@ export default async function AdminBookingsPage({
       </div>
 
       {/* dashboard-like filters */}
-      <AdminBookingsFilters initialRange={range} />
+      <AdminBookingsFilters initialRange={range} status={activeStatus} />
 
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <StatusTabs
@@ -278,7 +311,21 @@ export default async function AdminBookingsPage({
         </div>
       </div>
 
-      <AdminBookingsSection title={title} items={byStatus[activeStatus]} />
+      {activeStatus === "confirmed" ? (
+        <div className="space-y-4">
+          {[...confirmedByDay.entries()]
+            .sort(([dateA], [dateB]) => dateA.localeCompare(dateB))
+            .map(([date, group]) => (
+              <ConfirmedDayGroup
+                key={date}
+                label={group.label}
+                items={group.items}
+              />
+            ))}
+        </div>
+      ) : (
+        <AdminBookingsSection title={title} items={byStatus[activeStatus]} />
+      )}
     </div>
   );
 }
