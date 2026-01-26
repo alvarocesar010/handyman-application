@@ -2,7 +2,12 @@ import Image from "next/image";
 import Link from "next/link";
 import TrackedCallButton from "../TrackedCallButton";
 
-const HeroSection = () => {
+import { getLocale } from "@/lib/getLocale";
+import { getMessages } from "@/lib/getMessages";
+
+export default async function HeroSection() {
+  const locale = await getLocale();
+  const t = getMessages(locale);
   return (
     <section
       aria-labelledby="hero-title"
@@ -16,6 +21,7 @@ const HeroSection = () => {
             className="text-3xl md:text-4xl font-extrabold tracking-tight text-indigo-950"
           >
             Handyman Services in Dublin – Repairs & Maintenance
+            {t.home.title}
           </h1>
 
           <p className="text-slate-800 leading-relaxed">
@@ -61,6 +67,4 @@ const HeroSection = () => {
       </div>
     </section>
   );
-};
-
-export default HeroSection;
+}
