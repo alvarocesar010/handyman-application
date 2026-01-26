@@ -2,36 +2,43 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { QuoteItem, FurnitureType } from "@/types/quote";
-import { calculateQuoteTotals } from "@/lib/pricing/calculator";
-import { FURNITURE_REGISTRY } from "./furniture/registry";
-import FurniturePickerModal from "./FurniturePickerModal";
 
-type Step = "select" | "details" | "eircode";
+import { QuoteItem, QuoteItemType } from "@/types/quote";
+import { calculateQuoteTotals } from "@/lib/pricing/calculator";
+
+import QuoteItemPickerModal from "./QuoteItemPickerModal";
+import { QUOTE_ITEM_REGISTRY } from "./registry";
+
+type Step = "idle" | "picker" | "details" | "location";
 
 export default function QuoteBuilder() {
   const router = useRouter();
 
-  const [step, setStep] = useState<Step>("select");
-  const [selectedFurniture, setSelectedFurniture] =
-    useState<FurnitureType | null>(null);
+  const [step, setStep] = useState<Step>("idle");
+  const [selectedType, setSelectedType] = useState<QuoteItemType | null>(null);
 
   const [items, setItems] = useState<QuoteItem[]>([]);
   const [eircode, setEircode] = useState("");
   const [travelCost, setTravelCost] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const selectedDef = selectedType
+    ? QUOTE_ITEM_REGISTRY.find((i) => i.type === selectedType) ?? null
+    : null;
+
   function handleAddItem(item: Omit<QuoteItem, "id">) {
     setItems((prev) => [...prev, { id: crypto.randomUUID(), ...item }]);
-    setStep("select");
+    setSelectedType(null);
+    setStep("location"); // 🔥 APÓS ITEM → LOCATION
   }
 
   function removeItem(id: string) {
     setItems((prev) => prev.filter((i) => i.id !== id));
   }
 
-  async function calculateDistance() {
+  async function calculateLocation() {
     if (!eircode) return;
+
     setLoading(true);
 
     const res = await fetch("/api/distance", {
@@ -43,12 +50,13 @@ export default function QuoteBuilder() {
     setLoading(false);
     if (!res.ok) return;
 
-    const data = await res.json();
+    const data = (await res.json()) as { cost: number };
     setTravelCost(data.cost);
+    setStep("idle"); // 🔥 volta pro estado neutro
   }
 
   const totals =
-    travelCost != null && items.length > 0
+    items.length > 0 && travelCost !== null
       ? calculateQuoteTotals(items, travelCost)
       : null;
 
@@ -60,9 +68,9 @@ export default function QuoteBuilder() {
         btoa(
           JSON.stringify({
             items,
-            travelCost: totals.adjustedTravelCost,
-            total: totals.finalTotal,
             eircode,
+            travelCost,
+            total: totals.finalTotal,
           })
         )
       )}`
@@ -71,36 +79,76 @@ export default function QuoteBuilder() {
 
   return (
     <section className="rounded-2xl border bg-white p-6 shadow-sm space-y-6">
+      {/* Header */}
       <div className="rounded-xl bg-cyan-50 p-4">
         <h2 className="text-xl font-bold">Get your quote now</h2>
         <p className="text-sm text-slate-600">
-          Instant price. No obligation. Final price confirmed before arrival.
+          Instant price. Final price confirmed before arrival.
         </p>
       </div>
 
-      {step === "select" && (
-        <FurniturePickerModal
-          ctaText={items.length === 0 ? "Choose furniture" : "Add another item"}
+      {/* Actions */}
+      <div className="flex gap-3">
+        <button
+          onClick={() => setStep("picker")}
+          className="rounded-xl bg-cyan-700 px-5 py-3 text-white font-semibold"
+        >
+          {step === "details" ? "Change item" : "Add item"}
+        </button>
+
+        {items.length > 0 && (
+          <button
+            onClick={() => setStep("location")}
+            className="flex-1 rounded-xl bg-slate-900 py-3 text-white font-semibold"
+          >
+            {travelCost !== null ? "Change location" : "Set location"}
+          </button>
+        )}
+      </div>
+
+      {/* Picker */}
+      {step === "picker" && (
+        <QuoteItemPickerModal
+          items={QUOTE_ITEM_REGISTRY}
+          title="Select item"
+          ctaText="Select"
           onChange={(type) => {
-            setSelectedFurniture(type);
+            setSelectedType(type);
             setStep("details");
           }}
         />
       )}
 
-      {step === "details" &&
-        selectedFurniture &&
-        (() => {
-          const def = FURNITURE_REGISTRY.find(
-            (f) => f.type === selectedFurniture
-          );
-          if (!def) return null;
-          const Form = def.Form;
-          return <Form onAddItem={handleAddItem} />;
-        })()}
+      {/* Item form (NUNCA ESCONDE A LISTA) */}
+      {step === "details" && selectedDef && (
+        <div className="space-y-3">
+          <p className="text-sm font-semibold">{selectedDef.label}</p>
+          <selectedDef.Form onAddItem={handleAddItem} />
+        </div>
+      )}
 
+      {/* Location */}
+      {step === "location" && (
+        <div className="space-y-3">
+          <input
+            value={eircode}
+            onChange={(e) => setEircode(e.target.value.toUpperCase())}
+            placeholder="Eircode (e.g. D01 Y313)"
+            className="w-full rounded border p-3"
+          />
+
+          <button
+            onClick={calculateLocation}
+            className="w-full rounded-xl bg-cyan-600 py-3 text-white font-semibold"
+          >
+            {loading ? "Calculating..." : "Calculate travel"}
+          </button>
+        </div>
+      )}
+
+      {/* Quote list (SEMPRE VISÍVEL SE TIVER ITEM) */}
       {items.length > 0 && (
-        <div className="rounded-xl border p-4 space-y-2">
+        <div className="rounded-xl border p-4 space-y-3">
           <h3 className="font-semibold">Your quote</h3>
 
           {items.map((item) => (
@@ -118,53 +166,39 @@ export default function QuoteBuilder() {
             </div>
           ))}
 
+          {travelCost !== null && (
+            <div className="flex justify-between text-sm">
+              <span>Call-out fee</span>
+              <span>€{travelCost}</span>
+            </div>
+          )}
+
           {totals && (
             <>
-              <div className="flex justify-between text-sm">
-                <span>Travel</span>
-                <span>€{totals.adjustedTravelCost}</span>
-              </div>
-
               <div className="flex justify-between font-bold border-t pt-2">
                 <span>Total</span>
                 <span>€{totals.finalTotal}</span>
               </div>
+
+              <button
+                onClick={handleBook}
+                className="w-full rounded-xl bg-emerald-600 py-3 text-white font-semibold"
+              >
+                Book now
+              </button>
             </>
-          )}
-
-          <div className="flex gap-3 pt-3">
-            <button
-              onClick={() => setStep("eircode")}
-              className="flex-1 rounded-xl bg-cyan-600 py-3 text-white font-semibold"
-            >
-              Set location
-            </button>
-          </div>
-
-          {totals && (
-            <button
-              onClick={handleBook}
-              className="w-full rounded-xl bg-emerald-600 py-3 text-white font-semibold mt-3"
-            >
-              Book now
-            </button>
           )}
         </div>
       )}
 
-      {step === "eircode" && (
-        <div className="space-y-3">
-          <input
-            value={eircode}
-            onChange={(e) => setEircode(e.target.value.toUpperCase())}
-            placeholder="Eircode (e.g. D03 K882)"
-            className="border p-3 rounded w-full"
-          />
-          <button
-            onClick={calculateDistance}
-            className="w-full rounded-xl bg-cyan-600 py-3 text-white font-semibold"
-          >
-            {loading ? "Calculating..." : "Calculate travel"}
+      {/* Location summary */}
+      {travelCost !== null && step !== "location" && (
+        <div className="flex justify-between rounded-lg bg-emerald-50 p-3 text-xs text-emerald-800">
+          <span>
+            <strong>Location:</strong> {eircode}
+          </span>
+          <button onClick={() => setStep("location")} className="underline">
+            Change location
           </button>
         </div>
       )}

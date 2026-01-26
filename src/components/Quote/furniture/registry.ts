@@ -1,24 +1,15 @@
-import type { ComponentType } from "react";
-import { FurnitureType } from "@/types/quote";
-import { FurnitureFormProps } from "./types";
+// src/components/Quote/furniture/registry.ts
+import { Package, DoorClosed, BedDouble } from "lucide-react";
+import type { QuoteRegistryItem } from "../registry.types";
 
+import BedForm from "./BedForm";
 import ChestOfDrawersForm from "./ChestOfDrawersForm";
 import WardrobeForm from "./WardrobeForm";
-import BedForm from "./BedForm";
 
-import { Package, DoorClosed, BedDouble } from "lucide-react";
-
-export type FurnitureDefinition = {
-  type: FurnitureType;
-  title: string;
-  summary: string;
-  icon: ComponentType<{ className?: string }>;
-  Form: ComponentType<FurnitureFormProps>;
-};
-
-export const FURNITURE_REGISTRY: FurnitureDefinition[] = [
+export const FURNITURE_REGISTRY: QuoteRegistryItem[] = [
   {
     type: "chest_drawers",
+    label: "Chest of drawers installation",
     title: "Chest of drawers",
     summary: "Flat-pack or pre-built units",
     icon: Package,
@@ -26,15 +17,17 @@ export const FURNITURE_REGISTRY: FurnitureDefinition[] = [
   },
   {
     type: "wardrobe",
+    label: "Wardrobe installation",
     title: "Wardrobe",
-    summary: "Single, double, or sliding wardrobes",
+    summary: "Single, double or sliding wardrobes",
     icon: DoorClosed,
     Form: WardrobeForm,
   },
   {
     type: "bed",
+    label: "Bed installation",
     title: "Bed",
-    summary: "Single, double, king-size beds",
+    summary: "Single, double or king-size beds",
     icon: BedDouble,
     Form: BedForm,
   },
