@@ -1,0 +1,29 @@
+{
+  "NavBar": {
+    "navLinks": [
+      {
+        "href": "/",
+        "label": "Início"
+      },
+      {
+        "href": "/services",
+        "label": "Serviços"
+      },
+
+      {
+        "href": "/contact",
+        "label": "Contacto"
+      }
+    ],
+    "Image": {
+      "height": 40,
+      "src": "/images/logoLL.jpeg",
+      "alt": "Logo LisLock",
+      "width": 140
+    },
+    "buttons": {
+      "book": "Marcar Reparação",
+      "accessBookings": "As Minhas Reservas"
+    }
+  }
+}

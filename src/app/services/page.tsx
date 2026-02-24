@@ -2,21 +2,22 @@ import Link from "next/link";
 import { getServices } from "@/lib/getServices";
 import { getSeo } from "@/lib/getSeo";
 import { ICON_MAP } from "@/lib/iconMap";
+import { getMessages } from "@/lib/getMessages";
+import { getLocale } from "@/lib/getLocale";
 
 export const generateMetadata = () => getSeo("services");
 
 export default async function ServicesPage() {
   const services = await getServices();
+  const locale = await getLocale();
+  const m = getMessages(locale).services;
 
   return (
     <main className="mx-auto max-w-6xl px-6 py-16">
       {/* Page header */}
       <header className="mb-12 text-center">
-        <h1 className="text-4xl font-extrabold text-slate-900">Our Services</h1>
-        <p className="mt-3 text-lg text-slate-600">
-          From urgent repairs to home improvements, choose the service that
-          suits you best.
-        </p>
+        <h1 className="text-4xl font-extrabold text-slate-900">{m.title}</h1>
+        <p className="mt-3 text-lg text-slate-600">{m.cta}</p>
       </header>
 
       {/* Services grid */}

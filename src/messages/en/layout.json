@@ -1,0 +1,30 @@
+{
+  "NavBar": {
+    "navLinks": [
+      {
+        "href": "/",
+        "label": "Home"
+      },
+      {
+        "href": "/services",
+        "label": "Services"
+      },
+
+      {
+        "href": "/contact",
+        "label": "Contact"
+      }
+    ],
+    "Image": {
+      "height": 40,
+      "src": "/images/logoDH.png",
+      "alt": "Logo Dubliner Handyman",
+      "width": 40,
+      "text": "Dubliner Handyman"
+    },
+    "buttons": {
+      "book": "Book a Repair",
+      "accessBookings": "Acces My Bookings"
+    }
+  }
+}

@@ -3,7 +3,7 @@ import { getMessages } from "@/lib/getMessages";
 import type { Messages } from "@/lib/getMessages";
 import type { Metadata } from "next";
 
-type PageKey = Exclude<keyof Messages, "common">;
+type PageKey = Exclude<keyof Messages, "common" | "layout">;
 
 export async function getSeo(page: PageKey): Promise<Metadata> {
   const locale = await getLocale();

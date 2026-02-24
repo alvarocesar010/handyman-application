@@ -5,16 +5,15 @@ import { useState } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import Image from "next/image";
+import type { Messages } from "@/lib/getMessages";
 
-const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/services", label: "Services" },
-  { href: "/booking", label: "Booking" },
-  { href: "/contact", label: "Contact" },
-];
+type NavBarProps = {
+  layout: Messages["layout"];
+};
 
-export default function Navbar() {
+export default function Navbar({ layout }: NavBarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const navBar = layout.NavBar;
 
   return (
     <header className="sticky top-0 z-50 bg-white shadow-sm">
@@ -25,18 +24,18 @@ export default function Navbar() {
           className="text-xl font-bold text-cyan-700 flex flex-row items-center"
         >
           <Image
-            height={40}
-            src={"/images/logoDH.png"}
+            height={navBar.Image.height}
+            src={navBar.Image.src}
             alt="Logo Dubliner Handyman"
-            width={40}
-            className="rounded-lg mr-4 "
+            width={navBar.Image.width}
+            className="rounded-lg mr-4 opacity-100"
           />
-          Dubliner Handyman
+          {navBar.Image.text}
         </Link>
 
         {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-6">
-          {navLinks.map(({ href, label }) => (
+          {navBar.navLinks.map(({ href, label }) => (
             <Link
               key={href}
               href={href}
@@ -49,14 +48,14 @@ export default function Navbar() {
             href="/booking"
             className="rounded-lg bg-cyan-700 px-4 py-2 text-sm font-medium text-white shadow hover:bg-cyan-800 transition-colors"
           >
-            Book a Repair
+            {navBar.buttons.book}
           </Link>
           <Link
             href="/customer/bookings"
             onClick={() => setMobileOpen(false)}
             className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-emerald-800 transition-colors"
           >
-            Access My Bookings
+            {navBar.buttons.accessBookings}
           </Link>
         </div>
 
@@ -77,7 +76,7 @@ export default function Navbar() {
       {mobileOpen && (
         <div className="md:hidden bg-white border-t border-slate-200">
           <div className="space-y-1 px-6 py-4">
-            {navLinks.map(({ href, label }) => (
+            {navBar.navLinks.map(({ href, label }) => (
               <Link
                 key={href}
                 href={href}
@@ -92,14 +91,14 @@ export default function Navbar() {
               onClick={() => setMobileOpen(false)}
               className="block rounded bg-cyan-700 px-3 py-2 text-white font-medium text-center hover:bg-cyan-800"
             >
-              Book a Repair
+              {navBar.buttons.book}
             </Link>
             <Link
               href="/customer/bookings"
               onClick={() => setMobileOpen(false)}
               className="block rounded bg-emerald-600 px-3 py-2 text-white font-medium text-center hover:bg-cyan-800"
             >
-              Access My Bookings
+              {navBar.buttons.accessBookings}
             </Link>
           </div>
         </div>

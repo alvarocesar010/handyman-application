@@ -31,6 +31,7 @@ export default async function RootLayout({
   const t = getMessages(locale);
   const isPT = locale === "pt";
   const structuredData = t.home.seo.structuredData; // Get the schema from your JSON
+  const layout = t.layout;
 
   return (
     <html lang={isPT ? "pt-PT" : "en-IE"}>
@@ -56,7 +57,7 @@ export default async function RootLayout({
 
         {/* Schema.org */}
         {structuredData && <JsonLd data={structuredData} />}
-        <Navbar />
+        <Navbar layout={layout} />
         {children}
         <ToastContainer position="top-center" autoClose={3000} />
         <Footer />
