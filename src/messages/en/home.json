@@ -1,4 +1,75 @@
 {
-  "title": "This is a test",
-  "subtitle": "Teste"
+  "seo": {
+    "title": "Handyman Services in Dublin | Expert Home Repairs & Maintenance",
+    "description": "Looking for a reliable handyman in Dublin? We provide expert laminate flooring installation, bathroom renovation, door installations, furniture assembly, and general home repairs. Fully insured with upfront pricing. Book your repair online today!",
+    "keywords": [
+      "handyman dublin",
+      "door replacement",
+      "tap replacement",
+      "furniture assembly",
+      "bathroom renovation",
+      "laminate flooring installation"
+    ],
+    "applicationName": "Dubliner Handyman",
+    "authors": [{ "name": "Dubliner Handyman" }],
+    "creator": "Dubliner Handyman",
+    "publisher": "Dubliner Handyman",
+    "icons": {
+      "icon": "/favicon.ico"
+    },
+    "manifest": "/site.webmanifest",
+    "robots": {
+      "index": true,
+      "follow": true,
+      "googleBot": {
+        "index": true,
+        "follow": true,
+        "max-image-preview": "large",
+        "max-video-preview": -1,
+        "max-snippet": -1
+      }
+    },
+    "openGraph": {
+      "title": "Handyman Services in Dublin | Dubliner Handyman",
+      "description": "Professional handyman services across Dublin.",
+      "ogImg": "/ogImgDH.png"
+    },
+    "twitter": {
+      "card": "summary_large_image"
+    }
+  },
+  "heroSection": {
+    "title": "Handyman Services in Dublin - Expert Home Repairs & Renovations",
+    "subtitle": "From small fixes to urgent repairs, I can help. Choose the service that suits you best below and book a convenient date.",
+    "bookButton": "Book a Repair",
+    "callButton": { "phone": "+353894924563", "children": "Call Now" },
+    "ul": {
+      "li0": "✔ Same-day callouts when available",
+      "li1": "✔ Upfront pricing",
+      "li2": "✔ Fully insured"
+    }
+  },
+  "servicesGrid": {
+    "title": "Our Services"
+  },
+  "whyUs": {
+  "title": "Why Choose Us?",
+  "points": [
+    {
+      "icon": "ShieldCheck",
+      "title": "Fully Insured & Certified",
+      "text": "Every job is carried out safely and covered by public liability insurance for complete peace of mind."
+    },
+    {
+      "icon": "Clock",
+      "title": "Fast Response",
+      "text": "Same-day callouts available across Dublin, with flexible booking times to suit your schedule."
+    },
+    {
+      "icon": "ThumbsUp",
+      "title": "Trusted Experience",
+      "text": "Over 10 years of hands-on experience in repairs, maintenance, and home improvements."
+    }
+  ]
+}
 }

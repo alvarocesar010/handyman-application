@@ -1,4 +1,77 @@
 {
-  "title": "Este é um teste",
-  "subtitle": "Teste"
+  "seo": {
+    "title": "Marido de Aluguer em Lisboa – Reparações e Renovações Doméstica",
+    "description": "Serviços de marido de aluguer de confiança em Lisboa para portas, torneiras, eletrodomésticos, luzes e muito mais.",
+    "keywords": [
+      "marido de aluguer lisboa",
+      "faz-tudo lisboa",
+      "substituição de portas",
+      "substituição de torneiras",
+      "montagem de móveis",
+      "remodelação de casas de banho",
+      "instalação de pavimento flutuante"
+    ],
+    "applicationName": "LisLock",
+    "authors": [{ "name": "LisLock" }],
+    "creator": "LisLock",
+    "publisher": "LisLock",
+    "icons": {
+      "icon": "/lisLock.ico"
+    },
+    "manifest": "/site.webmanifest",
+    "robots": {
+      "index": true,
+      "follow": true,
+      "googleBot": {
+        "index": true,
+        "follow": true,
+        "max-image-preview": "large",
+        "max-video-preview": -1,
+        "max-snippet": -1
+      }
+    },
+    "openGraph": {
+      "title": "Serviços de Marido de Aluguer em Lisboa",
+      "description": "Serviços profissionais de manutenção e reparações em toda a zona de Lisboa.",
+      "ogImg": "/ogImgLL.png"
+    },
+    "twitter": {
+      "card": "summary_large_image"
+    }
+  },
+
+  "heroSection": {
+    "title": "Marido de Aluguer em Lisboa - Especialista em Reparações e Remodelações",
+    "subtitle": "De pequenos arranjos a reparações urgentes, eu posso ajudar. Escolha abaixo o serviço que melhor se adapta às suas necessidades e reserve uma data conveniente.",
+    "bookButton": "Agendar Reparação",
+    "callButton": { "phone": "+351933401695", "children": "Ligar Agora" },
+    "ul": {
+      "li0": "✔ Deslocações no próprio dia (mediante disponibilidade)",
+      "li1": "✔ Preços fixos e transparentes",
+      "li2": "✔ Seguro de responsabilidade civil incluído"
+    }
+  },
+  "servicesGrid": {
+    "title": "Os Nossos Serviços"
+  },
+  "whyUs": {
+    "title": "Porquê escolher-nos?",
+    "points": [
+      {
+        "icon": "ShieldCheck",
+        "title": "Totalmente Segurado e Certificado",
+        "text": "Trabalhos realizados com segurança e cobertura de responsabilidade civil."
+      },
+      {
+        "icon": "Clock",
+        "title": "Resposta Rápida",
+        "text": "Deslocações no próprio dia em Lisboa, mediante disponibilidade."
+      },
+      {
+        "icon": "ThumbsUp",
+        "title": "Experiência Comprovada",
+        "text": "Mais de 10 anos de experiência em reparações e manutenção."
+      }
+    ]
+  }
 }

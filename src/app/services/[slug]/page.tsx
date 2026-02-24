@@ -1,61 +1,93 @@
 // app/services/[slug]/page.tsx
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { SERVICE_MAP, SERVICES } from "@/lib/services";
+import { SERVICES_EN, SERVICE_MAP_EN } from "@/lib/services_en";
+
+import { SERVICES_PT, SERVICE_MAP_PT } from "@/lib/services_pt";
+
 import type { Metadata } from "next";
-import { absUrl, pageTitle, SITE } from "@/lib/seo";
 import { CalendarCheck, Phone } from "lucide-react";
 import ReviewsBox from "@/components/ReviewsBox";
 import ServiceSteps from "@/components/Services/ServiceSteps";
 import { CategoriesGrid } from "@/components/Services/CategoriesGrid";
+import { getLocale } from "@/lib/getLocale";
+import { ICON_MAP } from "@/lib/iconMap";
 
 type Params = { slug: string };
 type PageProps = { params: Promise<Params> };
 
 export async function generateStaticParams() {
-  return SERVICES.map((s) => ({ slug: s.slug }));
+  return [
+    ...SERVICES_EN.map((s) => ({ slug: s.slug })),
+    ...SERVICES_PT.map((s) => ({ slug: s.slug })),
+  ];
 }
 
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const svc = SERVICE_MAP.get(slug);
 
-  if (!svc)
+  const locale = await getLocale();
+  const isPT = locale === "pt";
+
+  const svc = isPT ? SERVICE_MAP_PT.get(slug) : SERVICE_MAP_EN.get(slug);
+
+  if (!svc) {
     return {
-      title: pageTitle("Service not found"),
+      title: "Service not found",
       robots: { index: false, follow: false },
     };
+  }
 
-  const url = absUrl(`/services/${svc.slug}`);
-  const titleText = `${svc.title} in Dublin`;
-  const title = pageTitle(titleText);
+  const baseUrl = isPT ? "https://lislock.pt" : "https://dublinerhandyman.ie";
 
-  const desc = `${
-    svc.summary
-  } Available across Dublin. Book ${svc.title.toLowerCase()} online with ${
-    SITE.name
-  }.`;
+  const path = `/services/${svc.slug}`;
+  const url = `${baseUrl}${path}`;
+
+  const title = isPT ? `${svc.title} em Lisboa` : `${svc.title} in Dublin`;
+
+  const description = isPT
+    ? `${svc.summary} Disponível em Lisboa. Marque ${svc.title.toLowerCase()} online.`
+    : `${svc.summary} Available across Dublin. Book ${svc.title.toLowerCase()} online.`;
+
+  const ogImage = isPT ? "/ogImgLislock.png" : "/ogImgDH.png";
+  const siteName = isPT ? "Lislock" : "Dubliner Handyman";
 
   return {
     title,
-    description: desc,
-    alternates: { canonical: url },
+    description,
+
+    alternates: {
+      canonical: url,
+      languages: {
+        "en-IE": `https://dublinerhandyman.ie${path}`,
+        "pt-PT": `https://lislock.pt${path}`,
+      },
+    },
+
     openGraph: {
       type: "article",
       url,
       title,
-      description: desc,
-      siteName: SITE.name,
-      images: [{ url: SITE.ogImage, width: 1200, height: 630, alt: svc.title }],
-      locale: SITE.locale,
+      description,
+      siteName,
+      images: [
+        {
+          url: `${baseUrl}${ogImage}`,
+          width: 1200,
+          height: 630,
+          alt: svc.title,
+        },
+      ],
+      locale: isPT ? "pt_PT" : "en_IE",
     },
+
     twitter: {
       card: "summary_large_image",
       title,
-      description: desc,
-      images: [SITE.ogImage],
+      description,
+      images: [`${baseUrl}${ogImage}`],
     },
   };
 }
@@ -63,14 +95,21 @@ export async function generateMetadata({
 export default async function ServiceDetailPage({ params }: PageProps) {
   const { slug } = await params;
 
-  const svc = SERVICE_MAP.get(slug);
+  const locale = await getLocale();
+  const isPT = locale === "pt";
+
+  const svc = isPT ? SERVICE_MAP_PT.get(slug) : SERVICE_MAP_EN.get(slug);
   if (!svc) return notFound();
+
+  const baseUrl = isPT ? "https://lislock.pt" : "https://dublinerhandyman.ie";
+
+  const siteName = isPT ? "Lislock" : "Dubliner Handyman";
 
   const price = svc.startingPrice
     ? `from €${(svc.startingPrice / 100).toFixed(0)}`
     : "Get a quote";
 
-  const Icon = svc.icon;
+  const Icon = ICON_MAP[svc.icon];
   const categoryNames = svc.categories
     ? Object.keys(svc.categories)
     : undefined;
@@ -209,12 +248,12 @@ export default async function ServiceDetailPage({ params }: PageProps) {
               description: svc.summary,
               areaServed: {
                 "@type": "AdministrativeArea",
-                name: "Dublin, Ireland",
+                name: isPT ? "Lisboa, Portugal" : "Dublin, Ireland",
               },
               provider: {
                 "@type": "LocalBusiness",
-                name: SITE.name,
-                url: SITE.url,
+                name: siteName,
+                url: baseUrl,
               },
               hasOfferCatalog: categoryNames
                 ? {
@@ -252,7 +291,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
         )}
       </main>
 
-      <div className="fixed inset-x-0 bottom-0 z-40  print:hidden">
+      <div className="fixed inset-x-0 bottom-0 z-40 print:hidden">
         <div className="fixed bottom-6 right-6 z-50 flex flex-col items-center gap-3 print:hidden">
           <Link
             href={`/booking?service=${svc.slug}`}

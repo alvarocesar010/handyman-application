@@ -3,9 +3,11 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Search, X } from "lucide-react";
-import { SERVICES, type Service } from "@/lib/services";
+import { Service } from "@/types/service";
+import { ICON_MAP } from "@/lib/iconMap";
 
 type Props = {
+  services: Service[];
   value?: string; // selected slug
   onChange?: (slug: string) => void; // notify parent
   ctaText?: string; // button label
@@ -15,13 +17,14 @@ export default function ServicePickerModal({
   value,
   onChange,
   ctaText = "Choose a service",
+  services,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const dialogRef = useRef<HTMLDivElement>(null);
   const firstFocusRef = useRef<HTMLInputElement>(null);
 
-  const selectedItem = SERVICES.find((s) => s.slug === value);
+  const selectedItem = services.find((s) => s.slug === value);
 
   // Close on Esc
   useEffect(() => {
@@ -37,7 +40,7 @@ export default function ServicePickerModal({
     if (open) setTimeout(() => firstFocusRef.current?.focus(), 0);
   }, [open]);
 
-  const filtered: Service[] = SERVICES.filter((s) => {
+  const filtered: Service[] = services.filter((s) => {
     const q = query.trim().toLowerCase();
     if (!q) return true;
     return (
@@ -112,7 +115,8 @@ export default function ServicePickerModal({
             {/* List */}
             <div className="max-h-[70vh] overflow-y-auto px-5 pb-5">
               <div className="grid gap-3 sm:grid-cols-2">
-                {filtered.map(({ slug, title, summary, icon: Icon }) => {
+                {filtered.map(({ slug, title, summary, icon }) => {
+                  const Icon = ICON_MAP[icon];
                   const selected = value === slug;
                   return (
                     <button

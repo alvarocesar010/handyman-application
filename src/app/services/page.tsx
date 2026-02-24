@@ -1,19 +1,12 @@
 import Link from "next/link";
-import type { Metadata } from "next";
-import { absUrl, pageTitle } from "@/lib/seo";
-import { SERVICES } from "@/lib/services"; // ← pull data from the lib
+import { getServices } from "@/lib/getServices";
+import { getSeo } from "@/lib/getSeo";
+import { ICON_MAP } from "@/lib/iconMap";
 
-export const metadata: Metadata = {
-  title: pageTitle("Services"),
-  description:
-    "Browse our most requested handyman services in Dublin and book online.",
-  alternates: { canonical: absUrl("/services") },
-  openGraph: { url: absUrl("/services") },
-};
+export const generateMetadata = () => getSeo("services");
 
-export default function ServicesPage() {
-  // If you ever want to filter which services show on this index, do it here.
-  const services = SERVICES;
+export default async function ServicesPage() {
+  const services = await getServices();
 
   return (
     <main className="mx-auto max-w-6xl px-6 py-16">
@@ -28,24 +21,34 @@ export default function ServicesPage() {
 
       {/* Services grid */}
       <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-        {services.map(({ slug, title, summary, icon: Icon }) => (
-          <Link
-            key={slug}
-            href={`/services/${slug}`}
-            className="group rounded-xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-600"
-          >
-            <div className="flex items-center gap-4 mb-4">
-              <div className="rounded-lg bg-cyan-100 p-3">
-                <Icon className="h-6 w-6 text-cyan-700 group-hover:scale-110 transition-transform" />
+        {services.map(({ slug, title, summary, icon }) => {
+          const Icon = ICON_MAP[icon];
+
+          return (
+            <Link
+              key={slug}
+              href={`/services/${slug}`}
+              className="group rounded-xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-600"
+            >
+              <div className="flex items-center gap-4 mb-4">
+                <div className="rounded-lg bg-cyan-100 p-3">
+                  {Icon ? (
+                    <Icon className="h-6 w-6 text-cyan-700 group-hover:scale-110 transition-transform" />
+                  ) : null}
+                </div>
+                <h2 className="text-lg font-semibold text-slate-900">
+                  {title}
+                </h2>
               </div>
-              <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
-            </div>
-            <p className="text-sm text-slate-600">{summary}</p>
-            <p className="mt-3 text-sm font-medium text-cyan-700">
-              Learn more →
-            </p>
-          </Link>
-        ))}
+
+              <p className="text-sm text-slate-600">{summary}</p>
+
+              <p className="mt-3 text-sm font-medium text-cyan-700">
+                Learn more →
+              </p>
+            </Link>
+          );
+        })}
       </div>
     </main>
   );

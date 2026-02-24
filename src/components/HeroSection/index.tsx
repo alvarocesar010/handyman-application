@@ -7,7 +7,7 @@ import { getMessages } from "@/lib/getMessages";
 
 export default async function HeroSection() {
   const locale = await getLocale();
-  const t = getMessages(locale);
+  const t = getMessages(locale).home.heroSection;
   return (
     <section
       aria-labelledby="hero-title"
@@ -20,14 +20,10 @@ export default async function HeroSection() {
             id="hero-title"
             className="text-3xl md:text-4xl font-extrabold tracking-tight text-indigo-950"
           >
-            Handyman Services in Dublin – Repairs & Maintenance
-            {t.home.title}
+            {t.title}
           </h1>
 
-          <p className="text-slate-800 leading-relaxed">
-            From small fixes to urgent repairs, I can help. Choose the service
-            that suits you best below and book a convenient date.
-          </p>
+          <p className="text-slate-800 leading-relaxed">{t.subtitle}</p>
 
           {/* CTA buttons */}
           <div className="flex flex-wrap gap-3 pt-2">
@@ -35,13 +31,15 @@ export default async function HeroSection() {
               href="/booking" // set this to your booking section id or /booking page
               className="inline-flex h-11 items-center justify-center rounded-lg bg-cyan-700 px-5 text-white font-medium shadow hover:bg-cyan-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-600 focus-visible:ring-offset-2"
             >
-              Book a Repair
+              {t.bookButton}
             </Link>
 
             <TrackedCallButton
-              phone={process.env.PHONE_NUMBER || "+353894924563"}
+              phone={t.callButton.phone}
               className="inline-flex h-11 items-center justify-center rounded-lg bg-slate-900 px-5 text-white font-medium shadow hover:bg-black focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-700 focus-visible:ring-offset-2"
-            />
+            >
+              {t.callButton.children}
+            </TrackedCallButton>
           </div>
         </div>
 
@@ -49,9 +47,9 @@ export default async function HeroSection() {
         <div className="md:col-span-6 flex md:justify-end gap-8">
           {/* Quick trust badges (optional, boosts conversions) */}
           <ul className="mt-3 flex flex-col gap-4 md:gap-x-6 gap-y-2 text-sm text-slate-700 justify-center">
-            <li>✔ Same-day callouts when available</li>
-            <li>✔ Upfront pricing</li>
-            <li>✔ Fully insured</li>
+            <li>{t.ul.li0}</li>
+            <li>{t.ul.li1}</li>
+            <li>{t.ul.li2}</li>
           </ul>
           <div className="rounded-xl bg-white p-2 shadow-sm ring-1 ring-slate-200">
             <Image

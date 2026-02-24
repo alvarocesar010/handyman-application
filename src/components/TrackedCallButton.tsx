@@ -6,7 +6,7 @@ import { handleConversionClick } from "@/lib/ads";
 export default function TrackedCallButton({
   phone,
   className,
-  children = "Call Now",
+  children,
 }: {
   phone: string;
   className?: string;

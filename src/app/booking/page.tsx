@@ -1,22 +1,17 @@
 import { Suspense } from "react";
 import BookingClient from "./BookingClient";
-import type { Metadata } from "next";
+import { getServices } from "@/lib/getServices";
+import { getSeo } from "@/lib/getSeo";
 
-export const metadata: Metadata = {
-  title: "Book a Repair | Dubliner Handyman",
-  description:
-    "Book a professional handyman service in Dublin — fast response, expert repairs.",
-  alternates: {
-    canonical: "https://dublinerhandyman.ie/booking",
-  },
-};
+export const generateMetadata = () => getSeo("booking");
 
-export default function BookingPage() {
+export default async function BookingPage() {
+  const services = await getServices();
   return (
     <Suspense
       fallback={<div className="p-10 text-center">Loading booking form...</div>}
     >
-      <BookingClient />
+      <BookingClient services={services} />
     </Suspense>
   );
 }

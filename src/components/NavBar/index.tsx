@@ -26,7 +26,7 @@ export default function Navbar() {
         >
           <Image
             height={40}
-            src={"/images/logo.png"}
+            src={"/images/logoDH.png"}
             alt="Logo Dubliner Handyman"
             width={40}
             className="rounded-lg mr-4 "

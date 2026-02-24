@@ -1,46 +1,6 @@
-import {
-  DoorOpen,
-  Heater,
-  Wrench,
-  ShowerHead,
-  WashingMachine,
-  Droplet,
-  Lightbulb,
-  Zap,
-  LucideIcon,
-  Tv,
-  Ruler,
-  Drill,
-  Bath,
-  Layers,
-} from "lucide-react";
+import { Service } from "@/types/service";
 
-export type ServiceStep = {
-  title: string;
-  description: string;
-  image: { src: string; alt: string };
-};
-
-export type Service = {
-  slug: string;
-  title: string;
-  summary: string;
-  longDescription: string;
-  startingPrice?: number; // cents
-  durationHint?: string;
-  inclusions: string[];
-  exclusions?: string[];
-  faqs?: { q: string; a: string }[];
-  icon: LucideIcon;
-
-  // Tópicos por categoria + imagem por categoria
-  categoriesTitle?: string;
-  categories?: Record<string, string[]>;
-  categoryImages?: Record<string, { src: string; alt: string }>;
-  steps?: ServiceStep[];
-};
-
-export const SERVICES: Service[] = [
+export const SERVICES_EN: Service[] = [
   // door-service
   {
     slug: "door-services",
@@ -160,11 +120,11 @@ export const SERVICES: Service[] = [
       },
       {
         q: "Do you offer painting or finishing?",
-        a: "We don’t usually paint or varnish as part of the standard service, but it can be arranged if required.",
+        a: "We don’t usually paint or varnish as part of the standard service,itcan be arrangedf required.",
       },
     ],
 
-    icon: DoorOpen,
+    icon: "DoorOpen",
   },
   // furniture-assembly
   {
@@ -268,10 +228,10 @@ export const SERVICES: Service[] = [
       },
       {
         q: "Do you remove packaging?",
-        a: "We tidy the area and can remove/dispose of packaging on request.",
+        a: "We tidy the area and can r/dspose of packagingn request.",
       },
     ],
-    icon: Drill,
+    icon: "Drill",
   },
   // curtain-installation
   {
@@ -286,10 +246,10 @@ export const SERVICES: Service[] = [
       "Accurate measurement and marking",
       "Secure bracket installation",
       "Curtains or blinds fitted and aligned",
-      "Safety check of all fittings",
-      "Area cleaned and packaging removed",
+      "Safety check of all fit",
+      "Area cleaned andackaging removed",
     ],
-    icon: Ruler,
+    icon: "Ruler",
     faqs: [
       {
         q: "Do you install both curtains and blinds?",
@@ -462,7 +422,7 @@ export const SERVICES: Service[] = [
     ],
 
     // use whatever icon set you already have; example with a wrench icon:
-    icon: Bath, // or Bathroom, ShowerHead, etc. from your icon library
+    icon: "Bath", // or Bathroom, ShowerHead, etc. from your icon library
   },
   // laminate-flooring
   {
@@ -561,7 +521,7 @@ export const SERVICES: Service[] = [
       },
     ],
 
-    icon: Layers, // or Flooring, Ruler, Home – depending on your icon set
+    icon: "Layers", // or Flooring, Ruler, Home – depending on your icon set
   },
   // fit-shower
   {
@@ -645,7 +605,7 @@ export const SERVICES: Service[] = [
         a: "We install the unit and plumbing. If a new electrical connection is required, a Safe Electric registered electrician can complete it.",
       },
     ],
-    icon: ShowerHead,
+    icon: "ShowerHead",
   },
   // heater-maintenance
   {
@@ -677,7 +637,7 @@ export const SERVICES: Service[] = [
         a: "For gas appliances, we coordinate with a registered RGII gas installer when required.",
       },
     ],
-    icon: Heater,
+    icon: "Heater",
   },
   // fit-washing-dishwasher
   {
@@ -706,7 +666,7 @@ export const SERVICES: Service[] = [
       "Test run & leak check",
       "Demonstrate your new appliance and complete one full cycle.",
     ],
-    icon: WashingMachine,
+    icon: "WashingMachine",
   },
   // tap-replacement
   {
@@ -733,7 +693,7 @@ export const SERVICES: Service[] = [
       "New flexi tails if needed",
       "Leak check",
     ],
-    icon: Droplet,
+    icon: "Droplet",
   },
   // lights-replacement
   {
@@ -756,7 +716,7 @@ export const SERVICES: Service[] = [
     ],
 
     inclusions: ["Remove old fitting", "Install new fitting", "Basic testing"],
-    icon: Lightbulb,
+    icon: "Lightbulb",
   },
   // eletrical-repairs
   {
@@ -783,7 +743,7 @@ export const SERVICES: Service[] = [
       "Replace defective parts (labour)",
       "Safety checks",
     ],
-    icon: Zap,
+    icon: "Zap",
   },
   // tv-assembly
   {
@@ -812,7 +772,7 @@ export const SERVICES: Service[] = [
       "Connect to WiFi and demonstrate smart features",
       "Clear up all packaging after installation",
     ],
-    icon: Tv,
+    icon: "Tv",
   },
 
   // shower-repair
@@ -842,8 +802,8 @@ export const SERVICES: Service[] = [
       "Brands covered include Mira, Triton, Aqualisa and more",
       "Area cleaned and removed debris",
     ],
-    icon: Wrench,
+    icon: "Wrench",
   },
 ];
 
-export const SERVICE_MAP = new Map(SERVICES.map((s) => [s.slug, s]));
+export const SERVICE_MAP_EN = new Map(SERVICES_EN.map((s) => [s.slug, s]));

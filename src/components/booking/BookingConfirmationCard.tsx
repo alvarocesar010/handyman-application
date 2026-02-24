@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { CheckCircle, Clock } from "lucide-react";
-import { SERVICES } from "@/lib/services";
+import { SERVICES_EN } from "@/lib/services_en";
 
 type Props = {
   booking: {
@@ -14,7 +14,7 @@ type Props = {
 };
 
 export default function BookingConfirmationCard({ booking }: Props) {
-  const service = SERVICES.find((s) => s.slug === booking.service);
+  const service = SERVICES_EN.find((s) => s.slug === booking.service);
 
   return (
     <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-6 shadow-sm space-y-6">

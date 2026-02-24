@@ -1,1 +1,44 @@
-{ "title": "teste", "cta": "teste" }
+{
+  "seo": {
+    "title": "Handyman Services in Dublin – Repairs & Maintenance",
+    "description": "Reliable handyman in Dublin for doors, taps, appliances, lights, and more.",
+    "keywords": [
+      "handyman dublin",
+      "door replacement",
+      "tap replacement",
+      "furniture assembly",
+      "bathroom renovation",
+      "laminate flooring installation"
+    ],
+    "applicationName": "Dubliner Handyman",
+    "authors": [{ "name": "Dubliner Handyman" }],
+    "creator": "Dubliner Handyman",
+    "publisher": "Dubliner Handyman",
+    "icons": {
+      "icon": "/favicon.ico",
+      "apple": "/apple-touch-icon.png"
+    },
+    "manifest": "/site.webmanifest",
+    "robots": {
+      "index": true,
+      "follow": true,
+      "googleBot": {
+        "index": true,
+        "follow": true,
+        "max-image-preview": "large",
+        "max-video-preview": -1,
+        "max-snippet": -1
+      }
+    },
+    "openGraph": {
+      "title": "Handyman Services in Dublin",
+      "description": "Professional handyman services across Dublin.",
+      "ogImg": "/ogImgDH.png"
+    },
+    "twitter": {
+      "card": "summary_large_image"
+    }
+  },
+  "title": "This is a test",
+  "cta": "Teste"
+}

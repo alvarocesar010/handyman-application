@@ -1,7 +1,7 @@
 // src/app/sitemap.ts
 import type { MetadataRoute } from "next";
 import { SITE } from "@/lib/seo";
-import { SERVICES } from "@/lib/services";
+import { SERVICES } from "@/lib/services_en";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date().toISOString();

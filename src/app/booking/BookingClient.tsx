@@ -5,9 +5,10 @@ import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { toast } from "react-toastify";
 import ServicePickerModal from "@/components/ServicePickerModal";
-import { SERVICES } from "@/lib/services";
 import BookingConfirmationCard from "@/components/booking/BookingConfirmationCard";
 import DateTimeAvailabilityField from "@/components/booking/DateTimeAvailabilityField";
+import { Service } from "@/types/service";
+import { ICON_MAP } from "@/lib/iconMap";
 
 /* ------------------------- Google Ads / gtag setup ------------------------- */
 
@@ -23,11 +24,15 @@ declare global {
   }
 }
 
+type Props = {
+  services: Service[];
+};
+
 const ADS_SEND_TO = "AW-10991191295/_1A7CLqc3LYbEP-Jgfko";
 
 function reportConversionAwait(
   params?: { value?: number; currency?: string },
-  timeoutMs = 2000
+  timeoutMs = 2000,
 ): Promise<void> {
   return new Promise((resolve) => {
     if (typeof window === "undefined" || typeof window.gtag === "undefined") {
@@ -96,23 +101,23 @@ function normalize(v: string) {
   return v.toLowerCase().trim().replace(/\s+/g, "-");
 }
 
-function findServiceSlug(input: string | null): string {
+function findServiceSlug(input: string | null, services: Service[]): string {
   if (!input) return "";
   const q = normalize(input);
-  if (SERVICES.some((s) => s.slug === q)) return q;
+  if (services.some((s) => s.slug === q)) return q;
   if (ALIASES[q]) return ALIASES[q];
 
   const qWords = q.replace(/-/g, " ");
-  const byTitle = SERVICES.find((s) => s.title.toLowerCase().includes(qWords));
+  const byTitle = services.find((s) => s.title.toLowerCase().includes(qWords));
   if (byTitle) return byTitle.slug;
 
-  const bySlug = SERVICES.find((s) => s.slug.includes(q));
+  const bySlug = services.find((s) => s.slug.includes(q));
   return bySlug ? bySlug.slug : "";
 }
 
 /* --------------------------------- Component -------------------------------- */
 
-export default function BookingClient() {
+export default function BookingClient({ services }: Props) {
   const search = useSearchParams();
   const [service, setService] = useState<string>("");
   const [photos, setPhotos] = useState<LocalPhoto[]>([]);
@@ -135,13 +140,13 @@ export default function BookingClient() {
 
   useEffect(() => {
     const raw = search.get("service") ?? search.get("type");
-    const chosen = findServiceSlug(raw);
+    const chosen = findServiceSlug(raw, services);
     setService(chosen);
-  }, [search]);
+  }, [search, services]);
 
   const selected = useMemo(
-    () => SERVICES.find((s) => s.slug === service),
-    [service]
+    () => services.find((s) => s.slug === service),
+    [service, services],
   );
   useEffect(() => {
     if (confirmedBooking) {
@@ -266,7 +271,11 @@ export default function BookingClient() {
               <span className="text-slate-600">Selected:</span>
               {selected ? (
                 <span className="inline-flex items-center gap-2 rounded-full bg-cyan-50 px-3 py-1.5 text-cyan-800 ring-1 ring-cyan-200">
-                  <selected.icon className="h-4 w-4" />
+                  {selected &&
+                    (() => {
+                      const Icon = ICON_MAP[selected.icon];
+                      return <Icon className="h-4 w-4" />;
+                    })()}
                   <span className="font-medium">{selected.title}</span>
                 </span>
               ) : (
@@ -277,6 +286,7 @@ export default function BookingClient() {
             <ServicePickerModal
               value={service}
               onChange={setService}
+              services={services}
               ctaText={selected ? "Change service" : "Choose a service"}
             />
           </header>
