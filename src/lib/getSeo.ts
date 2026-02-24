@@ -28,6 +28,7 @@ export async function getSeo(page: PageKey): Promise<Metadata> {
       languages: {
         "en-IE": `https://dublinerhandyman.ie${path}`,
         "pt-PT": `https://lislock.pt${path}`,
+        "x-default": `https://dublinerhandyman.ie${path}`,
       },
     },
     robots: seo.robots,

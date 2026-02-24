@@ -1,5 +1,5 @@
 {
-   "seo": {
+  "seo": {
     "title": "Serviços Marido de Aluguer em Lisboa – Lislock",
     "description": "Serviços profissionais de marido de aluguer em Lisboa. Reparações de canalização, eletricidade, montagem de móveis e manutenção. Orçamentos rápidos!",
     "applicationName": "LisLock",
@@ -30,7 +30,7 @@
       "siteName": "LisLock",
       "images": [
         {
-          "url": "/ogImgLL.png",
+          "url": "images/ogImgLL.png",
           "width": 1200,
           "height": 630,
           "alt": "LisLock - Serviços de Reparação em Lisboa"
@@ -41,7 +41,7 @@
       "card": "summary_large_image",
       "title": "Marido de Aluguer Lisboa | LisLock",
       "description": "Reparações e manutenções domésticas em Lisboa.",
-      "images": ["/ogImgLL.png"]
+      "images": ["images/ogImgLL.png"]
     },
     "category": "Home Services",
     "classification": "Local Business",
@@ -50,7 +50,7 @@
       "@context": "https://schema.org",
       "@type": "HomeAndConstructionBusiness",
       "name": "LisLock",
-      "image": "https://lislock.pt/ogImgLL.png",
+      "image": "https://lislock.pt/images/ogImgLL.png",
       "@id": "https://lislock.pt",
       "url": "https://lislock.pt",
       "telephone": "+351933401695",

@@ -1,13 +1,13 @@
 {
   "seo": {
-    "title": "Marido de Aluguer em Lisboa | Reparações Rápidas - LisLock",
-    "description": "Serviços profissionais de marido de aluguer em Lisboa. Reparações de canalização, eletricidade, montagem de móveis e manutenção. Orçamentos rápidos!",
-    "applicationName": "LisLock",
-    "authors": [{ "name": "LisLock" }],
-    "creator": "LisLock",
-    "publisher": "LisLock",
+    "title": "Book a Repair | Dubliner Handyman",
+    "description": "Book a professional handyman service in Dublin — fast response, expert repairs.",
+    "applicationName": "Dubliner Handyman",
+    "authors": [{ "name": "Dubliner Handyman" }],
+    "creator": "Dubliner Handyman",
+    "publisher": "Dubliner Handyman",
     "icons": {
-      "icon": "/lisLock.ico"
+      "icon": "/favicon.ico"
     },
     "manifest": "/site.webmanifest",
     "robots": {
@@ -22,26 +22,26 @@
       }
     },
     "openGraph": {
-      "title": "LisLock - Marido de Aluguer em Lisboa",
-      "description": "Reparações domésticas e manutenção profissional em toda a grande Lisboa. Contacte-nos hoje!",
+      "title": "Dubliner Handyman",
+      "description": "Reliable handyman services across Dublin. Book online.",
       "type": "website",
-      "locale": "pt_PT",
-      "url": "https://lislock.pt",
-      "siteName": "LisLock",
+      "locale": "en_IE",
+      "url": "https://dublinerhandyman.ie",
+      "siteName": "Dubliner Handyman",
       "images": [
         {
-          "url": "/ogImgLL.png",
+          "url": "images/ogImgDH.png",
           "width": 1200,
           "height": 630,
-          "alt": "LisLock - Serviços de Reparação em Lisboa"
+          "alt": "Dubliner Handyman"
         }
       ]
     },
     "twitter": {
       "card": "summary_large_image",
-      "title": "Marido de Aluguer Lisboa | LisLock",
-      "description": "Reparações e manutenções domésticas em Lisboa.",
-      "images": ["/ogImgLL.png"]
+      "title": "Dubliner Handyman",
+      "description": "Reliable handyman services across Dublin. Book online.",
+      "images": ["images/ogImgDH.png"]
     },
     "category": "Home Services",
     "classification": "Local Business",
@@ -49,23 +49,23 @@
     "structuredData": {
       "@context": "https://schema.org",
       "@type": "HomeAndConstructionBusiness",
-      "name": "LisLock",
-      "image": "https://lislock.pt/ogImgLL.png",
-      "@id": "https://lislock.pt",
-      "url": "https://lislock.pt",
-      "telephone": "+351933401695",
-      "priceRange": "$$",
+      "name": "Dubliner Handyman",
+      "image": "https://dublinerhandyman.ie/images/ogImgDH.png",
+      "@id": "https://dublinerhandyman.ie",
+      "url": "https://dublinerhandyman.ie",
+      "telephone": "+353894924563",
+      "priceRange": "€€",
       "address": {
         "@type": "PostalAddress",
-        "streetAddress": "Atendimento ao domicílio",
-        "addressLocality": "Lisboa",
-        "postalCode": "1000-001",
-        "addressCountry": "PT"
+        "streetAddress": "Home Service / Mobile",
+        "addressLocality": "Dublin",
+        "postalCode": "D01",
+        "addressCountry": "IE"
       },
       "geo": {
         "@type": "GeoCoordinates",
-        "latitude": 38.7223,
-        "longitude": -9.1393
+        "latitude": 53.3498,
+        "longitude": -6.2603
       },
       "openingHoursSpecification": [
         {
@@ -83,7 +83,7 @@
       ],
       "areaServed": {
         "@type": "City",
-        "name": "Lisboa"
+        "name": "Dublin"
       }
     }
   },
