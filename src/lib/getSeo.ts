@@ -8,20 +8,21 @@ type PageKey = Exclude<keyof Messages, "common">;
 export async function getSeo(page: PageKey): Promise<Metadata> {
   const locale = await getLocale();
   const t = getMessages(locale);
-
   const isPT = locale === "pt";
-
   const baseUrl = isPT ? "https://lislock.pt" : "https://dublinerhandyman.ie";
 
   const path = page === "home" ? "" : `/${page}`;
   const canonical = `${baseUrl}${path}`;
-
-  const seo = t[page].seo;
+  const seo = t[page].seo; // This matches your SeoJson type
 
   return {
     title: seo.title,
     description: seo.description,
-    keywords: seo.keywords,
+    applicationName: seo.applicationName,
+    authors: seo.authors,
+    creator: seo.creator,
+    publisher: seo.publisher,
+    metadataBase: new URL(baseUrl), // Essential for resolving relative image paths
     alternates: {
       canonical,
       languages: {
@@ -29,5 +30,19 @@ export async function getSeo(page: PageKey): Promise<Metadata> {
         "pt-PT": `https://lislock.pt${path}`,
       },
     },
+    robots: seo.robots,
+    openGraph: {
+      ...seo.openGraph,
+      url: canonical,
+      siteName: seo.openGraph?.siteName || seo.applicationName,
+      images: seo.openGraph?.images,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: seo.twitter?.title,
+      description: seo.twitter?.description,
+      images: seo.twitter?.images, // Ensure this is an array in your JSON
+    },
+    category: seo.category,
   };
 }

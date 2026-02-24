@@ -5,8 +5,23 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Script from "next/script";
 import { getLocale } from "@/lib/getLocale";
+import { Metadata } from "next";
 import { getMessages } from "@/lib/getMessages";
+import JsonLd from "@/components/JsonLd";
 
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  const isPT = locale === "pt";
+
+  const baseUrl = isPT ? "https://lislock.pt" : "https://dublinerhandyman.ie";
+
+  return {
+    metadataBase: new URL(baseUrl),
+    icons: {
+      icon: isPT ? "/lisLock.ico" : "/favicon.ico",
+    },
+  };
+}
 export default async function RootLayout({
   children,
 }: {
@@ -14,17 +29,12 @@ export default async function RootLayout({
 }) {
   const locale = await getLocale();
   const t = getMessages(locale);
-
   const isPT = locale === "pt";
-
-  // 🔑 Domain MUST be computed at runtime (not from JSON)
-  const baseUrl = isPT ? "https://lislock.pt" : "https://dublinerhandyman.ie";
-
-  const seo = t.home.seo;
+  const structuredData = t.home.seo.structuredData; // Get the schema from your JSON
 
   return (
     <html lang={isPT ? "pt-PT" : "en-IE"}>
-      <head>
+      <body>
         {/* Google tag (Ads + GA) */}
 
         <Script id="gtag-init" strategy="beforeInteractive">
@@ -45,24 +55,7 @@ export default async function RootLayout({
         </Script>
 
         {/* Schema.org */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "LocalBusiness",
-              name: seo.applicationName ?? seo.title,
-              url: baseUrl,
-              areaServed: isPT ? "Lisboa, Portugal" : "Dublin, Ireland",
-              telephone: process.env.PHONE_NUMBER?.replace(/\s/g, ""),
-              image: seo.openGraph?.ogImg && `${baseUrl}${seo.openGraph.ogImg}`,
-              sameAs: [],
-            }),
-          }}
-        />
-      </head>
-
-      <body>
+        {structuredData && <JsonLd data={structuredData} />}
         <Navbar />
         {children}
         <ToastContainer position="top-center" autoClose={3000} />

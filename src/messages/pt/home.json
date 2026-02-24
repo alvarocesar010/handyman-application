@@ -1,16 +1,7 @@
 {
   "seo": {
-    "title": "Marido de Aluguer em Lisboa – Reparações e Renovações Doméstica",
-    "description": "Serviços de marido de aluguer de confiança em Lisboa para portas, torneiras, eletrodomésticos, luzes e muito mais.",
-    "keywords": [
-      "marido de aluguer lisboa",
-      "faz-tudo lisboa",
-      "substituição de portas",
-      "substituição de torneiras",
-      "montagem de móveis",
-      "remodelação de casas de banho",
-      "instalação de pavimento flutuante"
-    ],
+    "title": "Marido de Aluguer em Lisboa | Reparações Rápidas - LisLock",
+    "description": "Serviços profissionais de marido de aluguer em Lisboa. Reparações de canalização, eletricidade, montagem de móveis e manutenção. Orçamentos rápidos!",
     "applicationName": "LisLock",
     "authors": [{ "name": "LisLock" }],
     "creator": "LisLock",
@@ -31,12 +22,69 @@
       }
     },
     "openGraph": {
-      "title": "Serviços de Marido de Aluguer em Lisboa",
-      "description": "Serviços profissionais de manutenção e reparações em toda a zona de Lisboa.",
-      "ogImg": "/ogImgLL.png"
+      "title": "LisLock - Marido de Aluguer em Lisboa",
+      "description": "Reparações domésticas e manutenção profissional em toda a grande Lisboa. Contacte-nos hoje!",
+      "type": "website",
+      "locale": "pt_PT",
+      "url": "https://lislock.pt",
+      "siteName": "LisLock",
+      "images": [
+        {
+          "url": "/ogImgLL.png",
+          "width": 1200,
+          "height": 630,
+          "alt": "LisLock - Serviços de Reparação em Lisboa"
+        }
+      ]
     },
     "twitter": {
-      "card": "summary_large_image"
+      "card": "summary_large_image",
+      "title": "Marido de Aluguer Lisboa | LisLock",
+      "description": "Reparações e manutenções domésticas em Lisboa.",
+      "images": ["/ogImgLL.png"]
+    },
+    "category": "Home Services",
+    "classification": "Local Business",
+
+    "structuredData": {
+      "@context": "https://schema.org",
+      "@type": "HomeAndConstructionBusiness",
+      "name": "LisLock",
+      "image": "https://lislock.pt/ogImgLL.png",
+      "@id": "https://lislock.pt",
+      "url": "https://lislock.pt",
+      "telephone": "+351933401695",
+      "priceRange": "$$",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Atendimento ao domicílio",
+        "addressLocality": "Lisboa",
+        "postalCode": "1000-001",
+        "addressCountry": "PT"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 38.7223,
+        "longitude": -9.1393
+      },
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+          "opens": "09:00",
+          "closes": "19:00"
+        },
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": "Saturday",
+          "opens": "09:00",
+          "closes": "13:00"
+        }
+      ],
+      "areaServed": {
+        "@type": "City",
+        "name": "Lisboa"
+      }
     }
   },
 
