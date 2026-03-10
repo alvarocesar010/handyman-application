@@ -37,7 +37,10 @@ export default async function RootLayout({
     <html lang={isPT ? "pt-PT" : "en-IE"}>
       <body>
         {/* Google tag (Ads + GA) */}
-
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=AW-10991191295"
+          strategy="beforeInteractive"
+        />
         <Script id="gtag-init" strategy="beforeInteractive">
           {`
             window.dataLayer = window.dataLayer || [];
