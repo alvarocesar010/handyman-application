@@ -4,7 +4,6 @@ export type ServiceStep = {
   image: { src: string; alt: string };
 };
 
-
 export type Service = {
   slug: string;
   title: string;
@@ -16,6 +15,7 @@ export type Service = {
   exclusions?: string[];
   faqs?: { q: string; a: string }[];
   icon: string;
+  budget?: { service: string; price: number;};
 
   categoriesTitle?: string;
   categories?: Record<string, string[]>;

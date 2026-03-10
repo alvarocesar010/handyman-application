@@ -123,6 +123,10 @@ export const SERVICES_EN: Service[] = [
         a: "We don’t usually paint or varnish as part of the standard service,itcan be arrangedf required.",
       },
     ],
+    budget: {
+      service: "Door installation",
+      price: 150,
+    },
 
     icon: "DoorOpen",
   },

@@ -12,6 +12,7 @@ import ServiceSteps from "@/components/Services/ServiceSteps";
 import { CategoriesGrid } from "@/components/Services/CategoriesGrid";
 import { getLocale } from "@/lib/getLocale";
 import { ICON_MAP } from "@/lib/iconMap";
+import Budgeter from "@/components/Budgeter";
 
 type Params = { slug: string };
 type PageProps = { params: Promise<Params> };
@@ -159,6 +160,8 @@ export default async function ServiceDetailPage({ params }: PageProps) {
             .
           </p>
         </section>
+
+        {svc.budget && <Budgeter />}
 
         {svc.categories && (
           <CategoriesGrid
