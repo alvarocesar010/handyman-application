@@ -34,7 +34,7 @@ export default function BookingBasicsPanel({
         <div className="font-medium text-slate-900">
           {typeof booking.durationMinutes === "number"
             ? `${booking.durationMinutes} min (${minutesToHM(
-                booking.durationMinutes
+                booking.durationMinutes,
               )})`
             : "—"}
         </div>

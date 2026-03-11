@@ -3,7 +3,7 @@ import { AdminBooking } from "./types";
 import StatusBadge from "./StatusBadge";
 import { formatWhenDate } from "./utils";
 import BookingBasicsPanel from "./BookingBasicsPanel";
-import { Image as ImageIcon} from "lucide-react";
+import { Image as ImageIcon } from "lucide-react";
 import Image from "next/image";
 
 export default function BookingHeader({
@@ -25,7 +25,7 @@ export default function BookingHeader({
   });
   const photosCount = booking.photos?.length ?? 0;
   return (
-    <div className="px-4 py-3">
+    <div className="px-4 py-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
@@ -117,6 +117,14 @@ export default function BookingHeader({
               <span>
                 {photosCount} photo{photosCount > 1 ? "s" : ""} attached
               </span>
+            </div>
+          )}
+          {booking.adminNotes && (
+            <div className=" rounded-lg border bg-slate-50 p-3 text-sm my-2 w-full">
+              <h3 className="text-slate-950 font-bold">
+                Notes about the services:
+              </h3>
+              {booking.adminNotes}
             </div>
           )}
         </div>
