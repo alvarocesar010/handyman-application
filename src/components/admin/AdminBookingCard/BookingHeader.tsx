@@ -3,7 +3,8 @@ import { AdminBooking } from "./types";
 import StatusBadge from "./StatusBadge";
 import { formatWhenDate } from "./utils";
 import BookingBasicsPanel from "./BookingBasicsPanel";
-import { Image as ImageIcon } from "lucide-react";
+import { Image as ImageIcon} from "lucide-react";
+import Image from "next/image";
 
 export default function BookingHeader({
   booking,
@@ -63,6 +64,21 @@ export default function BookingHeader({
                   {booking.phoneRaw}
                 </a>
               </div>
+              <Link
+                href={`https://wa.me/${booking.phoneE164}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center w-10 h-10 gap-2 p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              >
+                <Image
+                  src="/whatsapp.svg"
+                  alt="WhatsApp logo"
+                  width={22}
+                  height={22}
+                  // Note: 'colour' isn't a valid prop; styling happens in the SVG file itself
+                  className="shrink-0"
+                />
+              </Link>
 
               <div>
                 <Link
@@ -72,6 +88,7 @@ export default function BookingHeader({
                   Address: {booking.address} · {booking.eircode}
                 </Link>
               </div>
+
               {booking.distanceCost != null && (
                 <div className="mt-1 text-sm text-slate-700">
                   <span className="font-semibold">Estimated travel cost:</span>{" "}

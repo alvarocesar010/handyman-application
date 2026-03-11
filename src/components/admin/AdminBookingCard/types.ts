@@ -15,6 +15,7 @@ export type AdminBooking = {
   serviceDate?: string; // YYYY-MM-DD
 
   name: string;
+  phoneE164: string;
   phoneRaw: string;
   address: string;
   eircode: string;

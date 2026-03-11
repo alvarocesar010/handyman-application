@@ -43,6 +43,7 @@ type DbBooking = {
   adminNotes?: string;
   startTime?: string;
   durationMinutes?: number;
+  phoneE164:string
 
   amountReceived?: number;
   tipReceived?: number;
@@ -89,7 +90,7 @@ function getThisMonthRange(now: Date): { from: string; to: string } {
 }
 
 function parseRange(
-  sp: Record<string, string | string[] | undefined>
+  sp: Record<string, string | string[] | undefined>,
 ): RangeInfo {
   const now = new Date();
 
@@ -152,6 +153,7 @@ function toView(d: DbBooking): AdminBooking {
     time: d.time,
     serviceDate: d.serviceDate,
     name: d.name,
+    phoneE164: d.phoneE164,
     phoneRaw: d.phoneRaw,
     address: d.address,
     eircode: d.eircode,
@@ -247,10 +249,10 @@ export default async function AdminBookingsPage({
     activeStatus === "pending"
       ? "Pending"
       : activeStatus === "confirmed"
-      ? "Confirmed"
-      : activeStatus === "done"
-      ? "Done"
-      : "Cancelled";
+        ? "Confirmed"
+        : activeStatus === "done"
+          ? "Done"
+          : "Cancelled";
 
   function getDayKey(dateISO: string) {
     const d = new Date(dateISO);
@@ -288,12 +290,6 @@ export default async function AdminBookingsPage({
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-4">
         <h2 className="text-xl font-semibold text-slate-900">Bookings</h2>
-
-        <form action="/api/admin/bookings/reindex" method="post">
-          <button className="rounded-md border px-3 py-1.5 text-sm">
-            Reindex
-          </button>
-        </form>
       </div>
 
       {/* dashboard-like filters */}
