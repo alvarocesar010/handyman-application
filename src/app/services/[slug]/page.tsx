@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SERVICES_EN, SERVICE_MAP_EN } from "@/lib/services_en";
+import { BudgeterProvider } from "@/context/budgeter";
 
 import { SERVICES_PT, SERVICE_MAP_PT } from "@/lib/services_pt";
 
@@ -160,8 +161,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
             .
           </p>
         </section>
-
-        {svc.budget && <Budgeter />}
+        <BudgeterProvider>{svc.budget && <Budgeter />}</BudgeterProvider>
 
         {svc.categories && (
           <CategoriesGrid

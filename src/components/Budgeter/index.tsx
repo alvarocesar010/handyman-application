@@ -1,6 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { toast } from "react-toastify";
+import Start from "./Start";
+import { BudgeterContext } from "@/context/budgeter";
 
 type ServiceCategory =
   | "Internal Doors Installation"
@@ -23,7 +25,6 @@ const CATEGORY_DATA: Record<
   },
   Handles: { price: 25, canPaint: false, canDispose: false },
 };
-
 export default function IntegratedBudgeter() {
   const [step, setStep] = useState(1);
   const [category, setCategory] = useState<ServiceCategory>(
@@ -79,12 +80,17 @@ export default function IntegratedBudgeter() {
         toast.error(data.error || "Submission failed");
       }
     } catch (err) {
+      console.error(err);
       toast.error("Network error. Please try again.");
     }
   };
+  const [state] = useContext(BudgeterContext);
 
   return (
     <div className="max-w-2xl mx-auto p-4 bg-white rounded-2xl shadow-xl border border-slate-100">
+      {state.quoteStage === "Start" && <Start />}
+      {state.quoteStage === "Category" && <p>Choose ypur door</p>}
+
       {/* Progress Header */}
       <div className="flex justify-between mb-8 px-4">
         <div
@@ -150,7 +156,7 @@ export default function IntegratedBudgeter() {
             {selectedData.canDispose && (
               <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                 <span className="text-sm font-medium">
-                  Dispose of old items? (+€30ea)
+                  Dispose of old items?
                 </span>
                 <div className="flex gap-4">
                   <button
@@ -174,7 +180,7 @@ export default function IntegratedBudgeter() {
             {selectedData.canPaint && (
               <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                 <span className="text-sm font-medium">
-                  Professional Painting? (+€60ea)
+                  Professional Painting?
                 </span>
                 <div className="flex gap-4">
                   <button
