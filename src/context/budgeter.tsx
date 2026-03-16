@@ -7,7 +7,7 @@ interface BudgetState {
   quoteStage: Stage;
 }
 
-type Action = { type: "NEXT_STAGE"; payload?: string };
+type Action = { type: string; payload?: string };
 
 const STAGES: Stage[] = ["Start", "Category", "ProductDetails", "Quote"];
 

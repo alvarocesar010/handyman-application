@@ -3,6 +3,7 @@ import { useContext, useState } from "react";
 import { toast } from "react-toastify";
 import Start from "./Start";
 import { BudgeterContext } from "@/context/budgeter";
+import TypeOfService from "./TypeOfService";
 
 type ServiceCategory =
   | "Internal Doors Installation"
@@ -88,8 +89,8 @@ export default function IntegratedBudgeter() {
 
   return (
     <div className="max-w-2xl mx-auto p-4 bg-white rounded-2xl shadow-xl border border-slate-100">
-      {state.quoteStage === "Start" && <Start />}
-      {state.quoteStage === "Category" && <p>Choose ypur door</p>}
+      {/* {state.quoteStage === "Start" && <Start />}
+      {state.quoteStage === "Category" && <TypeOfService />} */}
 
       {/* Progress Header */}
       <div className="flex justify-between mb-8 px-4">

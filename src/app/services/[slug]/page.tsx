@@ -128,8 +128,8 @@ export default async function ServiceDetailPage({ params }: PageProps) {
           <h1 className="text-3xl font-extrabold text-slate-900">
             {svc.title}
           </h1>
-          <p className="text-slate-700">{svc.summary}</p>
-          <p className="text-slate-600 text-sm">
+          <p className="text-slate-800">{svc.summary}</p>
+          <p className="text-slate-700 text-sm">
             {svc.durationHint && <>Typical duration: {svc.durationHint} · </>}
             Price: {price}
           </p>
@@ -152,7 +152,12 @@ export default async function ServiceDetailPage({ params }: PageProps) {
 
         <section className="prose prose-slate max-w-none">
           <h2>What we do</h2>
-          <p>{svc.longDescription}</p>
+          {(Array.isArray(svc.longDescription)
+            ? svc.longDescription
+            : [svc.longDescription]
+          ).map((p, i) => (
+            <p key={i}>{p}</p>
+          ))}
           <p>
             Ready to get started?{" "}
             <Link href={`/booking?service=${svc.slug}`}>

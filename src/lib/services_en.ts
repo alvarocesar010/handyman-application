@@ -1,6 +1,139 @@
 import { Service } from "@/types/service";
 
 export const SERVICES_EN: Service[] = [
+  // internal-doors
+  {
+    slug: "internal-doors",
+    title: "Internal Doors - Supplied and Fitted",
+    summary:
+      "Professional fitting, repair, and replacement of all types of internal doors.",
+    longDescription: [
+      "We specialise in internal doors supplied and fitted, offering a complete service from supply to professional installation.",
+      "Choose one of our door models below and we’ll take care of the rest — measuring, adjusting, and fitting your new door for a perfect finish.",
+      "Already bought a door? No problem. We also provide a professional door fitting service for doors supplied by you.",
+    ],
+    startingPrice: 18000,
+    durationHint: "Usually 2–3 hours per door",
+    categoriesTitle: "Door types & topics we handle",
+
+    categories: {
+      "Internal Doors": [
+        "Bedroom doors",
+        "Living room doors",
+        "Hallway doors",
+        "Closet and storage doors",
+      ],
+      "External Doors": [
+        "Front and back entry doors",
+        "Patio and balcony doors",
+        "Garage side doors",
+        "Garden and shed doors",
+      ],
+      "Furniture & Cabinet Doors": [
+        "Wardrobe doors (sliding or hinged)",
+        "Kitchen cabinet doors",
+        "Cupboard doors",
+        "TV and media unit doors",
+      ],
+      "Bathroom & Enclosure Doors": [
+        "Shower enclosure doors",
+        "Glass partition doors",
+        "Toilet cubicle doors",
+      ],
+      "Appliance Doors": [
+        "Dishwasher panel doors",
+        "Fridge integrated doors",
+        "Laundry cabinet doors",
+      ],
+      "Specialty & Custom Doors": [
+        "Fire-rated doors",
+        "Acoustic/soundproof doors",
+        "Moisture-resistant doors",
+        "Custom-sized or bespoke joinery doors",
+      ],
+    },
+
+    // Imagem por categoria (usada dentro dos cards de tópicos)
+    // Ajuste os paths conforme suas imagens em /public
+    categoryImages: {
+      "Internal Doors": {
+        src: "/images/services/doors/door-internal.jpg",
+        alt: "Internal wooden door being fitted",
+      },
+      "External Doors": {
+        src: "/images/services/doors/door-external.jpg",
+        alt: "External composite front door",
+      },
+      "Furniture & Cabinet Doors": {
+        src: "/images/services/doors/door-kitchen-cabinet.jpg",
+        alt: "Kitchen cabinet door alignment",
+      },
+      "Bathroom & Enclosure Doors": {
+        src: "/images/services/doors/door-shower.jpg",
+        alt: "Shower enclosure glass door",
+      },
+      "Appliance Doors": {
+        src: "/images/services/doors/door-appliance.jpg",
+        alt: "Integrated appliance door fitted",
+      },
+      "Specialty & Custom Doors": {
+        src: "/images/services/doors/door-fire-rated.jpg",
+        alt: "Fire-rated door with label",
+      },
+    },
+
+    inclusions: [
+      "Remove and dispose of old door if required",
+      "Measure and ensure perfect alignment",
+      "Fit new door, hinges, handles, and locks",
+      "Plane door edges for smooth operation",
+      "Adjust frames and ensure proper clearance",
+      "Supply of standard spare parts (hinges, locks, handles, screws, etc.) if needed",
+      "Customer can also supply their own materials",
+    ],
+    exclusions: [
+      "Custom painting, varnishing, or staining (available upon request)",
+      "Glass cutting or design engraving",
+      "Supply of non-standard or bespoke doors unless pre-agreed",
+    ],
+    faqs: [
+      {
+        q: "Can you supply the doors and parts?",
+        a: "Yes, we can provide all the required spare parts like hinges, handles, and locks, as well as supply standard-sized doors. However, customers are also free to provide their own materials if preferred.",
+      },
+      {
+        q: "Do you repair or adjust existing doors?",
+        a: "Absolutely. We can repair swollen, misaligned, or sticking doors, as well as rehang or plane them for a smoother fit.",
+      },
+      {
+        q: "Do you install bathroom or glass doors?",
+        a: "Yes, we fit bathroom and shower enclosure doors, including glass and aluminium models with waterproof sealing.",
+      },
+      {
+        q: "Do you work on wardrobe and kitchen cabinet doors?",
+        a: "Yes, we can replace or repair furniture and cabinet doors, adjust hinges, and install new fittings.",
+      },
+      {
+        q: "Do you offer fire or moisture-resistant doors?",
+        a: "Yes, we can advise and install certified fire-rated and moisture-resistant doors suitable for kitchens, bathrooms, or commercial use.",
+      },
+      {
+        q: "Can you fix broken hinges or loose handles?",
+        a: "Yes, we replace or reinforce hinges, handles, locks, and any other fittings that are damaged or worn out.",
+      },
+      {
+        q: "Do you offer painting or finishing?",
+        a: "We don’t usually paint or varnish as part of the standard service,itcan be arrangedf required.",
+      },
+    ],
+    budget: {
+      service: "Door installation",
+      price: 150,
+    },
+
+    icon: "DoorOpen",
+  },
+
   // door-service
   {
     slug: "door-services",

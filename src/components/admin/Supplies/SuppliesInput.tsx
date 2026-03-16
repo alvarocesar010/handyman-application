@@ -3,14 +3,11 @@ import { useState, useRef } from "react";
 import { Plus, Link as LinkIcon, Image as ImageIcon, X } from "lucide-react";
 import { toast } from "react-toastify";
 import Image from "next/image";
+import { supplies } from "@/lib/supplies";
 
 export default function SupplyInput() {
   const [stores, setStores] = useState(["B&Q", "Screwfix", "Woodies"]);
-  const [categories, setCategories] = useState([
-    "Plumbing",
-    "Bathroom",
-    "Tools",
-  ]);
+  const [categories, setCategories] = useState(supplies.map((s) => s.category));
 
   const [files, setFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
@@ -22,8 +19,15 @@ export default function SupplyInput() {
     store: "B&Q",
     description: "",
     link: "",
-    category: "Plumbing",
+    category: "",
+    size: "",
   });
+
+  const selectedCategory = supplies.find(
+    (s) => s.category === formData.category,
+  );
+
+  const sizes = selectedCategory?.size || [];
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || []);
@@ -220,6 +224,28 @@ export default function SupplyInput() {
             }
           >
             {categories.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+          <button
+            type="button"
+            onClick={() => handleAddOption("category")}
+            className="p-3 bg-slate-100 rounded-lg"
+          >
+            <Plus size={20} />
+          </button>
+        </div>
+
+        {/* Size Selection - Fixed: Uses 'categories' and 'setCategories' */}
+        <div className="flex gap-2">
+          <select
+            className="flex-1 p-3 border rounded-lg bg-slate-50 outline-none"
+            value={formData.size}
+            onChange={(e) => setFormData({ ...formData, size: e.target.value })}
+          >
+            {sizes.map((c) => (
               <option key={c} value={c}>
                 {c}
               </option>
