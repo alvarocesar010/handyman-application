@@ -2,6 +2,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { Search, Trash2, Edit, ExternalLink, Package, X } from "lucide-react";
 import { toast } from "react-toastify";
+import Image from "next/image";
 
 interface SupplyItem {
   _id: string;
@@ -12,6 +13,7 @@ interface SupplyItem {
   description: string;
   link?: string;
   createdAt: string;
+  photos: string[];
 }
 
 export default function SuppliesDashboard() {
@@ -222,6 +224,18 @@ export default function SuppliesDashboard() {
                       <ExternalLink size={12} /> View Product Page
                     </a>
                   )}
+                </div>
+                <div className="flex gap-2 flex-wrap">
+                  {item.photos?.map((path, index) => (
+                    <Image
+                      key={`${path}-${index}`}
+                      src={path}
+                      alt={item.name}
+                      width={80}
+                      height={80}
+                      className="rounded-lg object-cover"
+                    />
+                  ))}
                 </div>
 
                 <div className="flex md:flex-col justify-between items-end gap-2 border-t md:border-t-0 pt-4 md:pt-0">

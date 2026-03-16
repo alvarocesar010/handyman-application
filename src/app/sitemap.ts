@@ -11,12 +11,6 @@ const DOMAINS = {
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
 
-  if (SERVICES_EN.length !== SERVICES_PT.length) {
-    throw new Error(
-      "SERVICES_EN and SERVICES_PT must have the same length and order.",
-    );
-  }
-
   const staticRoutes = ["", "services", "booking", "contact"];
 
   const staticUrls: MetadataRoute.Sitemap = staticRoutes.flatMap((route) => {
@@ -27,7 +21,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       {
         url: `${DOMAINS.en}${path}`,
         lastModified: now,
-        changeFrequency: "weekly",
+        changeFrequency: "weekly" as const,
         priority,
         alternates: {
           languages: {
@@ -39,7 +33,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       {
         url: `${DOMAINS.pt}${path}`,
         lastModified: now,
-        changeFrequency: "weekly",
+        changeFrequency: "weekly" as const,
         priority,
         alternates: {
           languages: {
@@ -51,38 +45,45 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ];
   });
 
-  const serviceUrls: MetadataRoute.Sitemap = SERVICES_EN.flatMap(
-    (serviceEn, index) => {
-      const servicePt = SERVICES_PT[index];
+  const serviceUrls: MetadataRoute.Sitemap = [
+    ...SERVICES_EN.map((serviceEn) => {
+      const matchingPt = SERVICES_PT.find((pt) => pt.slug === serviceEn.slug);
 
-      return [
-        {
-          url: `${DOMAINS.en}/services/${serviceEn.slug}`,
-          lastModified: now,
-          changeFrequency: "monthly",
-          priority: 0.7,
-          alternates: {
-            languages: {
-              "en-IE": `${DOMAINS.en}/services/${serviceEn.slug}`,
-              "pt-PT": `${DOMAINS.pt}/services/${servicePt.slug}`,
-            },
-          },
-        },
-        {
-          url: `${DOMAINS.pt}/services/${servicePt.slug}`,
-          lastModified: now,
-          changeFrequency: "monthly",
-          priority: 0.7,
-          alternates: {
-            languages: {
-              "en-IE": `${DOMAINS.en}/services/${serviceEn.slug}`,
-              "pt-PT": `${DOMAINS.pt}/services/${servicePt.slug}`,
-            },
-          },
-        },
-      ];
-    },
-  );
+      return {
+        url: `${DOMAINS.en}/services/${serviceEn.slug}`,
+        lastModified: now,
+        changeFrequency: "monthly" as const,
+        priority: 0.7,
+        alternates: matchingPt
+          ? {
+              languages: {
+                "en-IE": `${DOMAINS.en}/services/${serviceEn.slug}`,
+                "pt-PT": `${DOMAINS.pt}/services/${matchingPt.slug}`,
+              },
+            }
+          : undefined,
+      };
+    }),
+
+    ...SERVICES_PT.map((servicePt) => {
+      const matchingEn = SERVICES_EN.find((en) => en.slug === servicePt.slug);
+
+      return {
+        url: `${DOMAINS.pt}/services/${servicePt.slug}`,
+        lastModified: now,
+        changeFrequency: "monthly" as const,
+        priority: 0.7,
+        alternates: matchingEn
+          ? {
+              languages: {
+                "en-IE": `${DOMAINS.en}/services/${matchingEn.slug}`,
+                "pt-PT": `${DOMAINS.pt}/services/${servicePt.slug}`,
+              },
+            }
+          : undefined,
+      };
+    }),
+  ];
 
   return [...staticUrls, ...serviceUrls];
 }
