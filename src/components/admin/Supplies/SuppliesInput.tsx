@@ -1,13 +1,18 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Plus, Link as LinkIcon, Image as ImageIcon, X } from "lucide-react";
 import { toast } from "react-toastify";
 import Image from "next/image";
-import { supplies } from "@/lib/supplies";
+
+type Category = {
+  value: string;
+  sizes: string[];
+};
 
 export default function SupplyInput() {
-  const [stores, setStores] = useState(["B&Q", "Screwfix", "Woodies"]);
-  const [categories, setCategories] = useState(supplies.map((s) => s.category));
+  const [stores, setStores] = useState<string[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [files, setFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
@@ -16,18 +21,34 @@ export default function SupplyInput() {
   const [formData, setFormData] = useState({
     name: "",
     price: "",
-    store: "B&Q",
+    store: "",
     description: "",
     link: "",
     category: "",
     size: "",
+    qty: "",
   });
-
-  const selectedCategory = supplies.find(
-    (s) => s.category === formData.category,
+  const selectedCategory = categories.find(
+    (c) => c.value === formData.category,
   );
 
-  const sizes = selectedCategory?.size || [];
+  const sizes = selectedCategory?.sizes ?? [];
+
+  useEffect(() => {
+    loadOptions();
+  }, []);
+
+  async function loadOptions() {
+    try {
+      const res = await fetch("/api/supplies/options");
+      const data = await res.json();
+
+      setStores(data.stores);
+      setCategories(data.categories);
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || []);
@@ -47,15 +68,66 @@ export default function SupplyInput() {
     setPreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleAddOption = (type: "store" | "category") => {
+  const handleAddOption = async (type: "stores" | "categories" | "sizes") => {
     const newVal = prompt(`Enter new ${type} name:`);
+
     if (!newVal) return;
-    if (type === "store") setStores((prev) => [...prev, newVal]);
-    else setCategories((prev) => [...prev, newVal]);
+
+    try {
+      const payload = new FormData();
+      payload.append("type", type);
+      payload.append("value", newVal);
+
+      if (type === "sizes") {
+        payload.append("category", formData.category);
+      }
+
+      const res = await fetch("/api/supplies/options", {
+        method: "POST",
+        body: payload,
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error || `Failed to save ${type}`);
+        return;
+      }
+
+      if (type === "stores") {
+        setStores((prev) => [...prev, newVal]);
+      }
+
+      if (type === "categories") {
+        setCategories((prev) => [
+          ...prev,
+          {
+            value: newVal,
+            sizes: [],
+          },
+        ]);
+      }
+
+      if (type === "sizes") {
+        setCategories((prev) =>
+          prev.map((c) =>
+            c.value === formData.category
+              ? { ...c, sizes: [...c.sizes, newVal] }
+              : c,
+          ),
+        );
+      }
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
     const data = new FormData();
 
     // Append text fields
@@ -74,10 +146,25 @@ export default function SupplyInput() {
         toast.success("Item saved to Cloud!");
         setFiles([]);
         setPreviews([]);
+        // reset form
+        setFormData({
+          name: "",
+          price: "",
+          store: "",
+          description: "",
+          link: "",
+          category: "",
+          size: "",
+          qty: "",
+        });
+        // notify dashboard
+        window.dispatchEvent(new Event("supplies-updated"));
       }
     } catch (err) {
       console.error("Submission failed", err);
       toast.error("Upload failed");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -157,13 +244,23 @@ export default function SupplyInput() {
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           required
         />
-
+        {/* price */}
         <input
           type="number"
           placeholder="Price €"
           value={formData.price}
           className="w-full p-3 border rounded-lg bg-slate-50 outline-none"
           onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+          required
+        />
+
+        {/* quantity */}
+        <input
+          type="number"
+          placeholder="Quantity"
+          value={formData.qty}
+          className="w-full p-3 border rounded-lg bg-slate-50 outline-none"
+          onChange={(e) => setFormData({ ...formData, qty: e.target.value })}
           required
         />
 
@@ -176,6 +273,9 @@ export default function SupplyInput() {
               setFormData({ ...formData, store: e.target.value })
             }
           >
+            <option value="" disabled>
+              Select a store
+            </option>
             {stores.map((s) => (
               <option key={s} value={s}>
                 {s}
@@ -184,15 +284,15 @@ export default function SupplyInput() {
           </select>
           <button
             type="button"
-            onClick={() => handleAddOption("store")}
+            onClick={() => handleAddOption("stores")}
             className="p-3 bg-slate-100 rounded-lg"
           >
             <Plus size={20} />
           </button>
         </div>
 
-        <input
-          placeholder="Description (Dimensions)"
+        <textarea
+          placeholder="Description"
           value={formData.description}
           className="w-full p-3 border rounded-lg bg-slate-50 outline-none"
           onChange={(e) =>
@@ -223,15 +323,18 @@ export default function SupplyInput() {
               setFormData({ ...formData, category: e.target.value })
             }
           >
+            <option value="" disabled>
+              Select category
+            </option>
             {categories.map((c) => (
-              <option key={c} value={c}>
-                {c}
+              <option key={c.value} value={c.value}>
+                {c.value}
               </option>
             ))}
           </select>
           <button
             type="button"
-            onClick={() => handleAddOption("category")}
+            onClick={() => handleAddOption("categories")}
             className="p-3 bg-slate-100 rounded-lg"
           >
             <Plus size={20} />
@@ -253,7 +356,8 @@ export default function SupplyInput() {
           </select>
           <button
             type="button"
-            onClick={() => handleAddOption("category")}
+            onClick={() => handleAddOption("sizes")}
+            disabled={!formData.category}
             className="p-3 bg-slate-100 rounded-lg"
           >
             <Plus size={20} />
@@ -262,9 +366,10 @@ export default function SupplyInput() {
 
         <button
           type="submit"
+          disabled={isSubmitting}
           className="w-full bg-[#007b9e] text-white py-3 rounded-xl font-bold hover:bg-[#005f7a] transition-colors"
         >
-          Save Item
+          {isSubmitting ? "Saving..." : "Save Item"}
         </button>
       </form>
     </div>

@@ -30,8 +30,9 @@ function inferExt(mime: string) {
 export async function uploadReviewImage(opts: {
   serviceSlug: string;
   file: File;
+  prov: string;
 }) {
-  const { serviceSlug, file } = opts;
+  const { serviceSlug, file, prov } = opts;
 
   const storage = getStorage();
   const bucket = storage.bucket(getBucketName());
@@ -39,7 +40,7 @@ export async function uploadReviewImage(opts: {
   const slug = safeSlug(serviceSlug);
   const ext = inferExt(file.type);
 
-  const objectPath = `reviews/${slug}/${Date.now()}-${Math.random()
+  const objectPath = `${prov}/${slug}/${Date.now()}-${Math.random()
     .toString(16)
     .slice(2)}.${ext}`;
 

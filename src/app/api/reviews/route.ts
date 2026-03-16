@@ -37,17 +37,17 @@ export async function GET(req: Request) {
         ...r,
         photoUrls: await Promise.all(
           (r.photoUrls ?? []).map((objectPath) =>
-            signImage(objectPath, SIGNED_URL_EXPIRES_SECONDS)
-          )
+            signImage(objectPath, SIGNED_URL_EXPIRES_SECONDS),
+          ),
         ),
-      }))
+      })),
     );
 
     return NextResponse.json({ reviews: withSignedUrls });
   } catch (err) {
     return NextResponse.json(
       { error: err instanceof Error ? err.message : "Failed to load reviews" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -64,7 +64,7 @@ export async function POST(req: Request) {
     if (!serviceSlug || !customerName || !rating || !opinion) {
       return NextResponse.json(
         { error: "Missing required fields." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -75,7 +75,7 @@ export async function POST(req: Request) {
     if (opinion.length > MAX_OPINION_LEN) {
       return NextResponse.json(
         { error: `Opinion must be ${MAX_OPINION_LEN} characters or less.` },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -83,7 +83,7 @@ export async function POST(req: Request) {
     if (files.length > MAX_FILES) {
       return NextResponse.json(
         { error: `Up to ${MAX_FILES} photos.` },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -94,18 +94,23 @@ export async function POST(req: Request) {
       if (!ALLOWED.has(f.type)) {
         return NextResponse.json(
           { error: "Only JPG/PNG/WEBP images are allowed." },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
       if (f.size > MAX_EACH_BYTES) {
         return NextResponse.json(
           { error: "Each image must be 5MB or smaller." },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
-      const objectPath = await uploadReviewImage({ serviceSlug, file: f });
+      const prov = "reviews";
+      const objectPath = await uploadReviewImage({
+        serviceSlug,
+        file: f,
+        prov,
+      });
       photoPaths.push(objectPath);
     }
 
@@ -134,8 +139,8 @@ export async function POST(req: Request) {
       ...inserted,
       photoUrls: await Promise.all(
         (inserted.photoUrls ?? []).map((p) =>
-          signImage(p, SIGNED_URL_EXPIRES_SECONDS)
-        )
+          signImage(p, SIGNED_URL_EXPIRES_SECONDS),
+        ),
       ),
     };
 
@@ -143,7 +148,7 @@ export async function POST(req: Request) {
   } catch (err) {
     return NextResponse.json(
       { error: err instanceof Error ? err.message : "Failed to save review" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

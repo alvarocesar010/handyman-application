@@ -2,6 +2,25 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 import { Storage } from "@google-cloud/storage";
+import { uploadReviewImage, signImage } from "@/lib/gcs";
+
+const MAX_FILES = 5;
+const MAX_EACH_BYTES = 5 * 1024 * 1024;
+
+// Allowed formats for consistent display
+const ALLOWED = new Set(["image/jpeg", "image/png", "image/webp"]);
+
+const SIGNED_URL_EXPIRES_SECONDS = 7 * 24 * 60 * 60;
+
+function toTitleCase(value: string) {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, " ") // remove extra spaces
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
 
 // Initialize GCS
 function getBucket() {
@@ -25,38 +44,57 @@ export async function POST(req: Request) {
     const db = await getDb();
 
     const category = (formData.get("category") as string) || "unacategorized";
-    const folderCategory = category.toLowerCase().replace(/\s+/g, "-");
+    const serviceSlug = category;
 
-    const photos = formData.getAll("photos") as File[];
-    const uploadedUrls: string[] = [];
-
-    const bucket = getBucket();
-
-    for (const file of photos) {
-      const buffer = Buffer.from(await file.arrayBuffer());
-
-      const fileName = `supplies/${folderCategory}/${Date.now()}-${file.name.replace(/\s/g, "_")}`;
-      const gcsFile = bucket.file(fileName);
-
-      await gcsFile.save(buffer, {
-        contentType: file.type,
-        metadata: { cacheControl: "public, max-age=31536000" },
-      });
-
-      uploadedUrls.push(
-        `https://storage.googleapis.com/${bucket.name}/${fileName}`,
+    const files = formData.getAll("photos").filter(Boolean) as File[];
+    if (files.length > MAX_FILES) {
+      return NextResponse.json(
+        { error: `Up to ${MAX_FILES} photos.` },
+        { status: 400 },
       );
     }
 
+    // Store object paths in DB (not signed URLs)
+    const photoPaths: string[] = [];
+
+    for (const f of files) {
+      if (!ALLOWED.has(f.type)) {
+        return NextResponse.json(
+          { error: "Only JPG/PNG/WEBP images are allowed." },
+          { status: 400 },
+        );
+      }
+
+      if (f.size > MAX_EACH_BYTES) {
+        return NextResponse.json(
+          { error: "Each image must be 5MB or smaller." },
+          { status: 400 },
+        );
+      }
+
+      const prov = "supplies";
+      const objectPath = await uploadReviewImage({
+        serviceSlug,
+        file: f,
+        prov,
+      });
+      photoPaths.push(objectPath);
+    }
+
+    const rawName = String(formData.get("name"));
+    const name = toTitleCase(rawName);
+
     const supplyDoc = {
-      name: formData.get("name"),
+      name: name,
       price: parseFloat(formData.get("price") as string),
       store: formData.get("store"),
       description: formData.get("description"),
       link: formData.get("link"),
-      category: formData.get("category"),
-      photos: uploadedUrls,
+      category: category,
+      photos: photoPaths,
+      size: formData.get("size"),
       createdAt: new Date(),
+      qty: formData.get("qty"),
     };
 
     const result = await db.collection("supplies").insertOne(supplyDoc);
@@ -78,7 +116,18 @@ export async function GET() {
       .sort({ createdAt: -1 })
       .toArray();
 
-    return NextResponse.json(items);
+    const withSignedUrls = await Promise.all(
+      items.map(async (item) => ({
+        ...item,
+        photos: await Promise.all(
+          (item.photos ?? []).map((objectPath: string) =>
+            signImage(objectPath, SIGNED_URL_EXPIRES_SECONDS),
+          ),
+        ),
+      })),
+    );
+
+    return NextResponse.json(withSignedUrls);
   } catch (err) {
     console.error("GET Error:", err);
     return NextResponse.json(

@@ -23,6 +23,13 @@ export default function SuppliesDashboard() {
 
   useEffect(() => {
     fetchItems();
+    const refresh = () => fetchItems();
+
+    window.addEventListener("supplies-updated", refresh);
+
+    return () => {
+      window.removeEventListener("supplies-updated", refresh);
+    };
   }, []);
 
   const fetchItems = async () => {
@@ -229,7 +236,7 @@ export default function SuppliesDashboard() {
                   {item.photos?.map((path, index) => (
                     <Image
                       key={`${path}-${index}`}
-                      src={path}
+                      src={`${path}`}
                       alt={item.name}
                       width={80}
                       height={80}
