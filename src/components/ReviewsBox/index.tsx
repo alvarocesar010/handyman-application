@@ -18,7 +18,13 @@ type LocalPhoto = { file: File; url: string };
 const MAX_COUNT = 5;
 const MAX_EACH = 5 * 1024 * 1024;
 const MAX_OPINION_LEN = 500;
-const ALLOWED = new Set(["image/jpeg", "image/png", "image/webp"]);
+const ALLOWED = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/heic",
+  "image/heif",
+]);
 
 function formatIrishDate(iso: string) {
   const d = new Date(iso);

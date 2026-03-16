@@ -8,8 +8,13 @@ const MAX_FILES = 5;
 const MAX_EACH_BYTES = 5 * 1024 * 1024;
 
 // Allowed formats for consistent display
-const ALLOWED = new Set(["image/jpeg", "image/png", "image/webp"]);
-
+const ALLOWED = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/heic",
+  "image/heif",
+]);
 const SIGNED_URL_EXPIRES_SECONDS = 7 * 24 * 60 * 60;
 
 function toTitleCase(value: string) {

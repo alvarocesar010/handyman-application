@@ -7,8 +7,14 @@ const MAX_FILES = 5;
 const MAX_EACH_BYTES = 5 * 1024 * 1024;
 const MAX_OPINION_LEN = 500;
 
-// Allowed formats for consistent display
-const ALLOWED = new Set(["image/jpeg", "image/png", "image/webp"]);
+//  formats for consistent display
+const ALLOWED = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/heic",
+  "image/heif",
+]);
 
 // Signed URL expiry: 7 days (in seconds)
 const SIGNED_URL_EXPIRES_SECONDS = 7 * 24 * 60 * 60;
