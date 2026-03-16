@@ -1,7 +1,7 @@
 "use client";
 import { createContext, Dispatch, ReactNode, useReducer } from "react";
 
-type Stage = "Start" | "Category" | "ProductDetails" | "Quote";
+type Stage = string;
 
 interface BudgetState {
   quoteStage: Stage;
@@ -9,7 +9,13 @@ interface BudgetState {
 
 type Action = { type: string; payload?: string };
 
-const STAGES: Stage[] = ["Start", "Category", "ProductDetails", "Quote"];
+const STAGES: Stage[] = [
+  "Start",
+  "Category",
+  "SuppliedFitted",
+  "ProductDetails",
+  "Quote",
+];
 
 const initialState: BudgetState = {
   quoteStage: STAGES[0],

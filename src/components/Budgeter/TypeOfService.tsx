@@ -4,7 +4,7 @@ import { BudgeterContext } from "@/context/budgeter";
 export default function Start() {
   const [, dispatch] = useContext(BudgeterContext);
 
-  const typeOfService = () => {};
+  //   const typeOfService = () => {};
 
   return (
     <div>
