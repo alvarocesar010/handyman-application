@@ -32,7 +32,7 @@ function getBucket() {
 
   const storage = new Storage({
     projectId: process.env.GCS_PROJECT_ID,
-    keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
+    // keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
   });
 
   return storage.bucket(bucketName);
