@@ -1,7 +1,7 @@
 // src/components/Navbar.tsx
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import Image from "next/image";
@@ -14,9 +14,32 @@ type NavBarProps = {
 export default function Navbar({ layout }: NavBarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const navBar = layout.NavBar;
+  const [show, setShow] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScroll = window.scrollY;
+
+      if (currentScroll > lastScrollY) {
+        // scrolling down
+        setShow(false);
+      } else {
+        // scrolling up
+        setShow(true);
+      }
+
+      setLastScrollY(currentScroll);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScrollY]);
 
   return (
-    <header className="sticky top-0 z-50 bg-white shadow-sm">
+    <header className={`fixed top-0 left-0 w-full bg-white shadow transition-transform duration-300 z-50
+        ${show ? "translate-y-0" : "-translate-y-full"}`}>
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         {/* Brand / Logo */}
         <Link
