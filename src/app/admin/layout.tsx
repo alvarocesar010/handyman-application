@@ -1,4 +1,4 @@
-import Link from "next/link";
+import AdminNav from "@/components/NavBar/AdminNav";
 
 export default function AdminLayout({
   children,
@@ -9,18 +9,7 @@ export default function AdminLayout({
     <main className="mx-auto max-w-6xl px-6 py-8 space-y-6">
       <header className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-slate-900">Admin</h1>
-        <nav className="text-sm text-slate-600 space-x-4">
-          <Link className="hover:underline" href="/admin/bookings">
-            Bookings
-          </Link>
-          <Link href="/admin/dashboard">Dashboard</Link>
-          <Link className="hover:underline" href="/admin/create-booking">
-            Create Book
-          </Link>
-          <Link className="hover:underline" href="/admin/inventory">
-            Inventory
-          </Link>
-        </nav>
+        <AdminNav />
       </header>
       {children}
     </main>

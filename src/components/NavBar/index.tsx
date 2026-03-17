@@ -38,8 +38,10 @@ export default function Navbar({ layout }: NavBarProps) {
   }, [lastScrollY]);
 
   return (
-    <header className={`fixed top-0 left-0 w-full bg-white shadow transition-transform duration-300 z-50
-        ${show ? "translate-y-0" : "-translate-y-full"}`}>
+    <header
+      className={` fixed top-0 left-0 w-full bg-white shadow transition-transform duration-300 z-50
+        ${show ? "translate-y-0" : "-translate-y-full"}`}
+    >
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         {/* Brand / Logo */}
         <Link

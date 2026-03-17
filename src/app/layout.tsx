@@ -61,7 +61,7 @@ export default async function RootLayout({
         {/* Schema.org */}
         {structuredData && <JsonLd data={structuredData} />}
         <Navbar layout={layout} />
-        {children}
+        <div className="pt-16">{children}</div>
         <ToastContainer position="top-center" autoClose={3000} />
         <Footer />
       </body>
