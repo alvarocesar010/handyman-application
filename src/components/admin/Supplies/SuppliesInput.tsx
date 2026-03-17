@@ -232,6 +232,7 @@ export default function SupplyInput() {
             ref={fileInputRef}
             className="hidden"
             accept="image/*"
+            required
             multiple
             onChange={handleFileChange}
           />
@@ -269,6 +270,7 @@ export default function SupplyInput() {
           <select
             className="flex-1 p-3 border rounded-lg bg-slate-50 outline-none"
             value={formData.store}
+            required
             onChange={(e) =>
               setFormData({ ...formData, store: e.target.value })
             }
@@ -319,6 +321,7 @@ export default function SupplyInput() {
           <select
             className="flex-1 p-3 border rounded-lg bg-slate-50 outline-none"
             value={formData.category}
+            required
             onChange={(e) =>
               setFormData({ ...formData, category: e.target.value, size: "" })
             }
@@ -346,6 +349,7 @@ export default function SupplyInput() {
           <select
             className="flex-1 p-3 border rounded-lg bg-slate-50 outline-none"
             value={formData.size}
+            required
             onChange={(e) => setFormData({ ...formData, size: e.target.value })}
           >
             <option value="" disabled>
