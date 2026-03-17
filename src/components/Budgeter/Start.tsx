@@ -9,7 +9,7 @@ export default function Start() {
       <p className="font-bold my-2">Click on button to start your quote</p>
       <button
         className="bg-slate-400 py-2 px-4 rounded-2xl"
-        onClick={() => dispatch({ type: "NEXT_STAGE" })}
+        onClick={() => dispatch({ type: "TYPE_OF_SERVICES" })}
       >
         Start
       </button>

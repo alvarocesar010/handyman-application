@@ -320,11 +320,11 @@ export default function SupplyInput() {
             className="flex-1 p-3 border rounded-lg bg-slate-50 outline-none"
             value={formData.category}
             onChange={(e) =>
-              setFormData({ ...formData, category: e.target.value })
+              setFormData({ ...formData, category: e.target.value, size: "" })
             }
           >
             <option value="" disabled>
-              Select category
+              Select or add a category
             </option>
             {categories.map((c) => (
               <option key={c.value} value={c.value}>
@@ -348,6 +348,9 @@ export default function SupplyInput() {
             value={formData.size}
             onChange={(e) => setFormData({ ...formData, size: e.target.value })}
           >
+            <option value="" disabled>
+              Select or add a size
+            </option>
             {sizes.map((c) => (
               <option key={c} value={c}>
                 {c}

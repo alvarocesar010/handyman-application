@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 import { Storage } from "@google-cloud/storage";
@@ -27,6 +27,17 @@ function toTitleCase(value: string) {
     .join(" ");
 }
 
+export function slugify(value: string): string {
+  return value
+    .toLowerCase()
+    .trim()
+    .normalize("NFD") // split accents (á → a + ́)
+    .replace(/[\u0300-\u036f]/g, "") // remove accents
+    .replace(/[^a-z0-9\s-]/g, "") // remove special chars
+    .replace(/\s+/g, "-") // spaces → hyphen
+    .replace(/-+/g, "-"); // remove duplicated hyphens
+}
+
 // Initialize GCS
 function getBucket() {
   const bucketName = process.env.GCS_BUCKET_NAME;
@@ -35,9 +46,15 @@ function getBucket() {
     throw new Error("GCS_BUCKET_NAME is not defined");
   }
 
+  const devep = process.env.DEV_MODE;
+  let keyFilename: string | undefined;
+
+  if (devep === "true") {
+    keyFilename = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+  }
   const storage = new Storage({
     projectId: process.env.GCS_PROJECT_ID,
-    // keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
+    keyFilename,
   });
 
   return storage.bucket(bucketName);
@@ -48,8 +65,11 @@ export async function POST(req: Request) {
     const formData = await req.formData();
     const db = await getDb();
 
-    const category = (formData.get("category") as string) || "unacategorized";
-    const serviceSlug = category;
+    const rawCategory =
+      (formData.get("category") as string) || "unacategorized";
+
+    const category = toTitleCase(rawCategory);
+    const categorySlug = slugify(rawCategory);
 
     const files = formData.getAll("photos").filter(Boolean) as File[];
     if (files.length > MAX_FILES) {
@@ -79,7 +99,7 @@ export async function POST(req: Request) {
 
       const prov = "supplies";
       const objectPath = await uploadReviewImage({
-        serviceSlug,
+        categorySlug,
         file: f,
         prov,
       });
@@ -95,9 +115,12 @@ export async function POST(req: Request) {
       store: formData.get("store"),
       description: formData.get("description"),
       link: formData.get("link"),
-      category: category,
+
+      category,
+      categorySlug,
+
       photos: photoPaths,
-      size: formData.get("size"),
+      size: String(formData.get("size")),
       createdAt: new Date(),
       qty: formData.get("qty"),
     };
@@ -111,15 +134,31 @@ export async function POST(req: Request) {
   }
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     const db = await getDb();
 
-    const items = await db
+    const { searchParams } = new URL(req.url);
+
+    const category = searchParams.get("category");
+    const limit = Number(searchParams.get("limit")) || 0;
+
+    const filter: { categorySlug?: string } = {};
+
+    if (category) {
+      filter.categorySlug = category;
+    }
+
+    const query = db
       .collection("supplies")
-      .find({})
-      .sort({ createdAt: -1 })
-      .toArray();
+      .find(filter)
+      .sort({ createdAt: -1 });
+
+    if (limit > 0) {
+      query.limit(limit);
+    }
+
+    const items = await query.toArray();
 
     const withSignedUrls = await Promise.all(
       items.map(async (item) => ({

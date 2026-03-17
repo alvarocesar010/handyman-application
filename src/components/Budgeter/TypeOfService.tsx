@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { BudgeterContext } from "@/context/budgeter";
 
-export default function Start() {
+export default function TypeOfService() {
   const [, dispatch] = useContext(BudgeterContext);
 
   //   const typeOfService = () => {};
@@ -11,7 +11,7 @@ export default function Start() {
       <p className="font-bold my-2">What type of service would you like?</p>
       <button
         className="bg-slate-400 py-2 px-4 rounded-2xl"
-        onClick={() => dispatch({ type: "NEXT_STAGE" })}
+        onClick={() => dispatch({ type: "SUP_FIT" })}
       >
         Door Supplied and Fitted
       </button>

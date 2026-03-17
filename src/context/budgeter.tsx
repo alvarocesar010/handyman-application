@@ -11,7 +11,7 @@ type Action = { type: string; payload?: string };
 
 const STAGES: Stage[] = [
   "Start",
-  "Category",
+  "TypeOfService",
   "SuppliedFitted",
   "ProductDetails",
   "Quote",
@@ -23,12 +23,17 @@ const initialState: BudgetState = {
 
 const budgeterReducer = (state: BudgetState, action: Action) => {
   switch (action.type) {
-    case "NEXT_STAGE":
+    case "TYPE_OF_SERVICES":
       return {
         ...state,
         quoteStage: STAGES[1],
       };
 
+    case "SUP_FIT":
+      return {
+        ...state,
+        quoteStage: STAGES[2],
+      };
     default:
       return state;
   }

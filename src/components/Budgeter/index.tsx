@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
 
+
 type ServiceCategory =
   | "Internal Doors Installation"
   | "Shower Doors Installation"
@@ -86,6 +87,7 @@ export default function IntegratedBudgeter() {
   return (
     <div className="max-w-2xl mx-auto p-4 bg-white rounded-2xl shadow-xl border border-slate-100">
       {/* Progress Header */}
+     
       <div className="flex justify-between mb-8 px-4">
         <div
           className={`flex flex-col items-center ${step >= 1 ? "text-cyan-600" : "text-slate-300"}`}
