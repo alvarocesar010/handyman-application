@@ -28,16 +28,16 @@ function inferExt(mime: string) {
 
 /** Uploads image and returns object path (not URL) */
 export async function uploadReviewImage(opts: {
-  categorySlug: string;
+  serviceSlug: string;
   file: File;
   prov: string;
 }) {
-  const { categorySlug, file, prov } = opts;
+  const { serviceSlug, file, prov } = opts;
 
   const storage = getStorage();
   const bucket = storage.bucket(getBucketName());
 
-  const slug = safeSlug(categorySlug);
+  const slug = safeSlug(serviceSlug);
   const ext = inferExt(file.type);
 
   const objectPath = `${prov}/${slug}/${Date.now()}-${Math.random()

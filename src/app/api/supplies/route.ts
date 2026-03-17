@@ -69,7 +69,7 @@ export async function POST(req: Request) {
       (formData.get("category") as string) || "unacategorized";
 
     const category = toTitleCase(rawCategory);
-    const categorySlug = slugify(rawCategory);
+    const serviceSlug = slugify(rawCategory);
 
     const files = formData.getAll("photos").filter(Boolean) as File[];
     if (files.length > MAX_FILES) {
@@ -99,7 +99,7 @@ export async function POST(req: Request) {
 
       const prov = "supplies";
       const objectPath = await uploadReviewImage({
-        categorySlug,
+        serviceSlug,
         file: f,
         prov,
       });
@@ -117,7 +117,7 @@ export async function POST(req: Request) {
       link: formData.get("link"),
 
       category,
-      categorySlug,
+      serviceSlug,
 
       photos: photoPaths,
       size: String(formData.get("size")),
@@ -143,10 +143,10 @@ export async function GET(req: NextRequest) {
     const category = searchParams.get("category");
     const limit = Number(searchParams.get("limit")) || 0;
 
-    const filter: { categorySlug?: string } = {};
+    const filter: { serviceSlug?: string } = {};
 
     if (category) {
-      filter.categorySlug = category;
+      filter.serviceSlug = category;
     }
 
     const query = db
