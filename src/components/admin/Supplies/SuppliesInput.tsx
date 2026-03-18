@@ -1,384 +1,570 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
-import { Plus, Link as LinkIcon, Image as ImageIcon, X } from "lucide-react";
-import { toast } from "react-toastify";
-import Image from "next/image";
 
-type Category = {
+import { useState, useRef, useEffect } from "react";
+import { Trash2, Plus, X, Edit3, Package } from "lucide-react";
+import Image from "next/image";
+import { ToastContainer, toast } from "react-toastify";
+
+/** * Strict Type Definitions
+ */
+interface Category {
   value: string;
   sizes: string[];
-};
+}
+
+interface InventoryItem {
+  size: string;
+  qty: string;
+}
+
+interface StoreEntry {
+  storeName: string;
+  link: string;
+  price: string;
+  inventory: InventoryItem[];
+}
+
+interface SupplyItem {
+  _id?: string;
+  name: string;
+  description: string;
+  category: string;
+  color: string;
+  storeEntries: StoreEntry[];
+  localPreview?: string; // For the "Recently Added" UI
+}
+
+interface APIOptionsResponse {
+  stores: string[];
+  categories: Category[];
+}
 
 export default function SupplyInput() {
   const [stores, setStores] = useState<string[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [addedItems, setAddedItems] = useState<SupplyItem[]>([]);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const [files, setFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<SupplyItem>({
     name: "",
-    price: "",
-    store: "",
     description: "",
-    link: "",
     category: "",
-    size: "",
-    qty: "",
+    color: "",
+    storeEntries: [
+      {
+        storeName: "",
+        link: "",
+        price: "",
+        inventory: [{ size: "", qty: "" }],
+      },
+    ],
   });
+
   const selectedCategory = categories.find(
     (c) => c.value === formData.category,
   );
-
-  const sizes = selectedCategory?.sizes ?? [];
+  const availableSizes = selectedCategory?.sizes ?? [];
 
   useEffect(() => {
     loadOptions();
   }, []);
 
-  async function loadOptions() {
+  async function loadOptions(): Promise<void> {
     try {
       const res = await fetch("/api/supplies/options");
-      const data = await res.json();
-
+      const data: APIOptionsResponse = await res.json();
       setStores(data.stores);
       setCategories(data.categories);
     } catch (err) {
       console.error(err);
+      toast.error("Failed to load options");
     }
   }
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const selectedFiles = Array.from(e.target.files || []);
     if (files.length + selectedFiles.length > 5) {
-      toast.warning("You can only upload up to 5 photos.");
+      toast.warning("Maximum 5 photos allowed");
       return;
     }
     const newFiles = [...files, ...selectedFiles];
-    const newPreviews = selectedFiles.map((file) => URL.createObjectURL(file));
-
+    const newPreviews = newFiles.map((file) => URL.createObjectURL(file));
     setFiles(newFiles);
-    setPreviews((prev) => [...prev, ...newPreviews]);
+    setPreviews(newPreviews);
   };
 
-  const removePhoto = (index: number) => {
+  const removePhoto = (index: number): void => {
     setFiles((prev) => prev.filter((_, i) => i !== index));
     setPreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleAddOption = async (type: "stores" | "categories" | "sizes") => {
-    const newVal = prompt(`Enter new ${type} name:`);
+  const updateStoreField = (
+    sIdx: number,
+    field: keyof Omit<StoreEntry, "inventory">,
+    value: string,
+  ): void => {
+    setFormData((prev) => {
+      const updatedEntries = [...prev.storeEntries];
+      updatedEntries[sIdx] = { ...updatedEntries[sIdx], [field]: value };
+      return { ...prev, storeEntries: updatedEntries };
+    });
+  };
 
-    if (!newVal) return;
+  const updateInventory = (
+    sIdx: number,
+    iIdx: number,
+    field: keyof InventoryItem,
+    value: string,
+  ): void => {
+    const updatedEntries = [...formData.storeEntries];
+    updatedEntries[sIdx].inventory[iIdx][field] = value;
+    setFormData({ ...formData, storeEntries: updatedEntries });
+  };
 
+  const removeInventoryRow = (sIdx: number, iIdx: number): void => {
+    const updatedEntries = [...formData.storeEntries];
+    updatedEntries[sIdx].inventory = updatedEntries[sIdx].inventory.filter(
+      (_, i) => i !== iIdx,
+    );
+    setFormData({ ...formData, storeEntries: updatedEntries });
+  };
+
+  const handleDelete = async (id: string, index: number): Promise<void> => {
+    if (!confirm("Are you sure?")) return;
     try {
-      const payload = new FormData();
-      payload.append("type", type);
-      payload.append("value", newVal);
-
-      if (type === "sizes") {
-        payload.append("category", formData.category);
-      }
-
-      const res = await fetch("/api/supplies/options", {
-        method: "POST",
-        body: payload,
+      const res = await fetch(`/api/supplies/${id}`, {
+        method: "DELETE",
+        headers: {
+          "x-admin-secret": process.env.NEXT_PUBLIC_ADMIN_ROUTE_SECRET || "",
+        },
       });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        alert(data.error || `Failed to save ${type}`);
-        return;
-      }
-
-      if (type === "stores") {
-        setStores((prev) => [...prev, newVal]);
-      }
-
-      if (type === "categories") {
-        setCategories((prev) => [
-          ...prev,
-          {
-            value: newVal,
-            sizes: [],
-          },
-        ]);
-      }
-
-      if (type === "sizes") {
-        setCategories((prev) =>
-          prev.map((c) =>
-            c.value === formData.category
-              ? { ...c, sizes: [...c.sizes, newVal] }
-              : c,
-          ),
-        );
-      }
+      if (!res.ok) throw new Error("Delete failed");
+      setAddedItems((prev) => prev.filter((_, i) => i !== index));
+      toast.success("Item removed");
     } catch (err) {
       console.error(err);
+      toast.error("Could not delete item");
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleEdit = (index: number): void => {
+    const item = addedItems[index];
+    setFormData({ ...item });
+    setEditingId(item._id || null);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    toast.info("Item loaded for editing");
+  };
+
+  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
-
-    if (isSubmitting) return;
     setIsSubmitting(true);
-
-    const data = new FormData();
-
-    // Append text fields
-    Object.entries(formData).forEach(([key, value]) => data.append(key, value));
-
-    // Append files
-    files.forEach((file) => data.append("photos", file));
+    const loadingToast = toast.loading(
+      editingId ? "Updating item..." : "Creating item...",
+    );
 
     try {
-      const res = await fetch("/api/supplies", {
-        method: "POST",
-        body: data, // Sending raw multipart/form-data
+      const data = new FormData();
+      files.forEach((file) => data.append("photos", file));
+      data.append("payload", JSON.stringify(formData));
+
+      const url = editingId ? `/api/supplies?id=${editingId}` : "/api/supplies";
+      const method = editingId ? "PUT" : "POST";
+
+      const res = await fetch(url, {
+        method,
+        headers: {
+          "x-admin-secret": process.env.NEXT_PUBLIC_ADMIN_ROUTE_SECRET || "",
+        },
+        body: data,
       });
 
-      if (res.ok) {
-        toast.success("Item saved to Cloud!");
-        setFiles([]);
-        setPreviews([]);
-        // reset form
-        setFormData({
-          name: "",
-          price: "",
-          store: "",
-          description: "",
-          link: "",
-          category: "",
-          size: "",
-          qty: "",
-        });
-        // notify dashboard
-        window.dispatchEvent(new Event("supplies-updated"));
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || "Operation failed");
+
+      const savedItem: SupplyItem = {
+        ...formData,
+        _id: result.id || editingId,
+        localPreview: previews[0], // Set the first preview for the list
+      };
+
+      if (editingId) {
+        setAddedItems((prev) =>
+          prev.map((item) => (item._id === editingId ? savedItem : item)),
+        );
+      } else {
+        setAddedItems((prev) => [savedItem, ...prev]);
       }
+
+      toast.update(loadingToast, {
+        render: editingId ? "Updated!" : "Created!",
+        type: "success",
+        isLoading: false,
+        autoClose: 3000,
+      });
+
+      // Reset Form
+      setEditingId(null);
+      setFormData({
+        name: "",
+        description: "",
+        category: "",
+        color: "",
+        storeEntries: [
+          {
+            storeName: "",
+            link: "",
+            price: "",
+            inventory: [{ size: "", qty: "" }],
+          },
+        ],
+      });
+      setFiles([]);
+      setPreviews([]);
     } catch (err) {
-      console.error("Submission failed", err);
-      toast.error("Upload failed");
+      const errorMessage = err instanceof Error ? err.message : "Unknown error";
+      toast.update(loadingToast, {
+        render: errorMessage,
+        type: "error",
+        isLoading: false,
+        autoClose: 3000,
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 max-w-md p-6">
-      <h2 className="text-xl font-bold mb-6 text-slate-800">
-        Add New Supply Item
-      </h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Photo Upload */}
-        <div className="space-y-2">
-          <div className="flex justify-between items-center">
-            <label className="text-xs font-bold text-slate-500 uppercase italic">
-              Item Photos ({files.length}/5)
-            </label>
-          </div>
+    <div className="bg-slate-50 min-h-screen p-4 md:p-8 text-slate-900">
+      <ToastContainer position="bottom-right" theme="colored" />
 
-          {previews.length === 0 ? (
+      <div className="max-w-2xl mx-auto space-y-8">
+        <header className="flex items-center justify-between px-1">
+          <div className="flex items-center gap-3">
+            <div className="bg-[#002d5a] p-2 rounded-lg text-white">
+              <Package size={24} />
+            </div>
+            <h2 className="text-2xl font-bold text-[#002d5a]">
+              {editingId ? "Edit Supply" : "New Supply"}
+            </h2>
+          </div>
+          {editingId && (
             <button
               type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="w-full h-32 border-2 border-dashed border-slate-200 rounded-xl flex flex-col items-center justify-center text-slate-400 hover:bg-slate-50 transition-colors"
+              onClick={() => {
+                setEditingId(null);
+                setFormData({
+                  name: "",
+                  description: "",
+                  category: "",
+                  color: "",
+                  storeEntries: [
+                    {
+                      storeName: "",
+                      link: "",
+                      price: "",
+                      inventory: [{ size: "", qty: "" }],
+                    },
+                  ],
+                });
+              }}
+              className="text-xs font-bold text-red-500 uppercase hover:underline"
             >
-              <ImageIcon size={28} /> {/* Fixed: Using ImageIcon here */}
-              <span className="text-xs mt-2 font-medium">
-                Click to upload photos
-              </span>
+              Cancel Edit
             </button>
-          ) : (
-            <div className="grid grid-cols-3 gap-2">
-              {previews.map((url, index) => (
-                <div
-                  key={index}
-                  className="relative aspect-square rounded-lg overflow-hidden border border-slate-200"
-                >
-                  <Image
-                    src={url}
-                    alt="Preview"
-                    className="w-full h-full object-cover"
-                    width={20}
-                    height={20}
-                  />
+          )}
+        </header>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-5">
+            {/* Photo Section */}
+            <div className="space-y-3">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                Item Photos ({files.length}/5)
+              </label>
+              <div className="flex flex-wrap gap-3">
+                {previews.map((url, i) => (
+                  <div
+                    key={i}
+                    className="relative w-20 h-20 rounded-xl border border-slate-200 overflow-hidden group"
+                  >
+                    <Image
+                      src={url}
+                      alt="preview"
+                      fill
+                      className="object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removePhoto(i)}
+                      className="absolute inset-0 bg-red-500/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white"
+                    >
+                      <X size={20} />
+                    </button>
+                  </div>
+                ))}
+                {files.length < 5 && (
                   <button
                     type="button"
-                    onClick={() => removePhoto(index)}
-                    className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full shadow-md"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-20 h-20 border-2 border-dashed border-slate-200 rounded-xl flex items-center justify-center text-slate-400 bg-slate-50 hover:bg-slate-100 transition-all"
                   >
-                    <X size={10} />
+                    <Plus size={24} />
+                  </button>
+                )}
+              </div>
+              <input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                multiple
+                accept="image/*"
+                onChange={handleFileChange}
+              />
+            </div>
+
+            {/* Inputs */}
+            <div className="space-y-4">
+              <input
+                placeholder="Item Name"
+                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#007b9e]"
+                value={formData.name}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+                required
+              />
+              <div className="grid grid-cols-2 gap-4">
+                <select
+                  className="p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none text-sm"
+                  value={formData.category}
+                  onChange={(e) =>
+                    setFormData({ ...formData, category: e.target.value })
+                  }
+                  required
+                >
+                  <option value="">Category</option>
+                  {categories.map((c) => (
+                    <option key={c.value} value={c.value}>
+                      {c.value}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  placeholder="Color / Finish"
+                  className="p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none text-sm"
+                  value={formData.color}
+                  onChange={(e) =>
+                    setFormData({ ...formData, color: e.target.value })
+                  }
+                />
+              </div>
+              <textarea
+                placeholder="Description"
+                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none text-sm min-h-[100px]"
+                value={formData.description}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
+              />
+            </div>
+          </div>
+
+          {/* Stores Section */}
+          <div className="space-y-4">
+            <div className="flex justify-between items-center px-1">
+              <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">
+                Store Availability
+              </h3>
+              <button
+                type="button"
+                onClick={() =>
+                  setFormData((p) => ({
+                    ...p,
+                    storeEntries: [
+                      ...p.storeEntries,
+                      {
+                        storeName: "",
+                        link: "",
+                        price: "",
+                        inventory: [{ size: "", qty: "" }],
+                      },
+                    ],
+                  }))
+                }
+                className="text-[#007b9e] text-xs font-bold flex items-center gap-1 hover:underline"
+              >
+                <Plus size={14} /> Add Source
+              </button>
+            </div>
+            {formData.storeEntries.map((entry, sIdx) => (
+              <div
+                key={sIdx}
+                className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm relative space-y-4"
+              >
+                <div className="flex gap-3">
+                  <select
+                    className="flex-1 p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm"
+                    value={entry.storeName}
+                    onChange={(e) =>
+                      updateStoreField(sIdx, "storeName", e.target.value)
+                    }
+                  >
+                    <option value="">Select Store</option>
+                    {stores.map((s) => (
+                      <option key={s} value={s}>
+                        {s}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="w-32 flex items-center bg-slate-50 border border-slate-200 rounded-xl px-3">
+                    <span className="text-slate-400 text-sm">€</span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      className="w-full bg-transparent outline-none text-sm font-bold ml-1"
+                      value={entry.price}
+                      onChange={(e) =>
+                        updateStoreField(sIdx, "price", e.target.value)
+                      }
+                    />
+                  </div>
+                </div>
+                <input
+                  placeholder="Product URL"
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs"
+                  value={entry.link}
+                  onChange={(e) =>
+                    updateStoreField(sIdx, "link", e.target.value)
+                  }
+                />
+
+                <div className="bg-slate-50 p-4 rounded-xl space-y-3">
+                  {entry.inventory.map((inv, iIdx) => (
+                    <div key={iIdx} className="flex gap-2">
+                      <select
+                        className="flex-1 p-2 bg-white border border-slate-200 rounded-lg text-xs"
+                        value={inv.size}
+                        onChange={(e) =>
+                          updateInventory(sIdx, iIdx, "size", e.target.value)
+                        }
+                      >
+                        <option value="">Size</option>
+                        {availableSizes.map((sz) => (
+                          <option key={sz} value={sz}>
+                            {sz}
+                          </option>
+                        ))}
+                      </select>
+                      <input
+                        type="number"
+                        placeholder="Qty"
+                        className="w-20 p-2 bg-white border border-slate-200 rounded-lg text-xs text-center"
+                        value={inv.qty}
+                        onChange={(e) =>
+                          updateInventory(sIdx, iIdx, "qty", e.target.value)
+                        }
+                      />
+                      {entry.inventory.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeInventoryRow(sIdx, iIdx)}
+                          className="p-2 text-slate-300 hover:text-red-500"
+                        >
+                          <X size={16} />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const up = [...formData.storeEntries];
+                      up[sIdx].inventory.push({ size: "", qty: "" });
+                      setFormData({ ...formData, storeEntries: up });
+                    }}
+                    className="text-[10px] text-[#007b9e] font-bold uppercase"
+                  >
+                    + Add Size
                   </button>
                 </div>
-              ))}
-              {files.length < 5 && (
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="aspect-square border-2 border-dashed border-slate-200 rounded-lg flex items-center justify-center text-slate-300"
+              </div>
+            ))}
+          </div>
+
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full bg-[#002d5a] text-white py-4 rounded-2xl font-bold hover:bg-[#001d3d] transition-all shadow-lg shadow-blue-900/10"
+          >
+            {isSubmitting
+              ? "Processing..."
+              : editingId
+                ? "Update Supply Item"
+                : "Create Supply Item"}
+          </button>
+        </form>
+
+        {/* Recently Added Section with Images */}
+        {addedItems.length > 0 && (
+          <div className="pt-10 border-t border-slate-200 space-y-4">
+            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest text-center">
+              Recently Added
+            </h3>
+            <div className="grid gap-4">
+              {addedItems.map((item, idx) => (
+                <div
+                  key={idx}
+                  className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center justify-between group shadow-sm"
                 >
-                  <Plus size={20} />
-                </button>
-              )}
+                  <div className="flex items-center gap-4">
+                    <div className="relative w-12 h-12 bg-slate-100 rounded-xl overflow-hidden flex items-center justify-center">
+                      {item.localPreview ? (
+                        <Image
+                          src={item.localPreview}
+                          alt={item.name}
+                          fill
+                          className="object-cover"
+                        />
+                      ) : (
+                        <Package size={20} className="text-[#007b9e]" />
+                      )}
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-slate-800 leading-tight">
+                        {item.name}
+                      </h4>
+                      <p className="text-[10px] uppercase font-bold text-slate-400">
+                        {item.category} • {item.storeEntries.length} Stores
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={() => handleEdit(idx)}
+                      className="p-2 text-slate-400 hover:text-[#007b9e] hover:bg-blue-50 rounded-lg transition-all"
+                      title="Edit"
+                    >
+                      <Edit3 size={18} />
+                    </button>
+                    <button
+                      onClick={() => item._id && handleDelete(item._id, idx)}
+                      className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                      title="Delete"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
-          )}
-          <input
-            type="file"
-            ref={fileInputRef}
-            className="hidden"
-            accept="image/*"
-            required
-            multiple
-            onChange={handleFileChange}
-          />
-        </div>
-
-        <input
-          placeholder="Item Name"
-          value={formData.name}
-          className="w-full p-3 border rounded-lg bg-slate-50 outline-none"
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          required
-        />
-        {/* price */}
-        <input
-          type="number"
-          placeholder="Price €"
-          value={formData.price}
-          className="w-full p-3 border rounded-lg bg-slate-50 outline-none"
-          onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-          required
-        />
-
-        {/* quantity */}
-        <input
-          type="number"
-          placeholder="Quantity"
-          value={formData.qty}
-          className="w-full p-3 border rounded-lg bg-slate-50 outline-none"
-          onChange={(e) => setFormData({ ...formData, qty: e.target.value })}
-          required
-        />
-
-        {/* Store Selection - Fixed: Uses 'stores' and 'setStores' */}
-        <div className="flex gap-2">
-          <select
-            className="flex-1 p-3 border rounded-lg bg-slate-50 outline-none"
-            value={formData.store}
-            required
-            onChange={(e) =>
-              setFormData({ ...formData, store: e.target.value })
-            }
-          >
-            <option value="" disabled>
-              Select a store
-            </option>
-            {stores.map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
-            ))}
-          </select>
-          <button
-            type="button"
-            onClick={() => handleAddOption("stores")}
-            className="p-3 bg-slate-100 rounded-lg"
-          >
-            <Plus size={20} />
-          </button>
-        </div>
-
-        <textarea
-          placeholder="Description"
-          value={formData.description}
-          className="w-full p-3 border rounded-lg bg-slate-50 outline-none"
-          onChange={(e) =>
-            setFormData({ ...formData, description: e.target.value })
-          }
-        />
-
-        {/* Link Input - Fixed: Uses LinkIcon */}
-        <div className="relative">
-          <LinkIcon
-            className="absolute left-3 top-3.5 text-slate-400"
-            size={18}
-          />
-          <input
-            placeholder="Product Link (URL)"
-            value={formData.link}
-            className="w-full p-3 pl-10 border rounded-lg bg-slate-50 outline-none"
-            onChange={(e) => setFormData({ ...formData, link: e.target.value })}
-          />
-        </div>
-
-        {/* Category Selection - Fixed: Uses 'categories' and 'setCategories' */}
-        <div className="flex gap-2">
-          <select
-            className="flex-1 p-3 border rounded-lg bg-slate-50 outline-none"
-            value={formData.category}
-            required
-            onChange={(e) =>
-              setFormData({ ...formData, category: e.target.value, size: "" })
-            }
-          >
-            <option value="" disabled>
-              Select or add a category
-            </option>
-            {categories.map((c) => (
-              <option key={c.value} value={c.value}>
-                {c.value}
-              </option>
-            ))}
-          </select>
-          <button
-            type="button"
-            onClick={() => handleAddOption("categories")}
-            className="p-3 bg-slate-100 rounded-lg"
-          >
-            <Plus size={20} />
-          </button>
-        </div>
-
-        {/* Size Selection - Fixed: Uses 'categories' and 'setCategories' */}
-        <div className="flex gap-2">
-          <select
-            className="flex-1 p-3 border rounded-lg bg-slate-50 outline-none"
-            value={formData.size}
-            required
-            onChange={(e) => setFormData({ ...formData, size: e.target.value })}
-          >
-            <option value="" disabled>
-              Select or add a size
-            </option>
-            {sizes.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
-          <button
-            type="button"
-            onClick={() => handleAddOption("sizes")}
-            disabled={!formData.category}
-            className="p-3 bg-slate-100 rounded-lg"
-          >
-            <Plus size={20} />
-          </button>
-        </div>
-
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full bg-[#007b9e] text-white py-3 rounded-xl font-bold hover:bg-[#005f7a] transition-colors"
-        >
-          {isSubmitting ? "Saving..." : "Save Item"}
-        </button>
-      </form>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
