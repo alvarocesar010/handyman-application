@@ -76,7 +76,7 @@ export default function SupplyInput() {
 
   async function loadOptions(): Promise<void> {
     try {
-      const res = await fetch("/api/supplies/options");
+      const res = await fetch("/api/admin/supplies/options");
       const data: APIOptionsResponse = await res.json();
       setStores(data.stores);
       setCategories(data.categories);
@@ -137,7 +137,7 @@ export default function SupplyInput() {
   const handleDelete = async (id: string, index: number): Promise<void> => {
     if (!confirm("Are you sure?")) return;
     try {
-      const res = await fetch(`/api/supplies/${id}`, {
+      const res = await fetch(`/api/admin/supplies/${id}`, {
         method: "DELETE",
         headers: {
           "x-admin-secret": process.env.NEXT_PUBLIC_ADMIN_ROUTE_SECRET || "",
@@ -172,7 +172,9 @@ export default function SupplyInput() {
       files.forEach((file) => data.append("photos", file));
       data.append("payload", JSON.stringify(formData));
 
-      const url = editingId ? `/api/supplies?id=${editingId}` : "/api/supplies";
+      const url = editingId
+        ? `/api/admin/supplies?id=${editingId}`
+        : "/api/adim/supplies";
       const method = editingId ? "PUT" : "POST";
 
       const res = await fetch(url, {

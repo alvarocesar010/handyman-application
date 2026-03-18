@@ -86,30 +86,89 @@ function getBucket(): Bucket {
 /** --- API Methods --- **/
 
 export async function POST(req: Request) {
-  try {
-    const authHeader = req.headers.get("x-admin-secret");
-    if (authHeader !== process.env.NEXT_PUBLIC_ADMIN_ROUTE_SECRET) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+  const formData = await req.formData();
+  const db = await getDb();
 
-    const formData = await req.formData();
-    const db = await getDb();
+  const payloadRaw = formData.get("payload");
+  if (!payloadRaw)
+    return NextResponse.json({ error: "Missing payload" }, { status: 400 });
 
-    const payloadRaw = formData.get("payload");
-    if (!payloadRaw)
-      return NextResponse.json({ error: "Missing payload" }, { status: 400 });
+  const payload: SupplyPayload = JSON.parse(String(payloadRaw));
+  const serviceSlug = slugify(payload.category);
 
-    const payload: SupplyPayload = JSON.parse(String(payloadRaw));
-    const serviceSlug = slugify(payload.category);
+  const files = formData.getAll("photos").filter(Boolean) as File[];
+  if (files.length > MAX_FILES)
+    return NextResponse.json(
+      { error: `Max ${MAX_FILES} photos.` },
+      { status: 400 },
+    );
 
-    const files = formData.getAll("photos").filter(Boolean) as File[];
+  const photoPaths: string[] = [];
+  for (const f of files) {
+    if (!ALLOWED.has(f.type))
+      return NextResponse.json(
+        { error: "Invalid file type." },
+        { status: 400 },
+      );
+    if (f.size > MAX_EACH_BYTES)
+      return NextResponse.json({ error: "Image too large." }, { status: 400 });
+
+    const objectPath = await uploadReviewImage({
+      serviceSlug,
+      file: f,
+      prov: "supplies",
+    });
+    photoPaths.push(objectPath);
+  }
+
+  const supplyDoc = {
+    name: toTitleCase(payload.name),
+    description: payload.description,
+    category: toTitleCase(payload.category),
+    serviceSlug,
+    color: payload.color || "",
+    photos: photoPaths,
+    storeEntries: payload.storeEntries.map((entry) => ({
+      ...entry,
+      price: parseFloat(String(entry.price)) || 0,
+      inventory: entry.inventory.map((inv) => ({
+        ...inv,
+        qty: parseInt(String(inv.qty)) || 0,
+      })),
+    })),
+    updatedAt: new Date(),
+    createdAt: new Date(),
+  };
+
+  const result = await db.collection("supplies").insertOne(supplyDoc);
+  return NextResponse.json({ ok: true, id: result.insertedId });
+}
+
+export async function PUT(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const id = searchParams.get("id");
+  if (!id || !ObjectId.isValid(id))
+    return NextResponse.json({ error: "Valid ID required" }, { status: 400 });
+
+  const formData = await req.formData();
+  const payloadRaw = formData.get("payload");
+  if (!payloadRaw)
+    return NextResponse.json({ error: "Missing payload" }, { status: 400 });
+
+  const payload: SupplyPayload = JSON.parse(String(payloadRaw));
+  const db = await getDb();
+
+  // 1. Process Photos with Validation (Missing logic added)
+  const newPhotoPaths: string[] = [];
+  const files = formData.getAll("photos").filter(Boolean) as File[];
+
+  if (files.length > 0) {
     if (files.length > MAX_FILES)
       return NextResponse.json(
         { error: `Max ${MAX_FILES} photos.` },
         { status: 400 },
       );
-
-    const photoPaths: string[] = [];
+    const serviceSlug = slugify(payload.category);
     for (const f of files) {
       if (!ALLOWED.has(f.type))
         return NextResponse.json(
@@ -122,124 +181,40 @@ export async function POST(req: Request) {
           { status: 400 },
         );
 
-      const objectPath = await uploadReviewImage({
+      const path = await uploadReviewImage({
         serviceSlug,
         file: f,
         prov: "supplies",
       });
-      photoPaths.push(objectPath);
+      newPhotoPaths.push(path);
     }
-
-    const supplyDoc = {
-      name: toTitleCase(payload.name),
-      description: payload.description,
-      category: toTitleCase(payload.category),
-      serviceSlug,
-      color: payload.color || "",
-      photos: photoPaths,
-      storeEntries: payload.storeEntries.map((entry) => ({
-        ...entry,
-        price: parseFloat(String(entry.price)) || 0,
-        inventory: entry.inventory.map((inv) => ({
-          ...inv,
-          qty: parseInt(String(inv.qty)) || 0,
-        })),
-      })),
-      updatedAt: new Date(),
-      createdAt: new Date(),
-    };
-
-    const result = await db.collection("supplies").insertOne(supplyDoc);
-    return NextResponse.json({ ok: true, id: result.insertedId });
-  } catch (err) {
-    console.error(err);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 },
-    );
   }
-}
 
-export async function PUT(req: Request) {
-  try {
-    const authHeader = req.headers.get("x-admin-secret");
-    if (authHeader !== process.env.NEXT_PUBLIC_ADMIN_ROUTE_SECRET) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const { searchParams } = new URL(req.url);
-    const id = searchParams.get("id");
-    if (!id || !ObjectId.isValid(id))
-      return NextResponse.json({ error: "Valid ID required" }, { status: 400 });
-
-    const formData = await req.formData();
-    const payloadRaw = formData.get("payload");
-    if (!payloadRaw)
-      return NextResponse.json({ error: "Missing payload" }, { status: 400 });
-
-    const payload: SupplyPayload = JSON.parse(String(payloadRaw));
-    const db = await getDb();
-
-    // 1. Process Photos with Validation (Missing logic added)
-    const newPhotoPaths: string[] = [];
-    const files = formData.getAll("photos").filter(Boolean) as File[];
-
-    if (files.length > 0) {
-      if (files.length > MAX_FILES)
-        return NextResponse.json(
-          { error: `Max ${MAX_FILES} photos.` },
-          { status: 400 },
-        );
-      const serviceSlug = slugify(payload.category);
-      for (const f of files) {
-        if (!ALLOWED.has(f.type))
-          return NextResponse.json(
-            { error: "Invalid file type." },
-            { status: 400 },
-          );
-        if (f.size > MAX_EACH_BYTES)
-          return NextResponse.json(
-            { error: "Image too large." },
-            { status: 400 },
-          );
-
-        const path = await uploadReviewImage({
-          serviceSlug,
-          file: f,
-          prov: "supplies",
-        });
-        newPhotoPaths.push(path);
-      }
-    }
-
-    // 2. Format Data
-    const updateData: UpdateDocument = {
-      name: toTitleCase(payload.name),
-      description: payload.description,
-      category: toTitleCase(payload.category),
-      serviceSlug: slugify(payload.category),
-      color: payload.color || "",
-      storeEntries: payload.storeEntries.map((entry) => ({
-        ...entry,
-        price: parseFloat(String(entry.price)) || 0,
-        inventory: entry.inventory.map((inv) => ({
-          ...inv,
-          qty: parseInt(String(inv.qty)) || 0,
-        })),
+  // 2. Format Data
+  const updateData: UpdateDocument = {
+    name: toTitleCase(payload.name),
+    description: payload.description,
+    category: toTitleCase(payload.category),
+    serviceSlug: slugify(payload.category),
+    color: payload.color || "",
+    storeEntries: payload.storeEntries.map((entry) => ({
+      ...entry,
+      price: parseFloat(String(entry.price)) || 0,
+      inventory: entry.inventory.map((inv) => ({
+        ...inv,
+        qty: parseInt(String(inv.qty)) || 0,
       })),
-      updatedAt: new Date(),
-    };
+    })),
+    updatedAt: new Date(),
+  };
 
-    if (newPhotoPaths.length > 0) updateData.photos = newPhotoPaths;
+  if (newPhotoPaths.length > 0) updateData.photos = newPhotoPaths;
 
-    await db
-      .collection("supplies")
-      .updateOne({ _id: new ObjectId(id) }, { $set: updateData });
+  await db
+    .collection("supplies")
+    .updateOne({ _id: new ObjectId(id) }, { $set: updateData });
 
-    return NextResponse.json({ ok: true });
-  } catch {
-    return NextResponse.json({ error: "Update failed" }, { status: 500 });
-  }
+  return NextResponse.json({ ok: true });
 }
 
 export async function GET(req: NextRequest) {

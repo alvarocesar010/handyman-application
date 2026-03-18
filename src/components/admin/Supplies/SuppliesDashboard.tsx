@@ -37,7 +37,7 @@ export default function SuppliesDashboard() {
 
   const fetchItems = async () => {
     try {
-      const res = await fetch("/api/supplies");
+      const res = await fetch("/api/admin/supplies");
       const data = await res.json();
       setItems(data);
     } catch {
