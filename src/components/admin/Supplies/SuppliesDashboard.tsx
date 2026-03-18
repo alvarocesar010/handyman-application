@@ -21,6 +21,9 @@ export default function SuppliesDashboard() {
   const [search, setSearch] = useState("");
   const [editingItem, setEditingItem] = useState<SupplyItem | null>(null);
 
+  // NOVO: Estado para controlar qual imagem está aberta no modo "flutuante" (Lightbox)
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
   useEffect(() => {
     fetchItems();
     const refresh = () => fetchItems();
@@ -234,14 +237,21 @@ export default function SuppliesDashboard() {
                 </div>
                 <div className="flex gap-2 flex-wrap">
                   {item.photos?.map((path, index) => (
-                    <Image
+                    // NOVO: Adicionado um <button> ao redor da imagem para detectar o clique e a classe alterada para object-contain
+                    <button
                       key={`${path}-${index}`}
-                      src={`${path}`}
-                      alt={item.name}
-                      width={80}
-                      height={80}
-                      className="rounded-lg object-cover"
-                    />
+                      type="button"
+                      onClick={() => setSelectedImage(path)}
+                      className="relative w-20 h-20 rounded-lg overflow-hidden border border-slate-200 bg-slate-50 hover:border-cyan-500 hover:scale-105 transition-all focus:outline-none"
+                    >
+                      <Image
+                        src={`${path}`}
+                        alt={item.name}
+                        fill
+                        sizes="80px"
+                        className="object-contain p-1"
+                      />
+                    </button>
                   ))}
                 </div>
 
@@ -279,6 +289,31 @@ export default function SuppliesDashboard() {
           </div>
         )}
       </div>
+
+      {/* NOVO: A tela escura gigante (Modal Lightbox) que aparece quando uma foto é clicada */}
+      {selectedImage && (
+        <div
+          className="fixed inset-0 bg-black/80 flex items-center justify-center z-[100] p-4 backdrop-blur-sm transition-opacity"
+          onClick={() => setSelectedImage(null)}
+        >
+          <div className="relative w-full max-w-3xl aspect-square md:aspect-[4/3]">
+            <button
+              onClick={() => setSelectedImage(null)}
+              className="absolute -top-12 right-0 bg-white/10 hover:bg-white/20 text-white p-2 rounded-full backdrop-blur-md transition-colors"
+            >
+              <X size={24} />
+            </button>
+            <Image
+              src={selectedImage}
+              alt="Expanded view"
+              fill
+              className="object-contain drop-shadow-2xl"
+              sizes="(max-width: 768px) 100vw, 1200px"
+              priority
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
