@@ -1,6 +1,146 @@
 import { Service } from "@/types/service";
 
 export const SERVICES_EN: Service[] = [
+  //shower-doors
+  {
+    slug: "shower-doors",
+    title: "Shower Doors & Enclosures - Supply & Installation",
+    summary:
+      "Professional installation, replacement, and repair of shower doors and enclosures with waterproof sealing and perfect alignment.",
+
+    longDescription: [
+      "We specialise in shower doors and enclosures supplied and fitted, offering a complete service from product selection to professional installation.",
+      "Choose from a wide range of modern shower door styles below, and we’ll take care of measuring, fitting, sealing, and ensuring a leak-free finish.",
+      "Already purchased your shower door? No problem — we also provide expert installation for customer-supplied enclosures.",
+    ],
+
+    startingPrice: 12000,
+    durationHint: "Usually 1–3 hours depending on enclosure type",
+
+    categoriesTitle: "Shower door types we install",
+
+    categories: {
+      "Sliding Shower Doors": [
+        "Space-saving sliding glass doors",
+        "Double sliding enclosures",
+        "Frameless sliding doors",
+        "Soft-close rail systems",
+      ],
+      "Hinged (Pivot) Shower Doors": [
+        "Outward opening pivot doors",
+        "Frameless hinged doors",
+        "Wall-to-glass installations",
+        "Heavy-duty hinge systems",
+      ],
+      "Bi-Fold Shower Doors": [
+        "Folding glass panels for small bathrooms",
+        "Corner shower solutions",
+        "Compact enclosures",
+        "Space-efficient designs",
+      ],
+      "Walk-In Shower Panels": [
+        "Fixed glass panels",
+        "Minimalist open walk-in showers",
+        "Wet room glass screens",
+        "Frameless modern designs",
+      ],
+      "Quadrant Shower Enclosures": [
+        "Curved corner enclosures",
+        "Sliding quadrant doors",
+        "Small bathroom solutions",
+        "Acrylic or glass combinations",
+      ],
+      "Custom & Premium Enclosures": [
+        "Bespoke glass shower doors",
+        "Tinted or frosted glass",
+        "Black frame industrial style",
+        "Anti-limescale coated glass",
+      ],
+    },
+
+    categoryImages: {
+      "Sliding Shower Doors": {
+        src: "/images/services/shower/sliding-shower-door.jpg",
+        alt: "Sliding glass shower door enclosure",
+      },
+      "Hinged (Pivot) Shower Doors": {
+        src: "/images/services/shower/hinged-shower-door.jpg",
+        alt: "Frameless hinged shower door",
+      },
+      "Bi-Fold Shower Doors": {
+        src: "/images/services/shower/bifold-shower-door.jpg",
+        alt: "Bi-fold shower door for small bathroom",
+      },
+      "Walk-In Shower Panels": {
+        src: "/images/services/shower/walkin-shower.jpg",
+        alt: "Walk-in shower glass panel",
+      },
+      "Quadrant Shower Enclosures": {
+        src: "/images/services/shower/quadrant-shower.jpg",
+        alt: "Quadrant curved shower enclosure",
+      },
+      "Custom & Premium Enclosures": {
+        src: "/images/services/shower/custom-shower.jpg",
+        alt: "Custom frameless glass shower enclosure",
+      },
+    },
+
+    inclusions: [
+      "Removal and disposal of old shower doors if required",
+      "Precise measurement and alignment",
+      "Installation of shower door or enclosure",
+      "Silicone sealing for waterproof finish",
+      "Adjustment of rails, hinges, and rollers",
+      "Leak testing and finishing",
+      "Supply of standard fittings if needed",
+      "Customer-supplied units also accepted",
+    ],
+
+    exclusions: [
+      "Plumbing modifications",
+      "Tile cutting or major wall alterations",
+      "Custom glass manufacturing unless pre-agreed",
+      "Deep bathroom renovation work",
+    ],
+
+    faqs: [
+      {
+        q: "Can you supply the shower doors?",
+        a: "Yes, we can supply standard shower doors and enclosures, or install units purchased by the customer.",
+      },
+      {
+        q: "Do you fix leaking shower doors?",
+        a: "Yes, we reseal, adjust, and repair shower doors to prevent leaks and ensure proper closure.",
+      },
+      {
+        q: "Which shower door is best for small bathrooms?",
+        a: "Bi-fold and sliding doors are ideal for small spaces as they don’t require outward opening clearance.",
+      },
+      {
+        q: "Do you install frameless glass shower doors?",
+        a: "Yes, we specialise in frameless and minimalist glass installations for a modern finish.",
+      },
+      {
+        q: "How long does installation take?",
+        a: "Most installations take between 1 to 3 hours depending on the type and complexity.",
+      },
+      {
+        q: "Do you replace rollers and hinges?",
+        a: "Yes, we can replace worn rollers, hinges, and seals to restore smooth operation.",
+      },
+      {
+        q: "Do you offer custom shower solutions?",
+        a: "Yes, we can install bespoke glass panels and custom enclosures tailored to your space.",
+      },
+    ],
+
+    budget: {
+      service: "Shower door installation",
+      price: 120,
+    },
+
+    icon: "ShowerHead",
+  },
   // internal-doors
   {
     slug: "internal-doors",

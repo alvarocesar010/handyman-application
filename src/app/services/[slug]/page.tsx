@@ -14,6 +14,7 @@ import { CategoriesGrid } from "@/components/Services/CategoriesGrid";
 import { getLocale } from "@/lib/getLocale";
 import { ICON_MAP } from "@/lib/iconMap";
 import Budgeter from "@/components/Budgeter";
+import Stars from "@/components/ReviewsBox/Stars.tsx";
 
 type Params = { slug: string };
 type PageProps = { params: Promise<Params> };
@@ -128,6 +129,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
           <h1 className="text-3xl font-extrabold text-slate-900">
             {svc.title}
           </h1>
+          <Stars />
           <p className="text-slate-800">{svc.summary}</p>
           <p className="text-slate-700 text-sm">
             {svc.durationHint && <>Typical duration: {svc.durationHint} · </>}
@@ -212,8 +214,9 @@ export default async function ServiceDetailPage({ params }: PageProps) {
           />
         )}
 
-        <ReviewsBox serviceSlug={svc.slug} />
-
+        <div id="reviews">
+          <ReviewsBox serviceSlug={svc.slug} />
+        </div>
         {svc.faqs && svc.faqs.length > 0 && (
           <section className="space-y-3">
             <h3 className="text-lg font-semibold text-slate-900">FAQs</h3>
