@@ -4,7 +4,7 @@ export const SERVICES_EN: Service[] = [
   //shower-doors
   {
     slug: "shower-doors",
-    title: "Shower Doors & Enclosures - Supply & Installation",
+    title: "Shower Doors & Enclosures - Supplied and Fitted",
     summary:
       "Professional installation, replacement, and repair of shower doors and enclosures with waterproof sealing and perfect alignment.",
 
@@ -60,28 +60,24 @@ export const SERVICES_EN: Service[] = [
 
     categoryImages: {
       "Sliding Shower Doors": {
-        src: "/images/services/shower/sliding-shower-door.jpg",
+        src: "/images/services/shower-doors/sliding-shower-door.jpg",
         alt: "Sliding glass shower door enclosure",
       },
       "Hinged (Pivot) Shower Doors": {
-        src: "/images/services/shower/hinged-shower-door.jpg",
+        src: "/images/services/shower-doors/hinged-shower-door.jpg",
         alt: "Frameless hinged shower door",
       },
       "Bi-Fold Shower Doors": {
-        src: "/images/services/shower/bifold-shower-door.jpg",
+        src: "/images/services/shower-doors/bifold-shower-door.jpg",
         alt: "Bi-fold shower door for small bathroom",
       },
       "Walk-In Shower Panels": {
-        src: "/images/services/shower/walkin-shower.jpg",
+        src: "/images/services/shower-doors/walkin-shower.jpg",
         alt: "Walk-in shower glass panel",
       },
       "Quadrant Shower Enclosures": {
-        src: "/images/services/shower/quadrant-shower.jpg",
+        src: "/images/services/shower-doors/quadrant-shower.jpg",
         alt: "Quadrant curved shower enclosure",
-      },
-      "Custom & Premium Enclosures": {
-        src: "/images/services/shower/custom-shower.jpg",
-        alt: "Custom frameless glass shower enclosure",
       },
     },
 
@@ -146,128 +142,132 @@ export const SERVICES_EN: Service[] = [
     slug: "internal-doors",
     title: "Internal Doors - Supplied and Fitted",
     summary:
-      "Professional fitting, repair, and replacement of all types of internal doors.",
+      "Professional supply, installation, and replacement of internal doors with precise fitting and clean finishing.",
+
     longDescription: [
-      "We specialise in internal doors supplied and fitted, offering a complete service from supply to professional installation.",
-      "Choose one of our door models below and we’ll take care of the rest — measuring, adjusting, and fitting your new door for a perfect finish.",
-      "Already bought a door? No problem. We also provide a professional door fitting service for doors supplied by you.",
+      "We provide a complete internal doors supply and fit service, helping you choose the right door style and ensuring a perfect installation.",
+      "Whether you're upgrading your home or replacing damaged doors, we handle everything from measuring to fitting, alignment, and finishing.",
+      "We work with a wide range of door types, from standard hollow doors to premium solid wood and modern glazed designs.",
     ],
+
     startingPrice: 18000,
     durationHint: "Usually 2–3 hours per door",
-    categoriesTitle: "Door types & topics we handle",
+
+    categoriesTitle: "Internal door types we supply & install",
 
     categories: {
-      "Internal Doors": [
-        "Bedroom doors",
-        "Living room doors",
-        "Hallway doors",
-        "Closet and storage doors",
+      "Panel Doors (Most Common)": [
+        "2-panel and 4-panel doors",
+        "6-panel traditional doors",
+        "Shaker style doors",
+        "Classic moulded panel doors",
       ],
-      "External Doors": [
-        "Front and back entry doors",
-        "Patio and balcony doors",
-        "Garage side doors",
-        "Garden and shed doors",
+      "Flush Doors (Modern Style)": [
+        "Smooth flush doors",
+        "Painted white flush doors",
+        "Laminate finish doors",
+        "Minimalist contemporary doors",
       ],
-      "Furniture & Cabinet Doors": [
-        "Wardrobe doors (sliding or hinged)",
-        "Kitchen cabinet doors",
-        "Cupboard doors",
-        "TV and media unit doors",
+      "Glazed Internal Doors": [
+        "Full glass internal doors",
+        "Half glazed doors",
+        "Frosted glass panels",
+        "Decorative glass inserts",
       ],
-      "Bathroom & Enclosure Doors": [
-        "Shower enclosure doors",
-        "Glass partition doors",
-        "Toilet cubicle doors",
+      "Solid Wood Doors": [
+        "Oak internal doors",
+        "Pine doors",
+        "Walnut finish doors",
+        "Premium hardwood doors",
       ],
-      "Appliance Doors": [
-        "Dishwasher panel doors",
-        "Fridge integrated doors",
-        "Laundry cabinet doors",
+      "Sliding Internal Doors": [
+        "Sliding track doors",
+        "Pocket doors",
+        "Barn style sliding doors",
+        "Space-saving solutions",
       ],
-      "Specialty & Custom Doors": [
-        "Fire-rated doors",
-        "Acoustic/soundproof doors",
+      "Fire & Special Doors": [
+        "Fire-rated FD30 doors",
+        "Soundproof doors",
         "Moisture-resistant doors",
-        "Custom-sized or bespoke joinery doors",
+        "Custom size internal doors",
       ],
     },
 
-    // Imagem por categoria (usada dentro dos cards de tópicos)
-    // Ajuste os paths conforme suas imagens em /public
     categoryImages: {
-      "Internal Doors": {
-        src: "/images/services/doors/door-internal.jpg",
-        alt: "Internal wooden door being fitted",
+      "Panel Doors (Most Common)": {
+        src: "/images/services/internal-doors/panel-door.jpg",
+        alt: "Classic panel internal door",
       },
-      "External Doors": {
-        src: "/images/services/doors/door-external.jpg",
-        alt: "External composite front door",
+      "Flush Doors (Modern Style)": {
+        src: "/images/services/internal-doors/flush-door.jpg",
+        alt: "Modern flush internal door",
       },
-      "Furniture & Cabinet Doors": {
-        src: "/images/services/doors/door-kitchen-cabinet.jpg",
-        alt: "Kitchen cabinet door alignment",
+      "Glazed Internal Doors": {
+        src: "/images/services/internal-doors/glass-door.jpg",
+        alt: "Internal glazed door with glass panels",
       },
-      "Bathroom & Enclosure Doors": {
-        src: "/images/services/doors/door-shower.jpg",
-        alt: "Shower enclosure glass door",
+      "Solid Wood Doors": {
+        src: "/images/services/internal-doors/oak-door.jpg",
+        alt: "Solid oak internal door",
       },
-      "Appliance Doors": {
-        src: "/images/services/doors/door-appliance.jpg",
-        alt: "Integrated appliance door fitted",
-      },
-      "Specialty & Custom Doors": {
-        src: "/images/services/doors/door-fire-rated.jpg",
-        alt: "Fire-rated door with label",
+      "Sliding Internal Doors": {
+        src: "/images/services/internal-doors/sliding-door.jpg",
+        alt: "Sliding internal barn style door",
       },
     },
 
     inclusions: [
-      "Remove and dispose of old door if required",
-      "Measure and ensure perfect alignment",
-      "Fit new door, hinges, handles, and locks",
-      "Plane door edges for smooth operation",
-      "Adjust frames and ensure proper clearance",
-      "Supply of standard spare parts (hinges, locks, handles, screws, etc.) if needed",
-      "Customer can also supply their own materials",
+      "Removal of old internal door if required",
+      "Accurate measuring and fitting",
+      "Door trimming and planing for perfect fit",
+      "Installation of hinges, handles, and locks",
+      "Alignment and smooth closing adjustment",
+      "Frame adjustments if needed",
+      "Basic hardware supplied (hinges, screws, etc.)",
+      "Customer-supplied doors also accepted",
     ],
+
     exclusions: [
-      "Custom painting, varnishing, or staining (available upon request)",
-      "Glass cutting or design engraving",
-      "Supply of non-standard or bespoke doors unless pre-agreed",
+      "Painting, varnishing, or staining (available separately)",
+      "Major structural frame changes",
+      "Custom joinery manufacturing unless pre-agreed",
+      "Wall modifications for sliding/pocket systems",
     ],
+
     faqs: [
       {
-        q: "Can you supply the doors and parts?",
-        a: "Yes, we can provide all the required spare parts like hinges, handles, and locks, as well as supply standard-sized doors. However, customers are also free to provide their own materials if preferred.",
+        q: "Can you supply internal doors?",
+        a: "Yes, we can supply standard internal doors in different styles, or install doors purchased by the customer.",
       },
       {
-        q: "Do you repair or adjust existing doors?",
-        a: "Absolutely. We can repair swollen, misaligned, or sticking doors, as well as rehang or plane them for a smoother fit.",
+        q: "Do you cut doors to size?",
+        a: "Yes, we trim and adjust doors to ensure a perfect fit within your existing frame.",
       },
       {
-        q: "Do you install bathroom or glass doors?",
-        a: "Yes, we fit bathroom and shower enclosure doors, including glass and aluminium models with waterproof sealing.",
+        q: "What type of door is best?",
+        a: "It depends on your needs — flush doors are modern and simple, while panel or oak doors offer a more classic and premium finish.",
       },
       {
-        q: "Do you work on wardrobe and kitchen cabinet doors?",
-        a: "Yes, we can replace or repair furniture and cabinet doors, adjust hinges, and install new fittings.",
+        q: "Do you install sliding or pocket doors?",
+        a: "Yes, but these may require additional work depending on the wall structure.",
       },
       {
-        q: "Do you offer fire or moisture-resistant doors?",
-        a: "Yes, we can advise and install certified fire-rated and moisture-resistant doors suitable for kitchens, bathrooms, or commercial use.",
+        q: "Can you replace damaged doors?",
+        a: "Yes, we replace broken, swollen, or outdated doors with new ones.",
       },
       {
-        q: "Can you fix broken hinges or loose handles?",
-        a: "Yes, we replace or reinforce hinges, handles, locks, and any other fittings that are damaged or worn out.",
+        q: "Do you install handles and locks?",
+        a: "Yes, we fit all hardware including handles, latches, and locks.",
       },
       {
-        q: "Do you offer painting or finishing?",
-        a: "We don’t usually paint or varnish as part of the standard service,itcan be arrangedf required.",
+        q: "Do you install fire-rated doors?",
+        a: "Yes, we install certified fire doors following safety standards.",
       },
     ],
+
     budget: {
-      service: "Door installation",
+      service: "Internal door installation",
       price: 150,
     },
 
