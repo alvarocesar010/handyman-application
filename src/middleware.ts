@@ -25,7 +25,13 @@ export async function middleware(req: NextRequest) {
 
   if (!isAdminPath) return NextResponse.next();
 
-  // allow login page and login API without token
+  // ✅ Allow bot / server with secret
+  const authHeader = req.headers.get("authorization");
+  if (authHeader === `Bearer ${process.env.ADMIN_API_SECRET}`) {
+    return NextResponse.next();
+  }
+
+  // allow login routes
   if (
     pathname.startsWith("/admin/login") ||
     pathname.startsWith("/api/admin/login")
@@ -33,16 +39,19 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
+  // ✅ Cookie auth
   if (await isAuthenticated(req)) {
     return NextResponse.next();
   }
 
+  // ✅ API should return JSON, not redirect
+  if (pathname.startsWith("/api")) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  // ✅ UI redirect
   const loginUrl = req.nextUrl.clone();
-  loginUrl.pathname = "/admin/login"; // no query params
+  loginUrl.pathname = "/admin/login";
 
   return NextResponse.redirect(loginUrl);
 }
-
-export const config = {
-  matcher: ["/admin/:path*", "/api/admin/:path*"],
-};
