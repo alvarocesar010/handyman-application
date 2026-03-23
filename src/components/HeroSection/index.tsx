@@ -1,9 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
-import TrackedCallButton from "../WhatsAppButton";
 
 import { getLocale } from "@/lib/getLocale";
 import { getMessages } from "@/lib/getMessages";
+import WhatsAppButton from "../WhatsAppButton";
 
 export default async function HeroSection() {
   const locale = await getLocale();
@@ -34,8 +34,8 @@ export default async function HeroSection() {
               {t.bookButton}
             </Link>
 
-            <TrackedCallButton
-              phone={t.callButton.phone}
+            <WhatsAppButton
+              href={t.callButton.phone}
               className="inline-flex h-11 gap-2 items-center justify-center rounded-lg bg-slate-900 px-5 text-white font-medium shadow hover:bg-black focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-700 focus-visible:ring-offset-2"
               content={t.callButton.children}
             />

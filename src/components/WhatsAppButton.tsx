@@ -1,28 +1,28 @@
-// src/components/TrackedCallButton.tsx
 "use client";
 
 import { handleConversionClick } from "@/lib/ads";
 import { MessageCircle } from "lucide-react";
+import Link from "next/link";
 
 export default function WhatsAppButton({
-  phone,
+  href,
   className,
   content,
 }: {
-  phone: string;
+  href: string;
   className?: string;
   content?: string;
 }) {
-  const href = `tel:${phone.replace(/\s/g, "")}`;
-
   return (
-    <a
+    <Link
       href={href}
+      target="_blank"
+      rel="noopener noreferrer"
       className={className}
       onClick={(e) => handleConversionClick(e, href)}
     >
       <MessageCircle />
       {content}
-    </a>
+    </Link>
   );
 }

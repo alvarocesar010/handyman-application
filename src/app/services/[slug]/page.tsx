@@ -7,7 +7,7 @@ import { BudgeterProvider } from "@/context/budgeter";
 import { SERVICES_PT, SERVICE_MAP_PT } from "@/lib/services_pt";
 
 import type { Metadata } from "next";
-import { CalendarCheck, Phone } from "lucide-react";
+import { CalendarCheck, MessageCircle } from "lucide-react";
 import ReviewsBox from "@/components/ReviewsBox";
 import ServiceSteps from "@/components/Services/ServiceSteps";
 import { CategoriesGrid } from "@/components/Services/CategoriesGrid";
@@ -15,6 +15,7 @@ import { getLocale } from "@/lib/getLocale";
 import { ICON_MAP } from "@/lib/iconMap";
 import Budgeter from "@/components/Budgeter";
 import Stars from "@/components/ReviewsBox/Stars.tsx";
+import WhatsAppButton from "@/components/WhatsAppButton";
 
 type Params = { slug: string };
 type PageProps = { params: Promise<Params> };
@@ -143,12 +144,11 @@ export default async function ServiceDetailPage({ params }: PageProps) {
             >
               Book this service
             </Link>
-            <a
-              href={`tel:${process.env.PHONE_NUMBER?.replace(/\s/g, "") ?? ""}`}
-              className="inline-flex h-11 items-center justify-center rounded-lg bg-slate-900 px-5 text-white font-medium shadow hover:bg-black focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-700"
-            >
-              Call for advice
-            </a>
+            <WhatsAppButton
+              href="https://wa.me/353894924563?text=Hi%2C%20I%27d%20like%20to%20book%20a%20repair"
+              className="inline-flex h-11 gap-2 items-center justify-center rounded-lg bg-slate-900 px-5 text-white font-medium shadow hover:bg-black focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-700 focus-visible:ring-offset-2"
+              content="Get in touch"
+            />
           </div>
         </header>
 
@@ -312,11 +312,11 @@ export default async function ServiceDetailPage({ params }: PageProps) {
             <CalendarCheck className="h-6 w-6" />
           </Link>
           <a
-            href={`tel:${process.env.PHONE_NUMBER?.replace(/\s/g, "") ?? ""}`}
+            href={`https://wa.me/353894924563?text=Hi%2C%20I%27d%20like%20to%20get%20a%20quote`}
             aria-label="Call for advice"
             className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-slate-900 text-white shadow hover:bg-black focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-700"
           >
-            <Phone className="h-6 w-6" />
+            <MessageCircle className="h-6 w-6" />
           </a>
         </div>
       </div>
