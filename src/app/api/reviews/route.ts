@@ -29,14 +29,16 @@ export async function GET(req: Request) {
     }
 
     const col = await reviewsCollection();
+    const test = await col.find({}).toArray();
+    console.log("REVIEWS:", test.length);
+    const filter = service === "AllReviews" ? {} : { serviceSlug: service };
 
-    // Reviews contain photoUrls as object paths (e.g., "reviews/slug/123.jpg")
     const reviews = await col
-      .find({ serviceSlug: service })
+      .find(filter)
       .sort({ createdAtISO: -1 })
       .limit(200)
       .toArray();
-
+    console.log("const reviews:", reviews);
     // Convert object paths -> signed URLs for the client
     const withSignedUrls = await Promise.all(
       reviews.map(async (r) => ({
@@ -49,7 +51,7 @@ export async function GET(req: Request) {
       })),
     );
 
-    return NextResponse.json({ reviews: withSignedUrls });
+    return NextResponse.json({ reviews: withSignedUrls, test });
   } catch (err) {
     return NextResponse.json(
       { error: err instanceof Error ? err.message : "Failed to load reviews" },
