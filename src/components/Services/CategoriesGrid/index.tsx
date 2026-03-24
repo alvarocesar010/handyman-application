@@ -45,7 +45,7 @@ export function CategoriesGrid({
                     alt={img.alt}
                     fill
                     sizes="(max-width:768px) 100vw, 50vw"
-                    className="object-fill"
+                    className="object-contain"
                     priority={false}
                   />
                 </div>

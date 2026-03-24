@@ -34,6 +34,21 @@ const budgeterReducer = (state: BudgetState, action: Action) => {
         ...state,
         quoteStage: STAGES[2],
       };
+
+    case "CLOSE_TAB":
+      return {
+        ...state,
+        quoteStage: STAGES[0],
+      };
+
+    case "PREVIOUS":
+      const currentIndex = STAGES.indexOf(state.quoteStage);
+
+      const prevIndex = currentIndex > 0 ? currentIndex - 1 : 0;
+      return {
+        ...state,
+        quoteStage: STAGES[prevIndex],
+      };
     default:
       return state;
   }
