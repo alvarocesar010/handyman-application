@@ -6,6 +6,7 @@ import BookingDonePanel from "./BookingDonePanel";
 import BookingPhotos from "./BookingPhotos";
 import BookingActions from "./BookingActions";
 import BookingDetailsEditor from "./BookingDetailsEditor";
+import HardwareList from "./HardwareList";
 
 export default function BookingBody({ booking }: { booking: AdminBooking }) {
   const [editing, setEditing] = useState(false);
@@ -15,7 +16,10 @@ export default function BookingBody({ booking }: { booking: AdminBooking }) {
       <BookingDonePanel booking={booking} />
 
       <BookingPhotos photos={booking.photos} />
-
+      <HardwareList
+        bookingId={booking._id}
+        initialSupplies={booking.supplies}
+      />
       {editing && (
         <BookingDetailsEditor
           booking={booking}

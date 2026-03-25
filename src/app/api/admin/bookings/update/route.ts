@@ -29,7 +29,7 @@ type BookingUpdate = {
 };
 
 function parseNumberOrUndefined(
-  v: FormDataEntryValue | null
+  v: FormDataEntryValue | null,
 ): number | undefined {
   if (typeof v !== "string") return undefined;
   const s = v.trim();
@@ -39,7 +39,7 @@ function parseNumberOrUndefined(
 }
 
 function parseStringOrUndefined(
-  v: FormDataEntryValue | null
+  v: FormDataEntryValue | null,
 ): string | undefined {
   if (typeof v !== "string") return undefined;
   const s = v.trim();
@@ -102,7 +102,7 @@ export async function POST(req: Request) {
   if (finishTime !== undefined) update.finishTime = finishTime;
 
   const actualDurationMinutes = parseNumberOrUndefined(
-    form.get("actualDurationMinutes")
+    form.get("actualDurationMinutes"),
   );
   if (actualDurationMinutes !== undefined) {
     update.actualDurationMinutes = actualDurationMinutes;
@@ -119,4 +119,51 @@ export async function POST(req: Request) {
     return NextResponse.redirect(new URL("/admin/bookings", req.url));
   }
   return NextResponse.redirect(new URL("/admin/bookings", siteUrl));
+}
+
+export async function PATCH(req: Request): Promise<Response> {
+  try {
+    const body: {
+      id?: string;
+      updates?: Record<string, unknown>;
+    } = await req.json();
+
+    const { id, updates } = body;
+
+    if (!id || !updates) {
+      return NextResponse.json(
+        { success: false, message: "Missing data" },
+        { status: 400 },
+      );
+    }
+
+    const db = await getDb();
+
+    const result = await db.collection("bookings").updateOne(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          ...updates,
+          updatedAt: new Date(),
+        },
+      },
+    );
+
+    if (result.matchedCount === 0) {
+      return NextResponse.json(
+        { success: false, message: "Booking not found" },
+        { status: 404 },
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: "Booking updated successfully",
+    });
+  } catch {
+    return NextResponse.json(
+      { success: false, message: "Server error" },
+      { status: 500 },
+    );
+  }
 }

@@ -174,13 +174,13 @@ export default function SupplyInput() {
 
       const url = editingId
         ? `/api/admin/supplies?id=${editingId}`
-        : "/api/adim/supplies";
+        : "/api/admin/supplies";
       const method = editingId ? "PUT" : "POST";
 
       const res = await fetch(url, {
         method,
         headers: {
-          "x-admin-secret": process.env.NEXT_PUBLIC_ADMIN_ROUTE_SECRET || "",
+          Authorization: `Bearer ${process.env.ADMIN_API_SECRET}`,
         },
         body: data,
       });

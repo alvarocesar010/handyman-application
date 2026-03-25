@@ -30,7 +30,6 @@ export async function GET(req: Request) {
 
     const col = await reviewsCollection();
     const test = await col.find({}).toArray();
-    console.log("REVIEWS:", test.length);
     const filter = service === "AllReviews" ? {} : { serviceSlug: service };
 
     const reviews = await col
@@ -38,7 +37,6 @@ export async function GET(req: Request) {
       .sort({ createdAtISO: -1 })
       .limit(200)
       .toArray();
-    console.log("const reviews:", reviews);
     // Convert object paths -> signed URLs for the client
     const withSignedUrls = await Promise.all(
       reviews.map(async (r) => ({

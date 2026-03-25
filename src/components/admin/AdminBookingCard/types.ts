@@ -1,3 +1,5 @@
+import { SelectedItem } from "./HardwareList";
+
 export type AdminPhoto = { id: string; filename: string };
 
 export type AdminBookingStatus = "pending" | "confirmed" | "done" | "cancelled";
@@ -40,6 +42,8 @@ export type AdminBooking = {
   tipReceived?: number;
   finishTime?: string; // HH:mm
   actualDurationMinutes?: number; // calculated minutes (start->finish)
+
+  supplies: SelectedItem[];
 };
 
 // -------------------------

@@ -6,6 +6,7 @@ import { uploadReviewImage, signImage } from "@/lib/gcs";
 
 /** --- Strict Interfaces --- **/
 interface InventoryItem {
+  _id: string;
   size: string;
   qty: number;
 }
@@ -133,6 +134,7 @@ export async function POST(req: Request) {
       price: parseFloat(String(entry.price)) || 0,
       inventory: entry.inventory.map((inv) => ({
         ...inv,
+        _id: inv._id || new ObjectId().toString(),
         qty: parseInt(String(inv.qty)) || 0,
       })),
     })),

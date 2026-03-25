@@ -86,7 +86,6 @@ export async function POST(request: Request) {
       duration: durationMinutes,
       cost,
     };
-    console.log(result)
     return NextResponse.json(result);
   } catch (error) {
     console.error(error);

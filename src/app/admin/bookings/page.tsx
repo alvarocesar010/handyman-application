@@ -10,6 +10,7 @@ import type {
   AdminBookingStatus,
 } from "@/components/admin/AdminBookingCard/types";
 import ConfirmedDayGroup from "@/components/admin/AdminBookingCard/ConfimedDayGroup";
+import { SelectedItem } from "@/components/admin/AdminBookingCard/HardwareList";
 
 export const dynamic = "force-dynamic";
 
@@ -43,12 +44,14 @@ type DbBooking = {
   adminNotes?: string;
   startTime?: string;
   durationMinutes?: number;
-  phoneE164:string
+  phoneE164: string;
 
   amountReceived?: number;
   tipReceived?: number;
   finishTime?: string;
   actualDurationMinutes?: number;
+
+  supplies?: SelectedItem[];
 };
 
 type Bucket = "day" | "week" | "month";
@@ -176,6 +179,7 @@ function toView(d: DbBooking): AdminBooking {
     tipReceived: d.tipReceived,
     finishTime: d.finishTime,
     actualDurationMinutes: d.actualDurationMinutes,
+    supplies: d.supplies ?? [],
   };
 }
 
