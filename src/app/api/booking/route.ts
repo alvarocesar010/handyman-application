@@ -64,7 +64,7 @@ async function sendNotifications(opts: {
     tasks.push(
       twilioClient.messages
         .create({ from: SMS_FROM, to: opts.phoneE164, body: smsBody })
-        .catch((e) => console.error("SMS error:", e?.message || e))
+        .catch((e) => console.error("SMS error:", e?.message || e)),
     );
   }
 
@@ -76,7 +76,7 @@ async function sendNotifications(opts: {
           to: `whatsapp:${opts.phoneE164}`,
           body: waBody,
         })
-        .catch((e) => console.error("WA error:", e?.message || e))
+        .catch((e) => console.error("WA error:", e?.message || e)),
     );
   }
 
@@ -110,7 +110,7 @@ export async function POST(req: Request) {
     ) {
       return NextResponse.json(
         { error: "Missing required fields." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -121,7 +121,7 @@ export async function POST(req: Request) {
           error:
             "Please enter a valid Irish phone number (e.g., +353 87 123 4567).",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
     let distanceCost: number | null = null;
@@ -137,7 +137,7 @@ export async function POST(req: Request) {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ eircode }),
-        }
+        },
       );
 
       if (distanceRes.ok) {
@@ -177,7 +177,7 @@ export async function POST(req: Request) {
         size: number;
         contentType: string;
       }[];
-      status: "pending" | "confirmed" | "done" | "cancelled";
+      status: "new" | "pending" | "confirmed" | "done" | "cancelled";
       createdAt: Date;
       updatedAt: Date;
     } = {
@@ -194,7 +194,7 @@ export async function POST(req: Request) {
       distanceCost,
       description,
       photos: [],
-      status: "pending",
+      status: "new",
       createdAt: now,
       updatedAt: now,
     };
@@ -208,7 +208,7 @@ export async function POST(req: Request) {
         if (f.size > 5 * 1024 * 1024) {
           return NextResponse.json(
             { error: `Image "${f.name}" is larger than 5MB.` },
-            { status: 400 }
+            { status: 400 },
           );
         }
 
@@ -253,7 +253,7 @@ export async function POST(req: Request) {
     console.error("Booking POST error:", err);
     return NextResponse.json(
       { error: "Internal error while creating the booking." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

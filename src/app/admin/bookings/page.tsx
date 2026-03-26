@@ -197,14 +197,15 @@ export default async function AdminBookingsPage({
   const sp = await searchParams;
   const range = parseRange(sp);
 
-  const statusRaw = typeof sp.status === "string" ? sp.status : "pending";
+  const statusRaw = typeof sp.status === "string" ? sp.status : "new";
   const activeStatus: AdminBookingStatus =
+    statusRaw === "new" ||
     statusRaw === "pending" ||
     statusRaw === "confirmed" ||
     statusRaw === "done" ||
     statusRaw === "cancelled"
       ? statusRaw
-      : "pending";
+      : "new";
 
   const db = await getDb();
   const docs = (await db
@@ -228,6 +229,7 @@ export default async function AdminBookingsPage({
     confirmed: [],
     done: [],
     cancelled: [],
+    new: [],
   };
 
   for (const d of filtered) {
@@ -239,6 +241,7 @@ export default async function AdminBookingsPage({
     confirmed: byStatus.confirmed.length,
     done: byStatus.done.length,
     cancelled: byStatus.cancelled.length,
+    new: byStatus.new.length,
   };
 
   const currentParams = new URLSearchParams();
@@ -256,7 +259,9 @@ export default async function AdminBookingsPage({
         ? "Confirmed"
         : activeStatus === "done"
           ? "Done"
-          : "Cancelled";
+          : activeStatus === "new"
+            ? "New"
+            : "Cancelled";
 
   function getDayKey(dateISO: string) {
     const d = new Date(dateISO);
@@ -305,10 +310,6 @@ export default async function AdminBookingsPage({
           counts={counts}
           makeHref={makeTabHref}
         />
-
-        <div className="text-sm text-slate-600">
-          Showing: {range.from} → {range.to}
-        </div>
       </div>
 
       {activeStatus === "confirmed" ? (

@@ -30,7 +30,8 @@ export default function AdminBookingCard({
         open={open}
         onToggleOpen={() => setOpen((v) => !v)}
       />
-      {open && <BookingBody booking={booking} />}
+
+      <BookingBody booking={booking} />
     </article>
   );
 }

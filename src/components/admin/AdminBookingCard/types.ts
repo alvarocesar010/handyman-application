@@ -2,7 +2,12 @@ import { SelectedItem } from "./HardwareList";
 
 export type AdminPhoto = { id: string; filename: string };
 
-export type AdminBookingStatus = "pending" | "confirmed" | "done" | "cancelled";
+export type AdminBookingStatus =
+  | "pending"
+  | "confirmed"
+  | "done"
+  | "cancelled"
+  | "new";
 
 export type AdminBooking = {
   _id: string;

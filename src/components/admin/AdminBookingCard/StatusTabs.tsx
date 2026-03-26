@@ -17,6 +17,7 @@ export default function StatusTabs({
   makeHref: (status: AdminBookingStatus) => string;
 }) {
   const tabs: Tab[] = [
+    { key: "new", label: "New", count: counts.new },
     { key: "pending", label: "Pending", count: counts.pending },
     { key: "confirmed", label: "Confirmed", count: counts.confirmed },
     { key: "done", label: "Done", count: counts.done },

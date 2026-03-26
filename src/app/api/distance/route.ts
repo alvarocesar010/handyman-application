@@ -20,7 +20,7 @@ export async function POST(request: Request) {
   if (!apiKey) {
     return NextResponse.json(
       { error: "GOOGLE_MAPS_API_KEY is not configured" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 
@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     if (!eircode) {
       return NextResponse.json(
         { error: "Eircode is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -60,7 +60,7 @@ export async function POST(request: Request) {
     if (!element || element.status !== "OK") {
       return NextResponse.json(
         { error: "Could not calculate distance" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -75,8 +75,8 @@ export async function POST(request: Request) {
     // -------------------------
 
     const hours = (durationMinutes * 2) / 60; // convert minutes -> hours
-    const baseCost = hours * 50; // €50 per hour
-    const cost = Math.ceil(baseCost * 1.1);
+    const baseCost = hours * 25; // €25 per hour
+    const cost = Math.ceil(baseCost * 1.05);
     // -------------------------
 
     const result: DistanceApiResult = {

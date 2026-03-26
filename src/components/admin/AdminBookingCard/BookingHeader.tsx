@@ -25,7 +25,7 @@ export default function BookingHeader({
   });
   const photosCount = booking.photos?.length ?? 0;
   return (
-    <div className="px-4 py-4">
+    <div className="px-2 py-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
@@ -42,17 +42,11 @@ export default function BookingHeader({
             </div>
 
             <div className="flex gap-2">
-              <span className="font-semibold">When (preferred):</span>
-              <span>{formatWhenDate(booking.date)}</span>
-              <span>{booking.time}</span>
-            </div>
-
-            <div className="flex gap-2">
               <span className="font-semibold">Service date:</span>
               <span>
                 {booking.serviceDate
-                  ? formatWhenDate(booking.serviceDate)
-                  : "—"}
+                  ? `${formatWhenDate(booking.serviceDate)} at ${booking.startTime}`
+                  : "—"}{" "}
               </span>
             </div>
 
@@ -107,24 +101,25 @@ export default function BookingHeader({
             </div>
 
             {/* Short description visible even minimized */}
-            <p className="my-4 whitespace-normal text-slate-800">
-              {booking.description}
-            </p>
+
+            <div className="my-6">
+              <div className="flex gap-2">
+                <span className="font-semibold">When (preferred):</span>
+                <span>{formatWhenDate(booking.date)}</span>
+                <span>{booking.time}</span>
+              </div>
+              <p className="font-bold text-md">Customer description: </p>
+              <p className=" whitespace-normal text-slate-800">
+                {booking.description}
+              </p>
+            </div>
           </div>
           {photosCount > 0 && (
-            <div className="flex items-center gap-2 text-xs text-slate-500">
-              <ImageIcon className="h-4 w-4" />
+            <div className="flex items-center gap-2 text-sm text-slate-600 my-2">
+              <ImageIcon className="h-6 w-6" />
               <span>
                 {photosCount} photo{photosCount > 1 ? "s" : ""} attached
               </span>
-            </div>
-          )}
-          {booking.adminNotes && (
-            <div className=" rounded-lg border bg-slate-50 p-3 text-sm my-2 w-full">
-              <h3 className="text-slate-950 font-bold">
-                Notes about the services:
-              </h3>
-              {booking.adminNotes}
             </div>
           )}
         </div>

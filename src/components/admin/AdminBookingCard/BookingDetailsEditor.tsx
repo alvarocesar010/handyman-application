@@ -89,6 +89,7 @@ export default function BookingDetailsEditor({
             }
             className="w-full rounded-md border border-slate-300 px-2 py-2 text-sm"
           >
+            <option value="new">new</option>
             <option value="pending">pending</option>
             <option value="confirmed">confirmed</option>
             <option value="done">done</option>
@@ -201,17 +202,17 @@ export default function BookingDetailsEditor({
         </Field>
       </div>
 
-      <Field label="Notes about the service">
+      {/* <Field label="Notes about the service">
         <textarea
           name="adminNotes"
-          rows={3}
+          rows={8}
           value={values.adminNotes}
           onChange={(e) =>
             setValues((p) => ({ ...p, adminNotes: e.target.value }))
           }
           className="w-full rounded-md border border-slate-300 px-2 py-2 text-sm"
         />
-      </Field>
+      </Field> */}
 
       <div className="flex justify-end gap-2">
         <button
