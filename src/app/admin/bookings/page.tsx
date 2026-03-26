@@ -10,7 +10,7 @@ import type {
   AdminBookingStatus,
 } from "@/components/admin/AdminBookingCard/types";
 import ConfirmedDayGroup from "@/components/admin/AdminBookingCard/ConfimedDayGroup";
-import { SelectedItem } from "@/components/admin/AdminBookingCard/HardwareList";
+import { SelectedItem } from "@/components/admin/AdminBookingCard/BookingBody/HardwareList";
 
 export const dynamic = "force-dynamic";
 

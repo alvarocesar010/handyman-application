@@ -6,7 +6,7 @@ import BookingDonePanel from "./BookingDonePanel";
 import BookingPhotos from "./BookingPhotos";
 import BookingActions from "./BookingActions";
 import BookingDetailsEditor from "./BookingDetailsEditor";
-import HardwareList from "./HardwareList";
+import HardwareList from "./BookingBody/HardwareList";
 import ServiceDescription from "./ServiceDescription";
 import { ButtonGroup } from "@/components/Buttons/ButtonGroup";
 

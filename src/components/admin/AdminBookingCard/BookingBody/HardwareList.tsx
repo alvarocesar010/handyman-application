@@ -147,7 +147,6 @@ export default function HardwareList({ bookingId, initialSupplies }: Props) {
         }),
       };
 
-
       const res = await fetch("/api/admin/bookings/hardwareUpdate", {
         method: "PATCH",
         headers: {
@@ -294,7 +293,7 @@ export default function HardwareList({ bookingId, initialSupplies }: Props) {
               </div>
 
               <div className="flex-1 min-w-0 flex flex-col gap-1">
-                <h4 className="font-extrabold text-slate-900 truncate pr-4">
+                <h4 className="font-extrabold text-slate-900 pr-4">
                   {item.name}
                 </h4>
 

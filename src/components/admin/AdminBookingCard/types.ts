@@ -1,4 +1,4 @@
-import { SelectedItem } from "./HardwareList";
+import { SelectedItem } from "./BookingBody/HardwareList";
 
 export type AdminPhoto = { id: string; filename: string };
 
