@@ -53,7 +53,9 @@ export default function SuppliesDashboard() {
   const handleDelete = async (id: string) => {
     if (!confirm("Delete item?")) return;
     try {
-      const res = await fetch(`/api/supplies?id=${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/admin/supplies?id=${id}`, {
+        method: "DELETE",
+      });
       if (res.ok) {
         setItems((prev) => prev.filter((item) => item._id !== id));
         toast.success("Deleted");

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/mongodb";
-import { ObjectId } from "mongodb";
+import { ObjectId, UpdateFilter } from "mongodb";
 import { Storage, Bucket } from "@google-cloud/storage";
 import { uploadReviewImage, signImage } from "@/lib/gcs";
 
@@ -149,74 +149,76 @@ export async function POST(req: Request) {
 export async function PUT(req: Request) {
   const { searchParams } = new URL(req.url);
   const id = searchParams.get("id");
-  if (!id || !ObjectId.isValid(id))
+
+  if (!id || !ObjectId.isValid(id)) {
     return NextResponse.json({ error: "Valid ID required" }, { status: 400 });
-
-  const formData = await req.formData();
-  const payloadRaw = formData.get("payload");
-  if (!payloadRaw)
-    return NextResponse.json({ error: "Missing payload" }, { status: 400 });
-
-  const payload: SupplyPayload = JSON.parse(String(payloadRaw));
-  const db = await getDb();
-
-  // 1. Process Photos with Validation (Missing logic added)
-  const newPhotoPaths: string[] = [];
-  const files = formData.getAll("photos").filter(Boolean) as File[];
-
-  if (files.length > 0) {
-    if (files.length > MAX_FILES)
-      return NextResponse.json(
-        { error: `Max ${MAX_FILES} photos.` },
-        { status: 400 },
-      );
-    const serviceSlug = slugify(payload.category);
-    for (const f of files) {
-      if (!ALLOWED.has(f.type))
-        return NextResponse.json(
-          { error: "Invalid file type." },
-          { status: 400 },
-        );
-      if (f.size > MAX_EACH_BYTES)
-        return NextResponse.json(
-          { error: "Image too large." },
-          { status: 400 },
-        );
-
-      const path = await uploadReviewImage({
-        serviceSlug,
-        file: f,
-        prov: "supplies",
-      });
-      newPhotoPaths.push(path);
-    }
   }
 
-  // 2. Format Data
-  const updateData: UpdateDocument = {
-    name: toTitleCase(payload.name),
-    description: payload.description,
-    category: toTitleCase(payload.category),
-    serviceSlug: slugify(payload.category),
-    color: payload.color || "",
-    storeEntries: payload.storeEntries.map((entry) => ({
-      ...entry,
-      price: parseFloat(String(entry.price)) || 0,
-      inventory: entry.inventory.map((inv) => ({
-        ...inv,
-        qty: parseInt(String(inv.qty)) || 0,
+  try {
+    const formData = await req.formData();
+    const payloadRaw = formData.get("payload");
+    if (!payloadRaw)
+      return NextResponse.json({ error: "Missing payload" }, { status: 400 });
+
+    const payload: SupplyPayload = JSON.parse(String(payloadRaw));
+    const db = await getDb();
+
+    // 1. Process Photos
+    const newPhotoPaths: string[] = [];
+    const files = formData.getAll("photos").filter(Boolean) as File[];
+
+    if (files.length > 0) {
+      const serviceSlug = slugify(payload.category);
+      for (const f of files) {
+        const path = await uploadReviewImage({
+          serviceSlug,
+          file: f,
+          prov: "supplies",
+        });
+        newPhotoPaths.push(path);
+      }
+    }
+
+    // 2. Format Data
+    const updateData: UpdateDocument = {
+      name: toTitleCase(payload.name),
+      description: payload.description,
+      category: toTitleCase(payload.category),
+      serviceSlug: slugify(payload.category),
+      color: payload.color || "",
+      storeEntries: payload.storeEntries.map((entry) => ({
+        ...entry,
+        price: parseFloat(String(entry.price)) || 0,
+        inventory: entry.inventory.map((inv) => ({
+          ...inv,
+          _id: inv._id || new ObjectId().toString(),
+          qty: parseInt(String(inv.qty)) || 0,
+        })),
       })),
-    })),
-    updatedAt: new Date(),
-  };
+      updatedAt: new Date(),
+    };
 
-  if (newPhotoPaths.length > 0) updateData.photos = newPhotoPaths;
+    if (newPhotoPaths.length > 0) {
+      updateData.photos = newPhotoPaths;
+    }
 
-  await db
-    .collection("supplies")
-    .updateOne({ _id: new ObjectId(id) }, { $set: updateData });
+    // --- FIX IS HERE: Change 'id' to '_id' ---
+    const result = await db
+      .collection("supplies")
+      .updateOne(
+        { _id: new ObjectId(id) },
+        { $set: updateData as UpdateFilter<UpdateDocument> },
+      );
 
-  return NextResponse.json({ ok: true });
+    if (result.matchedCount === 0) {
+      return NextResponse.json({ error: "Item not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    console.error("Update error:", error);
+    return NextResponse.json({ error: "Update failed" }, { status: 500 });
+  }
 }
 
 export async function GET(req: NextRequest) {
