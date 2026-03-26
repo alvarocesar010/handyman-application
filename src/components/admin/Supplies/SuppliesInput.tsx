@@ -4,53 +4,26 @@ import { useState, useRef, useEffect } from "react";
 import { Trash2, Plus, X, Edit3, Package } from "lucide-react";
 import Image from "next/image";
 import { ToastContainer, toast } from "react-toastify";
-
-/** * Strict Type Definitions
- */
-interface Category {
-  value: string;
-  sizes: string[];
-}
-
-interface InventoryItem {
-  size: string;
-  qty: string;
-}
-
-interface StoreEntry {
-  storeName: string;
-  link: string;
-  price: string;
-  inventory: InventoryItem[];
-}
-
-interface SupplyItem {
-  _id?: string;
-  name: string;
-  description: string;
-  category: string;
-  color: string;
-  storeEntries: StoreEntry[];
-  localPreview?: string; // For the "Recently Added" UI
-}
-
-interface APIOptionsResponse {
-  stores: string[];
-  categories: Category[];
-}
+import {
+  APIOptionsResponse,
+  Category,
+  InventoryItem,
+  StoreEntry,
+  SupplyDB,
+} from "@/types/supplies/supplies";
 
 export default function SupplyInput() {
   const [stores, setStores] = useState<string[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [addedItems, setAddedItems] = useState<SupplyItem[]>([]);
+  const [addedItems, setAddedItems] = useState<SupplyDB[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
 
   const [files, setFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [formData, setFormData] = useState<SupplyItem>({
+  const [formData, setFormData] = useState<SupplyDB>({
     name: "",
     description: "",
     category: "",
@@ -188,7 +161,7 @@ export default function SupplyInput() {
       const result = await res.json();
       if (!res.ok) throw new Error(result.error || "Operation failed");
 
-      const savedItem: SupplyItem = {
+      const savedItem: SupplyDB = {
         ...formData,
         _id: result.id || editingId,
         localPreview: previews[0], // Set the first preview for the list
@@ -350,6 +323,7 @@ export default function SupplyInput() {
                   required
                 >
                   <option value="">Category</option>
+                  <option value="">Add New Category</option>
                   {categories.map((c) => (
                     <option key={c.value} value={c.value}>
                       {c.value}

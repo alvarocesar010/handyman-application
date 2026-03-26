@@ -1,316 +1,260 @@
 "use client";
 import { useState, useEffect, useMemo } from "react";
-import { Search, Trash2, Edit, ExternalLink, Package, X } from "lucide-react";
+import {
+  Search,
+  Trash2,
+  Edit,
+  ExternalLink,
+  Package,
+  Layers,
+  Palette,
+  Calendar,
+  X,
+  Store,
+} from "lucide-react";
 import { toast } from "react-toastify";
 import Image from "next/image";
+import { SupplyDB } from "@/types/supplies/supplies";
 
-interface SupplyItem {
-  _id: string;
-  name: string;
-  category: string;
-  store: string;
-  price: number;
-  description: string;
-  link?: string;
-  createdAt: string;
-  photos: string[];
-}
+type SupplyUI = Required<
+  Pick<SupplyDB, "_id" | "photos" | "createdAt" | "updatedAt">
+> &
+  SupplyDB;
 
 export default function SuppliesDashboard() {
-  const [items, setItems] = useState<SupplyItem[]>([]);
+  const [items, setItems] = useState<SupplyUI[]>([]);
   const [search, setSearch] = useState("");
-  const [editingItem, setEditingItem] = useState<SupplyItem | null>(null);
-
-  // NOVO: Estado para controlar qual imagem está aberta no modo "flutuante" (Lightbox)
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   useEffect(() => {
     fetchItems();
     const refresh = () => fetchItems();
-
     window.addEventListener("supplies-updated", refresh);
-
-    return () => {
-      window.removeEventListener("supplies-updated", refresh);
-    };
+    return () => window.removeEventListener("supplies-updated", refresh);
   }, []);
 
   const fetchItems = async () => {
     try {
       const res = await fetch("/api/admin/supplies");
-      const data = await res.json();
-      setItems(data);
+      const data: SupplyDB[] = await res.json();
+      const formatted = data.map((item) => ({
+        ...item,
+        _id: item._id ?? Math.random().toString(),
+        photos: item.photos ?? [],
+        createdAt: item.createdAt ?? new Date().toISOString(),
+        updatedAt: item.updatedAt ?? new Date().toISOString(),
+      })) as SupplyUI[];
+      setItems(formatted);
     } catch {
       toast.error("Failed to load items");
     }
   };
 
-  const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!editingItem) return;
-
-    try {
-      const res = await fetch(`/api/supplies?id=${editingItem._id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editingItem),
-      });
-
-      if (res.ok) {
-        setItems((prev) =>
-          prev.map((i) => (i._id === editingItem._id ? editingItem : i)),
-        );
-        setEditingItem(null);
-        toast.success("Item updated successfully");
-      }
-    } catch {
-      toast.error("Failed to update item");
-    }
-  };
-
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this item?")) return;
+    if (!confirm("Delete item?")) return;
     try {
       const res = await fetch(`/api/supplies?id=${id}`, { method: "DELETE" });
       if (res.ok) {
         setItems((prev) => prev.filter((item) => item._id !== id));
-        toast.success("Item removed");
+        toast.success("Deleted");
       }
     } catch {
-      toast.error("Error deleting item");
+      toast.error("Error deleting");
     }
   };
 
   const filteredItems = useMemo(() => {
+    const s = search.toLowerCase();
     return items.filter(
-      (item: SupplyItem) =>
-        item.name.toLowerCase().includes(search.toLowerCase()) ||
-        item.category.toLowerCase().includes(search.toLowerCase()) ||
-        item.store.toLowerCase().includes(search.toLowerCase()),
+      (i) =>
+        i.name.toLowerCase().includes(s) ||
+        i.category.toLowerCase().includes(s),
     );
   }, [items, search]);
 
   return (
-    <div className="max-w-5xl mx-auto p-4 space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <Package className="text-cyan-700" size={28} /> Inventory & Prices
-        </h1>
-        <div className="relative w-full md:w-64">
+    <div className="w-full max-w-[1400px] mx-auto p-4 space-y-4 bg-slate-50/50 min-h-screen">
+      {/* HEADER - Sleek and less round */}
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+        <div className="flex items-center gap-3">
+          <div className="bg-cyan-600 p-2 rounded-lg text-white">
+            <Package size={20} />
+          </div>
+          <h1 className="text-xl font-bold text-slate-900 tracking-tight">
+            Supply Inventory
+          </h1>
+        </div>
+
+        <div className="relative w-full md:w-96">
           <Search
-            className="absolute left-3 top-2.5 text-slate-400"
-            size={18}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+            size={16}
           />
           <input
-            placeholder="Search items..."
-            className="w-full pl-10 p-2 border rounded-xl bg-white shadow-sm outline-none focus:ring-2 focus:ring-cyan-500 text-sm"
+            placeholder="Search name, color, category..."
+            className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none text-sm transition-all"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
       </div>
 
-      {editingItem && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold text-slate-800">Edit Item</h2>
-              <button
-                onClick={() => setEditingItem(null)}
-                className="text-slate-400 hover:text-slate-600"
-              >
-                <X size={20} />
-              </button>
-            </div>
-            <form onSubmit={handleUpdate} className="space-y-4">
-              <div>
-                <label className="text-xs font-bold text-slate-500 uppercase">
-                  Item Name
-                </label>
-                <input
-                  className="w-full p-2 border rounded-lg mt-1"
-                  value={editingItem.name}
-                  onChange={(e) =>
-                    setEditingItem({ ...editingItem, name: e.target.value })
-                  }
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-xs font-bold text-slate-500 uppercase">
-                    Price (€)
-                  </label>
-                  <input
-                    type="number"
-                    className="w-full p-2 border rounded-lg mt-1"
-                    value={editingItem.price}
-                    onChange={(e) =>
-                      setEditingItem({
-                        ...editingItem,
-                        price: Number(e.target.value),
-                      })
-                    }
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-bold text-slate-500 uppercase">
-                    Store
-                  </label>
-                  <input
-                    className="w-full p-2 border rounded-lg mt-1"
-                    value={editingItem.store}
-                    onChange={(e) =>
-                      setEditingItem({ ...editingItem, store: e.target.value })
-                    }
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="text-xs font-bold text-slate-500 uppercase">
-                  Description
-                </label>
-                <textarea
-                  className="w-full p-2 border rounded-lg mt-1"
-                  rows={3}
-                  value={editingItem.description}
-                  onChange={(e) =>
-                    setEditingItem({
-                      ...editingItem,
-                      description: e.target.value,
-                    })
-                  }
-                />
-              </div>
-              <div className="flex gap-2 pt-2">
-                <button
-                  type="submit"
-                  className="flex-1 bg-cyan-700 text-white py-2 rounded-lg font-bold hover:bg-cyan-800 transition-colors"
-                >
-                  Save Changes
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setEditingItem(null)}
-                  className="flex-1 bg-slate-100 py-2 rounded-lg font-medium hover:bg-slate-200"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
+      {/* ITEM LIST */}
       <div className="grid gap-4">
-        {filteredItems.length > 0 ? (
-          filteredItems.map((item: SupplyItem) => (
-            <div
-              key={item._id}
-              className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow"
-            >
-              <div className="flex flex-col md:flex-row justify-between gap-4">
-                <div className="space-y-1 flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-slate-50 px-2 py-0.5 rounded">
-                      {item.category}
-                    </span>
-                    <span className="w-1 h-1 rounded-full bg-slate-300"></span>
-                    <span className="text-xs font-medium text-cyan-600">
-                      {item.store}
-                    </span>
-                  </div>
-                  <h3 className="text-lg font-bold text-slate-800">
-                    {item.name}
-                  </h3>
-                  <p className="text-sm text-slate-500">{item.description}</p>
-
-                  {item.link && (
-                    <a
-                      href={item.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs text-blue-600 font-medium hover:underline mt-2"
-                    >
-                      <ExternalLink size={12} /> View Product Page
-                    </a>
+        {filteredItems.map((item) => (
+          <div
+            key={item._id}
+            className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden hover:border-cyan-300 transition-colors"
+          >
+            <div className="flex flex-col md:flex-row">
+              {/* IMAGE: Fixed width on desktop, flexible on mobile */}
+              <div className="md:w-48 lg:w-56 bg-slate-50/50 p-4 flex items-center justify-center border-b md:border-b-0 md:border-r border-slate-100">
+                <div
+                  className="relative w-32 h-32 bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden cursor-zoom-in transition-transform hover:scale-105"
+                  onClick={() =>
+                    item.photos?.[0] && setSelectedImage(item.photos[0])
+                  }
+                >
+                  {item.photos?.[0] ? (
+                    <Image
+                      src={item.photos[0]}
+                      alt={item.name}
+                      fill
+                      className="object-contain p-2"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-slate-300">
+                      <Package size={32} />
+                    </div>
                   )}
                 </div>
-                <div className="flex gap-2 flex-wrap">
-                  {item.photos?.map((path, index) => (
-                    // NOVO: Adicionado um <button> ao redor da imagem para detectar o clique e a classe alterada para object-contain
-                    <button
-                      key={`${path}-${index}`}
-                      type="button"
-                      onClick={() => setSelectedImage(path)}
-                      className="relative w-20 h-20 rounded-lg overflow-hidden border border-slate-200 bg-slate-50 hover:border-cyan-500 hover:scale-105 transition-all focus:outline-none"
-                    >
-                      <Image
-                        src={`${path}`}
-                        alt={item.name}
-                        fill
-                        sizes="80px"
-                        className="object-contain p-1"
-                      />
-                    </button>
-                  ))}
-                </div>
+              </div>
 
-                <div className="flex md:flex-col justify-between items-end gap-2 border-t md:border-t-0 pt-4 md:pt-0">
-                  <div className="text-right">
-                    <div className="text-2xl font-black text-slate-900">
-                      €{item.price}
-                    </div>
-                    <div className="text-[10px] text-slate-400">
-                      Saved: {new Date(item.createdAt).toLocaleDateString()}
+              {/* CONTENT AREA: Uses all available space */}
+              <div className="flex-1 p-5 flex flex-col min-w-0">
+                <div className="flex items-start justify-between gap-4 mb-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="px-2 py-0.5 bg-cyan-50 text-cyan-700 rounded text-[10px] font-bold uppercase tracking-wider">
+                        {item.category}
+                      </span>
+                      <span className="text-slate-400 text-[10px] font-mono">
+                        #{item._id.slice(-6).toUpperCase()}
+                      </span>
                     </div>
                   </div>
 
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => setEditingItem(item)}
-                      className="p-2 text-slate-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-lg transition-colors"
-                    >
-                      <Edit size={18} />
+                  <div className="flex gap-1 shrink-0">
+                    <button className="p-2 hover:bg-slate-100 text-slate-400 hover:text-cyan-600 rounded-md transition-colors">
+                      <Edit size={16} />
                     </button>
                     <button
                       onClick={() => handleDelete(item._id)}
-                      className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      className="p-2 hover:bg-red-50 text-slate-400 hover:text-red-600 rounded-md transition-colors"
                     >
-                      <Trash2 size={18} />
+                      <Trash2 size={16} />
                     </button>
                   </div>
                 </div>
+                {/* TITLE: Clamped to 2 lines to prevent layout breaking */}
+                <h2 className="text-lg font-bold text-slate-800 ">
+                  {item.name}
+                </h2>
+
+                {/* DESCRIPTION: Fixed height with scroll for overflow */}
+                <div className="mb-4 bg-slate-50 rounded-lg p-3 border border-slate-100">
+                  <p className="text-slate-600 text-xs leading-relaxed max-h-25 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200 pr-2 italic">
+                    {item.description}
+                  </p>
+                </div>
+
+                {/* INFO GRID: Tightened spacing */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 py-3 border-t border-slate-100 mb-4">
+                  <div>
+                    <span className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 uppercase mb-1">
+                      <Palette size={12} /> Color
+                    </span>
+                    <p className="text-xs font-semibold text-slate-700 truncate">
+                      {item.color || "N/A"}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 uppercase mb-1">
+                      <Layers size={12} /> Service
+                    </span>
+                    <p className="text-xs font-semibold text-slate-700 truncate">
+                      {item.serviceSlug || "N/A"}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 uppercase mb-1">
+                      <Calendar size={12} /> Logged
+                    </span>
+                    <p className="text-xs font-semibold text-slate-700">
+                      {new Date(item.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 uppercase mb-1">
+                      <Store size={12} /> Stockists
+                    </span>
+                    <p className="text-xs font-semibold text-slate-700">
+                      {item.storeEntries.length} Sources
+                    </p>
+                  </div>
+                </div>
+
+                {/* VENDORS: List style for better horizontal space use */}
+                <div className="flex flex-wrap gap-2 mt-auto">
+                  {item.storeEntries.map((store, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center gap-3 bg-white border border-slate-200 pl-3 pr-1 rounded-lg group/price hover:border-cyan-500 transition-all"
+                    >
+                      <div className="py-1">
+                        <p className="text-[9px] font-bold text-slate-400 uppercase leading-none mb-1">
+                          {store.storeName}
+                        </p>
+                        <p className="text-sm font-bold text-slate-900 leading-none">
+                          €{Number(store.price).toFixed(2)}
+                        </p>
+                      </div>
+                      {store.link && (
+                        <a
+                          href={store.link}
+                          target="_blank"
+                          className="p-1.5 text-slate-300 hover:text-cyan-600 hover:bg-cyan-50 rounded transition-all"
+                        >
+                          <ExternalLink size={12} />
+                        </a>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
-          ))
-        ) : (
-          <div className="text-center py-20 bg-slate-50 rounded-2xl border border-dashed border-slate-200 text-slate-400">
-            No items found matching &quot;{search}&quot;
           </div>
-        )}
+        ))}
       </div>
 
-      {/* NOVO: A tela escura gigante (Modal Lightbox) que aparece quando uma foto é clicada */}
+      {/* LIGHTBOX */}
       {selectedImage && (
         <div
-          className="fixed inset-0 bg-black/80 flex items-center justify-center z-[100] p-4 backdrop-blur-sm transition-opacity"
+          className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-[100] p-4"
           onClick={() => setSelectedImage(null)}
         >
-          <div className="relative w-full max-w-3xl aspect-square md:aspect-[4/3]">
-            <button
-              onClick={() => setSelectedImage(null)}
-              className="absolute -top-12 right-0 bg-white/10 hover:bg-white/20 text-white p-2 rounded-full backdrop-blur-md transition-colors"
-            >
-              <X size={24} />
+          <div className="relative w-full max-w-2xl bg-white rounded-xl overflow-hidden shadow-2xl">
+            <button className="absolute top-4 right-4 z-10 p-2 bg-white/80 rounded-full text-slate-800 hover:bg-red-500 hover:text-white transition-all">
+              <X size={20} />
             </button>
-            <Image
-              src={selectedImage}
-              alt="Expanded view"
-              fill
-              className="object-contain drop-shadow-2xl"
-              sizes="(max-width: 768px) 100vw, 1200px"
-              priority
-            />
+            <div className="relative h-[60vh] w-full">
+              <Image
+                src={selectedImage}
+                alt="Preview"
+                fill
+                className="object-contain p-8"
+              />
+            </div>
           </div>
         </div>
       )}
