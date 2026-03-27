@@ -60,14 +60,44 @@ export default function BookingDetailsEditor({
     const hours = actualMinutes / 60;
     return `${formatEuro(received / hours)}/h`;
   }, [values.amountReceived, actualMinutes]);
+  
+// New function to handle form submission via JSON
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault(); // Prevent default form submission (page reload)
+
+    // Prepare the payload in the format expected by the backend (JSON)
+    const payload = {
+      id: booking._id,
+      updates: {
+        ...values,
+        actualDurationMinutes: actualMinutes,
+      },
+    };
+
+    // Send the data "behind the scenes"
+    try {
+      const res = await fetch("/api/admin/bookings/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        alert("Details saved successfully!");
+        onClose(); // Close the modal/form
+      } else {
+        alert("Oops! Something went wrong while saving.");
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    }
+  };
 
   return (
     <form
-      action="/api/admin/bookings/update"
-      method="post"
+      onSubmit={handleSubmit}
       className="mt-4 space-y-3 rounded-lg border border-slate-200 bg-slate-50 p-3"
     >
-      <input type="hidden" name="id" value={booking._id} />
 
       {/* ✅ save computed duration */}
       <input
