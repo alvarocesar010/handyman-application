@@ -32,7 +32,7 @@ export function ButtonGroup<T extends string>({
         if (selected) onChange(selected);
       }}
       className={cx(
-        "inline-flex rounded-lg shadow-sm overflow-hidden",
+        "inline-flex rounded-lg shadow-sm overflow-x-auto whitespace-nowrap scroll-smooth no-scrollbar",
         className,
       )}
     >
