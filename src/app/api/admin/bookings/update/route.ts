@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 import { getDb } from "@/lib/mongodb";
 
-export async function PATCH(req: Request): Promise<Response> {
+// ✅ 1. Mudámos de PATCH para POST nesta linha:
+export async function POST(req: Request): Promise<Response> {
   try {
     const body: {
       id?: string;
@@ -50,7 +51,8 @@ export async function PATCH(req: Request): Promise<Response> {
       message: "Booking updated successfully",
     });
   } catch (err) {
-    console.error("PATCH /bookings/update error:", err);
+    // ✅ 2. Atualizámos o nome no erro para não haver confusões no futuro
+    console.error("POST /bookings/update error:", err);
 
     return NextResponse.json(
       { success: false, message: "Server error" },
