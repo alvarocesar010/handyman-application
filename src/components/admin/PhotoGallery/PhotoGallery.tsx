@@ -1,12 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 type Photo = { id: string; filename: string };
 
-export default function PhotoGallery({ photos }: { photos: Photo[] }) {
+export default function PhotoGallery({ photos = [] }: { photos?: Photo[] }) {
   const [open, setOpen] = useState(false);
   const [idx, setIdx] = useState(0);
+
+  const next = useCallback(() => {
+    setIdx((i) => (i + 1) % photos.length);
+  }, [photos.length]);
+
+  const prev = useCallback(() => {
+    setIdx((i) => (i - 1 + photos.length) % photos.length);
+  }, [photos.length]);
 
   function openAt(i: number) {
     setIdx(i);
@@ -14,12 +22,6 @@ export default function PhotoGallery({ photos }: { photos: Photo[] }) {
   }
   function close() {
     setOpen(false);
-  }
-  function next() {
-    setIdx(i => (i + 1) % photos.length);
-  }
-  function prev() {
-    setIdx(i => (i - 1 + photos.length) % photos.length);
   }
 
   // keyboard: Esc/←/→
@@ -32,28 +34,38 @@ export default function PhotoGallery({ photos }: { photos: Photo[] }) {
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open]);
+  }, [open, next, prev]);
 
   return (
     <>
-      <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6">
-        {photos.map((p, i) => (
-          <button
-            key={p.id}
-            type="button"
-            onClick={() => openAt(i)}
-            className="block overflow-hidden rounded-md ring-1 ring-slate-200"
-            title={p.filename}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={`/api/booking/photo/${p.id}`}
-              alt={p.filename}
-              className="h-24 w-full object-cover"
-              loading="lazy"
-            />
-          </button>
-        ))}
+      <div
+        className={
+          photos.length > 0
+            ? "grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6"
+            : ""
+        }
+      >
+        {photos.length >= 1 ? (
+          photos.map((p, i) => (
+            <button
+              key={p.id}
+              type="button"
+              onClick={() => openAt(i)}
+              className="block overflow-hidden rounded-md ring-1 ring-slate-200"
+              title={p.filename}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={`/api/booking/photo/${p.id}`}
+                alt={p.filename}
+                className="h-24 w-full object-cover"
+                loading="lazy"
+              />
+            </button>
+          ))
+        ) : (
+          <p className="w-full text-center p-4">No photos attached</p>
+        )}
       </div>
 
       {open && (

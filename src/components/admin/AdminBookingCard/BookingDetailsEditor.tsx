@@ -77,7 +77,7 @@ export default function BookingDetailsEditor({
     // Send the data "behind the scenes"
     try {
       const res = await fetch("/api/admin/bookings/update", {
-        method: "POST",
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });

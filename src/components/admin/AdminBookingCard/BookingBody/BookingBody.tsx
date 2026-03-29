@@ -1,14 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import type { AdminBooking } from "./types";
-import BookingDonePanel from "./BookingDonePanel";
-import BookingPhotos from "./BookingPhotos";
-import BookingActions from "./BookingActions";
-import BookingDetailsEditor from "./BookingDetailsEditor";
-import HardwareList from "./BookingBody/HardwareList";
+import type { AdminBooking } from "../types";
+import BookingDonePanel from "../BookingDonePanel";
+import BookingActions from "../BookingActions";
+import BookingDetailsEditor from "../BookingDetailsEditor";
+import HardwareList from "./HardwareList";
 import ServiceDescription from "./ServiceDescription";
 import { ButtonGroup } from "@/components/Buttons/ButtonGroup";
+import JobDetails from "./JobDetails";
+import PhotoGallery from "../../PhotoGallery/PhotoGallery";
 
 export default function BookingBody({ booking }: { booking: AdminBooking }) {
   const [editing, setEditing] = useState(false);
@@ -16,7 +17,9 @@ export default function BookingBody({ booking }: { booking: AdminBooking }) {
   // ButtonGroup Settings
   const [value, setValue] = useState("ServiceDescription");
   const options = [
+    { value: "JobDetails", label: "Details" },
     { value: "ServiceDescription", label: "Description" },
+
     { value: "HardwareList", label: "Hardware" },
     { value: "Photos", label: "Photos" },
     { value: "Timetable", label: "Timetable" },
@@ -27,6 +30,9 @@ export default function BookingBody({ booking }: { booking: AdminBooking }) {
       {/* ButtonGroup for selection of feature */}
       <ButtonGroup options={options} value={value} onChange={setValue} />
 
+      {/* Job details */}
+
+      {value === "JobDetails" && <JobDetails booking={booking} />}
       {/* Service Description */}
       {value === "ServiceDescription" && (
         <ServiceDescription
@@ -46,7 +52,7 @@ export default function BookingBody({ booking }: { booking: AdminBooking }) {
       )}
 
       {/* Photos list */}
-      {value === "Photos" && <BookingPhotos photos={booking.photos} />}
+      {value === "Photos" && <PhotoGallery photos={booking.photos} />}
 
       {/* Timetable */}
       {value === "Timetable" && <BookingDonePanel booking={booking} />}
