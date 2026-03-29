@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import type { AdminBooking } from "./types";
 import BookingHeader from "./BookingHeader";
-import BookingBody from "./BookingBody";
+import BookingBody from "./BookingBody/BookingBody";
 
 export default function AdminBookingCard({
   booking,

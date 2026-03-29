@@ -64,7 +64,6 @@ export default function BookingDetailsEditor({
   return (
     <form
       action="/api/admin/bookings/update"
-      method="post"
       className="mt-4 space-y-3 rounded-lg border border-slate-200 bg-slate-50 p-3"
     >
       <input type="hidden" name="id" value={booking._id} />
