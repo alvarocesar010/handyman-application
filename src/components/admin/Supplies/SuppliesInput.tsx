@@ -51,21 +51,26 @@ const EMPTY_FORM: SupplyDB = {
   ],
 };
 
-export default function SupplyInput({ initialData, onSuccess }: SupplyInputProps) {
+export default function SupplyInput({
+  initialData,
+  onSuccess,
+}: SupplyInputProps) {
   // Data States
   const [stores, setStores] = useState<string[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   // ID now comes from initialData
-  const [editingTempId, setEditingTempId] = useState<string | null>(initialData?._id || null);
+  const [editingTempId, setEditingTempId] = useState<string | null>(
+    initialData?._id || null,
+  );
 
   // Temporary Session List (The "Basket")
   const [addedItems, setAddedItems] = useState<LocalSupply[]>([]);
 
   // Photo & Form States
   const [files, setFiles] = useState<File[]>([]);
-  
+
   // Load product photo, if it exists
   const [previews, setPreviews] = useState<string[]>(initialData?.photos || []);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -184,8 +189,11 @@ export default function SupplyInput({ initialData, onSuccess }: SupplyInputProps
       const updatedEntries = [...prev.storeEntries];
       const updatedInventory = [...updatedEntries[sIdx].inventory];
       updatedInventory[iIdx] = { ...updatedInventory[iIdx], [field]: value };
-      
-      updatedEntries[sIdx] = { ...updatedEntries[sIdx], inventory: updatedInventory };
+
+      updatedEntries[sIdx] = {
+        ...updatedEntries[sIdx],
+        inventory: updatedInventory,
+      };
       return { ...prev, storeEntries: updatedEntries };
     });
   };
@@ -194,9 +202,14 @@ export default function SupplyInput({ initialData, onSuccess }: SupplyInputProps
   const removeInventoryRow = (sIdx: number, iIdx: number) => {
     setFormData((prev) => {
       const updatedEntries = [...prev.storeEntries];
-      const updatedInventory = updatedEntries[sIdx].inventory.filter((_, index) => index !== iIdx);
-      
-      updatedEntries[sIdx] = { ...updatedEntries[sIdx], inventory: updatedInventory };
+      const updatedInventory = updatedEntries[sIdx].inventory.filter(
+        (_, index) => index !== iIdx,
+      );
+
+      updatedEntries[sIdx] = {
+        ...updatedEntries[sIdx],
+        inventory: updatedInventory,
+      };
       return { ...prev, storeEntries: updatedEntries };
     });
   };
@@ -204,16 +217,25 @@ export default function SupplyInput({ initialData, onSuccess }: SupplyInputProps
   // NEW FEATURE: Remove an entire store source
   const removeStoreSource = (sIdx: number) => {
     setFormData((prev) => {
-      const updatedEntries = prev.storeEntries.filter((_, index) => index !== sIdx);
-      
+      const updatedEntries = prev.storeEntries.filter(
+        (_, index) => index !== sIdx,
+      );
+
       // Prevent deleting the very last store box, reset it instead
       if (updatedEntries.length === 0) {
         return {
           ...prev,
-          storeEntries: [{ storeName: "", link: "", price: "", inventory: [{ size: "", qty: "" }] }]
+          storeEntries: [
+            {
+              storeName: "",
+              link: "",
+              price: "",
+              inventory: [{ size: "", qty: "" }],
+            },
+          ],
         };
       }
-      
+
       return { ...prev, storeEntries: updatedEntries };
     });
   };
@@ -303,7 +325,7 @@ export default function SupplyInput({ initialData, onSuccess }: SupplyInputProps
       const url = editingTempId
         ? `/api/admin/supplies?id=${editingTempId}`
         : "/api/admin/supplies";
-      
+
       // API METHOD CORRECTION (Using PUT)
       const res = await fetch(url, {
         method: editingTempId ? "PUT" : "POST",
@@ -311,25 +333,31 @@ export default function SupplyInput({ initialData, onSuccess }: SupplyInputProps
       });
 
       if (!res.ok) {
-          const errorMsg = await res.text();
-          console.error("BACKEND ERROR:", errorMsg);
-          throw new Error(`Failed to save: ${errorMsg}`);
-        }
-      const result = await res.json(); 
-      
+        const errorMsg = await res.text();
+        console.error("BACKEND ERROR:", errorMsg);
+        throw new Error(`Failed to save: ${errorMsg}`);
+      }
+      const result = await res.json();
+
       const newLocalItem: LocalSupply = {
         ...formData,
         tempId: editingTempId || Date.now().toString(),
-        _id: result.id || editingTempId, 
+        _id: result.id || editingTempId,
         localPreview: previews[0] || "",
       };
 
       // FIX FOR SESSION DUPLICATION MESS
       setAddedItems((prev) => {
-        const isExisting = prev.some(it => it.tempId === editingTempId || it._id === editingTempId);
+        const isExisting = prev.some(
+          (it) => it.tempId === editingTempId || it._id === editingTempId,
+        );
         if (isExisting) {
           // If already in session, OVERWRITE
-          return prev.map((it) => (it.tempId === editingTempId || it._id === editingTempId ? newLocalItem : it));
+          return prev.map((it) =>
+            it.tempId === editingTempId || it._id === editingTempId
+              ? newLocalItem
+              : it,
+          );
         } else if (!editingTempId) {
           // If CREATING NEW, add to top
           return [newLocalItem, ...prev];
@@ -558,8 +586,10 @@ export default function SupplyInput({ initialData, onSuccess }: SupplyInputProps
                       type="url"
                       placeholder="Product link (optional)"
                       className="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm focus:border-blue-400 outline-none"
-                      value={(entry as any).link || ""}
-                      onChange={(e) => updateStoreField(sIdx, "link", e.target.value)}
+                      value={entry.link}
+                      onChange={(e) =>
+                        updateStoreField(sIdx, "link", e.target.value)
+                      }
                     />
                   </div>
 
@@ -630,7 +660,7 @@ export default function SupplyInput({ initialData, onSuccess }: SupplyInputProps
               >
                 Cancel
               </button>
-              
+
               <button
                 type="submit"
                 disabled={isSubmitting}
@@ -639,8 +669,8 @@ export default function SupplyInput({ initialData, onSuccess }: SupplyInputProps
                 {isSubmitting
                   ? "Processing..."
                   : editingTempId
-                  ? "Save Changes"
-                  : "Create Supply Item"}
+                    ? "Save Changes"
+                    : "Create Supply Item"}
               </button>
             </div>
           </form>
