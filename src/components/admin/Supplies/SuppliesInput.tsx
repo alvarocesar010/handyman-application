@@ -29,10 +29,27 @@ interface OptionModalProps {
   onSave: () => void;
 }
 
+// Strict typing to avoid 'any' and pass production build
 interface SupplyInputProps {
-  initialData?: any; // Recebe os dados completos do produto
+  initialData?: Partial<SupplyDB> & { _id?: string; photos?: string[] };
   onSuccess?: () => void;
 }
+
+// Constant for perfectly clearing the form (including description)
+const EMPTY_FORM: SupplyDB = {
+  name: "",
+  description: "",
+  category: "",
+  color: "",
+  storeEntries: [
+    {
+      storeName: "",
+      link: "",
+      price: "",
+      inventory: [{ size: "", qty: "" }],
+    },
+  ],
+};
 
 export default function SupplyInput({ initialData, onSuccess }: SupplyInputProps) {
   // Data States
@@ -40,7 +57,7 @@ export default function SupplyInput({ initialData, onSuccess }: SupplyInputProps
   const [categories, setCategories] = useState<Category[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  // O ID agora vem do initialData
+  // ID now comes from initialData
   const [editingTempId, setEditingTempId] = useState<string | null>(initialData?._id || null);
 
   // Temporary Session List (The "Basket")
@@ -49,7 +66,7 @@ export default function SupplyInput({ initialData, onSuccess }: SupplyInputProps
   // Photo & Form States
   const [files, setFiles] = useState<File[]>([]);
   
-  // Carrega a foto do produto, se existir!
+  // Load product photo, if it exists
   const [previews, setPreviews] = useState<string[]>(initialData?.photos || []);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -61,7 +78,7 @@ export default function SupplyInput({ initialData, onSuccess }: SupplyInputProps
   const [newStoreValue, setNewStoreValue] = useState("");
   const [newSizeValue, setNewSizeValue] = useState("");
 
-  // A MÁGICA: Preenchemos o formulário com os dados reais do produto!
+  // Fill the form with real product data!
   const [formData, setFormData] = useState<SupplyDB>({
     name: initialData?.name || "",
     description: initialData?.description || "",
@@ -101,12 +118,12 @@ export default function SupplyInput({ initialData, onSuccess }: SupplyInputProps
   // --- SESSION LIST HANDLERS ---
 
   const handleEditRequest = (item: LocalSupply) => {
-    setEditingTempId(item._id!);
+    setEditingTempId(item._id || item.tempId);
     setFormData({
       name: item.name,
-      description: item.description,
+      description: item.description || "",
       category: item.category,
-      color: item.color,
+      color: item.color || "",
       storeEntries: JSON.parse(JSON.stringify(item.storeEntries)), // Deep clone to avoid direct mutation
     });
     setPreviews(item.localPreview ? [item.localPreview] : []);
@@ -165,16 +182,47 @@ export default function SupplyInput({ initialData, onSuccess }: SupplyInputProps
     }
     setFormData((prev) => {
       const updatedEntries = [...prev.storeEntries];
-      updatedEntries[sIdx].inventory[iIdx][field] = value;
+      const updatedInventory = [...updatedEntries[sIdx].inventory];
+      updatedInventory[iIdx] = { ...updatedInventory[iIdx], [field]: value };
+      
+      updatedEntries[sIdx] = { ...updatedEntries[sIdx], inventory: updatedInventory };
+      return { ...prev, storeEntries: updatedEntries };
+    });
+  };
+
+  // Remove an inventory size row
+  const removeInventoryRow = (sIdx: number, iIdx: number) => {
+    setFormData((prev) => {
+      const updatedEntries = [...prev.storeEntries];
+      const updatedInventory = updatedEntries[sIdx].inventory.filter((_, index) => index !== iIdx);
+      
+      updatedEntries[sIdx] = { ...updatedEntries[sIdx], inventory: updatedInventory };
+      return { ...prev, storeEntries: updatedEntries };
+    });
+  };
+
+  // NEW FEATURE: Remove an entire store source
+  const removeStoreSource = (sIdx: number) => {
+    setFormData((prev) => {
+      const updatedEntries = prev.storeEntries.filter((_, index) => index !== sIdx);
+      
+      // Prevent deleting the very last store box, reset it instead
+      if (updatedEntries.length === 0) {
+        return {
+          ...prev,
+          storeEntries: [{ storeName: "", link: "", price: "", inventory: [{ size: "", qty: "" }] }]
+        };
+      }
+      
       return { ...prev, storeEntries: updatedEntries };
     });
   };
 
   const addStoreSource = () => {
-    setFormData((p) => ({
-      ...p,
+    setFormData((prev) => ({
+      ...prev,
       storeEntries: [
-        ...p.storeEntries,
+        ...prev.storeEntries,
         {
           storeName: "",
           link: "",
@@ -186,9 +234,14 @@ export default function SupplyInput({ initialData, onSuccess }: SupplyInputProps
   };
 
   const addInventoryRow = (sIdx: number) => {
-    const up = [...formData.storeEntries];
-    up[sIdx].inventory.push({ size: "", qty: "" });
-    setFormData({ ...formData, storeEntries: up });
+    setFormData((prev) => {
+      const updatedEntries = [...prev.storeEntries];
+      updatedEntries[sIdx] = {
+        ...updatedEntries[sIdx],
+        inventory: [...updatedEntries[sIdx].inventory, { size: "", qty: "" }],
+      };
+      return { ...prev, storeEntries: updatedEntries };
+    });
   };
 
   const saveOption = async (
@@ -250,7 +303,8 @@ export default function SupplyInput({ initialData, onSuccess }: SupplyInputProps
       const url = editingTempId
         ? `/api/admin/supplies?id=${editingTempId}`
         : "/api/admin/supplies";
-      console.log("EDITING ID:", editingTempId);
+      
+      // API METHOD CORRECTION (Using PUT)
       const res = await fetch(url, {
         method: editingTempId ? "PUT" : "POST",
         body: data,
@@ -258,7 +312,7 @@ export default function SupplyInput({ initialData, onSuccess }: SupplyInputProps
 
       if (!res.ok) {
           const errorMsg = await res.text();
-          console.error("ERRO DO BACKEND:", errorMsg);
+          console.error("BACKEND ERROR:", errorMsg);
           throw new Error(`Failed to save: ${errorMsg}`);
         }
       const result = await res.json(); 
@@ -270,13 +324,19 @@ export default function SupplyInput({ initialData, onSuccess }: SupplyInputProps
         localPreview: previews[0] || "",
       };
 
-      if (editingTempId) {
-        setAddedItems((prev) =>
-          prev.map((it) => (it.tempId === editingTempId ? newLocalItem : it)),
-        );
-      } else {
-        setAddedItems((prev) => [newLocalItem, ...prev]);
-      }
+      // FIX FOR SESSION DUPLICATION MESS
+      setAddedItems((prev) => {
+        const isExisting = prev.some(it => it.tempId === editingTempId || it._id === editingTempId);
+        if (isExisting) {
+          // If already in session, OVERWRITE
+          return prev.map((it) => (it.tempId === editingTempId || it._id === editingTempId ? newLocalItem : it));
+        } else if (!editingTempId) {
+          // If CREATING NEW, add to top
+          return [newLocalItem, ...prev];
+        }
+        // If edited from Dashboard, just return current list without adding to session
+        return prev;
+      });
 
       toast.update(loadingToast, {
         render: "Success!",
@@ -286,22 +346,9 @@ export default function SupplyInput({ initialData, onSuccess }: SupplyInputProps
       });
       if (onSuccess) onSuccess();
 
-      // Reset
+      // Full reset after saving
       setEditingTempId(null);
-      setFormData({
-        name: "",
-        description: "",
-        category: "",
-        color: "",
-        storeEntries: [
-          {
-            storeName: "",
-            link: "",
-            price: "",
-            inventory: [{ size: "", qty: "" }],
-          },
-        ],
-      });
+      setFormData(EMPTY_FORM);
       setFiles([]);
       setPreviews([]);
     } catch (err) {
@@ -314,6 +361,18 @@ export default function SupplyInput({ initialData, onSuccess }: SupplyInputProps
       });
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  // CANCEL BUTTON FIX: Clear ID and reset description/fields
+  const handleCancel = () => {
+    if (onSuccess) {
+      onSuccess(); // Close modal if in Dashboard
+    } else {
+      setEditingTempId(null);
+      setFormData(EMPTY_FORM);
+      setFiles([]);
+      setPreviews([]);
     }
   };
 
@@ -483,6 +542,15 @@ export default function SupplyInput({ initialData, onSuccess }: SupplyInputProps
                         }
                       />
                     </div>
+                    {/* TRASH CAN TO REMOVE THE ENTIRE STORE BOX */}
+                    <button
+                      type="button"
+                      onClick={() => removeStoreSource(sIdx)}
+                      className="p-3 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors"
+                      title="Remove Store"
+                    >
+                      <Trash2 size={18} />
+                    </button>
                   </div>
                   {/* Product Link for this specific store */}
                   <div className="w-full mt-2 mb-4">
@@ -497,7 +565,7 @@ export default function SupplyInput({ initialData, onSuccess }: SupplyInputProps
 
                   <div className="bg-white p-4 rounded-xl space-y-3">
                     {entry.inventory.map((inv, iIdx) => (
-                      <div key={iIdx} className="flex gap-2">
+                      <div key={iIdx} className="flex gap-2 items-center">
                         <select
                           className="flex-1 p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs"
                           value={inv.size}
@@ -530,6 +598,15 @@ export default function SupplyInput({ initialData, onSuccess }: SupplyInputProps
                             updateInventory(sIdx, iIdx, "qty", e.target.value)
                           }
                         />
+                        {/* DELETE BUTTON FOR SIZES */}
+                        <button
+                          type="button"
+                          onClick={() => removeInventoryRow(sIdx, iIdx)}
+                          className="p-2 text-slate-300 hover:text-red-500 transition-colors"
+                          title="Remove size"
+                        >
+                          <Trash2 size={16} />
+                        </button>
                       </div>
                     ))}
                     <button
@@ -548,9 +625,7 @@ export default function SupplyInput({ initialData, onSuccess }: SupplyInputProps
             <div className="flex gap-3">
               <button
                 type="button"
-                onClick={() => {
-                  setEditingTempId(null); 
-                }}
+                onClick={handleCancel}
                 className="flex-1 py-4 px-6 border border-slate-200 rounded-2xl font-bold text-slate-500 hover:bg-slate-50 transition-all"
               >
                 Cancel
