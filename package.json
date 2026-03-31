@@ -33,8 +33,5 @@
     "eslint-config-next": "15.5.0",
     "tailwindcss": "^4",
     "typescript": "^5"
-  },
-  "engines": {
-  "node": "20.x"
-}
+  }
 }
