@@ -3,7 +3,7 @@ import { ObjectId } from "mongodb";
 import { getDb } from "@/lib/mongodb";
 
 // ✅ 1. Mudámos de PATCH para POST nesta linha:
-export async function POST(req: Request): Promise<Response> {
+export async function PATCH(req: Request): Promise<Response> {
   try {
     const body: {
       id?: string;

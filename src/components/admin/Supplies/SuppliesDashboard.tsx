@@ -150,15 +150,15 @@ export default function SuppliesDashboard() {
                   </div>
 
                   <div className="flex gap-1 shrink-0">
-                  <button 
-                    onClick={() => {
-                      setEditingId(item._id); 
-                      setIsModalOpen(true);   
-                   }}
-                   className="p-2 hover:bg-slate-100 text-slate-400 hover:text-cyan-600 rounded-md transition-colors"
-                 >
-                    <Edit size={16} />
-                  </button>
+                    <button
+                      onClick={() => {
+                        setEditingId(item._id);
+                        setIsModalOpen(true);
+                      }}
+                      className="p-2 hover:bg-slate-100 text-slate-400 hover:text-cyan-600 rounded-md transition-colors"
+                    >
+                      <Edit size={16} />
+                    </button>
                     <button
                       onClick={() => handleDelete(item._id)}
                       className="p-2 hover:bg-red-50 text-slate-400 hover:text-red-600 rounded-md transition-colors"
@@ -274,9 +274,8 @@ export default function SuppliesDashboard() {
       {isModalOpen && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[110] flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto relative">
-            
             {/* Close button */}
-            <button 
+            <button
               onClick={() => {
                 setIsModalOpen(false);
                 setEditingId(null);

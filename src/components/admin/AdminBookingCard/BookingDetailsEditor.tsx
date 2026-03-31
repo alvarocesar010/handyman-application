@@ -60,8 +60,8 @@ export default function BookingDetailsEditor({
     const hours = actualMinutes / 60;
     return `${formatEuro(received / hours)}/h`;
   }, [values.amountReceived, actualMinutes]);
-  
-// New function to handle form submission via JSON
+
+  // New function to handle form submission via JSON
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); // Prevent default form submission (page reload)
 
@@ -98,7 +98,6 @@ export default function BookingDetailsEditor({
       onSubmit={handleSubmit}
       className="mt-4 space-y-3 rounded-lg border border-slate-200 bg-slate-50 p-3"
     >
-
       {/* ✅ save computed duration */}
       <input
         type="hidden"
