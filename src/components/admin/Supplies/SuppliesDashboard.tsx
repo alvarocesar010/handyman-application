@@ -286,9 +286,9 @@ export default function SuppliesDashboard() {
               <X size={20} />
             </button>
             
-            <div className="p-6">
+           <div className="p-6">
               <SupplyInput 
-                editingTempId={editingId} 
+                initialData={items.find((i) => i._id === editingId)} 
                 onSuccess={() => {
                   setIsModalOpen(false);
                   setEditingId(null);

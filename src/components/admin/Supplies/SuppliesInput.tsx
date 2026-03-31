@@ -16,7 +16,7 @@ import {
 // Interface for items stored in the temporary session list
 interface LocalSupply extends SupplyDB {
   tempId: string;
-  _id?: string; // ✅ ADD THIS
+  _id?: string;
   localPreview?: string;
 }
 
@@ -30,23 +30,27 @@ interface OptionModalProps {
 }
 
 interface SupplyInputProps {
-  editingTempId?: string | null;
+  initialData?: any; // Recebe os dados completos do produto
   onSuccess?: () => void;
 }
 
-export default function SupplyInput({ editingTempId: initialId, onSuccess }: SupplyInputProps) {
+export default function SupplyInput({ initialData, onSuccess }: SupplyInputProps) {
   // Data States
   const [stores, setStores] = useState<string[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [editingTempId, setEditingTempId] = useState<string | null>(initialId || null);
+  
+  // O ID agora vem do initialData
+  const [editingTempId, setEditingTempId] = useState<string | null>(initialData?._id || null);
 
   // Temporary Session List (The "Basket")
   const [addedItems, setAddedItems] = useState<LocalSupply[]>([]);
 
   // Photo & Form States
   const [files, setFiles] = useState<File[]>([]);
-  const [previews, setPreviews] = useState<string[]>([]);
+  
+  // Carrega a foto do produto, se existir!
+  const [previews, setPreviews] = useState<string[]>(initialData?.photos || []);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Modal States
@@ -57,12 +61,13 @@ export default function SupplyInput({ editingTempId: initialId, onSuccess }: Sup
   const [newStoreValue, setNewStoreValue] = useState("");
   const [newSizeValue, setNewSizeValue] = useState("");
 
+  // A MÁGICA: Preenchemos o formulário com os dados reais do produto!
   const [formData, setFormData] = useState<SupplyDB>({
-    name: "",
-    description: "",
-    category: "",
-    color: "",
-    storeEntries: [
+    name: initialData?.name || "",
+    description: initialData?.description || "",
+    category: initialData?.category || "",
+    color: initialData?.color || "",
+    storeEntries: initialData?.storeEntries || [
       {
         storeName: "",
         link: "",
@@ -256,12 +261,12 @@ export default function SupplyInput({ editingTempId: initialId, onSuccess }: Sup
           console.error("ERRO DO BACKEND:", errorMsg);
           throw new Error(`Failed to save: ${errorMsg}`);
         }
-      const result = await res.json(); // ✅ GET BACKEND ID
-      // Update Local List
+      const result = await res.json(); 
+      
       const newLocalItem: LocalSupply = {
         ...formData,
         tempId: editingTempId || Date.now().toString(),
-        _id: result.id || editingTempId, // ✅ THIS FIXES EVERYTHING
+        _id: result.id || editingTempId, 
         localPreview: previews[0] || "",
       };
 
@@ -480,20 +485,19 @@ export default function SupplyInput({ editingTempId: initialId, onSuccess }: Sup
                     </div>
                   </div>
                   {/* Product Link for this specific store */}
-          <div className="w-full mt-2 mb-4">
-            <input
-              type="url"
-              placeholder="Product link (optional)"
-              className="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm focus:border-blue-400 outline-none"
-              value={(entry as any).link || ""}
-              onChange={(e) => updateStoreField(sIdx, "link", e.target.value)}
-            />
-          </div>
+                  <div className="w-full mt-2 mb-4">
+                    <input
+                      type="url"
+                      placeholder="Product link (optional)"
+                      className="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm focus:border-blue-400 outline-none"
+                      value={(entry as any).link || ""}
+                      onChange={(e) => updateStoreField(sIdx, "link", e.target.value)}
+                    />
+                  </div>
 
-           <div className="bg-white p-4 rounded-xl space-y-3">
-                {entry.inventory.map((inv, iIdx) => (
-           <div key={iIdx} className="flex gap-2">
-
+                  <div className="bg-white p-4 rounded-xl space-y-3">
+                    {entry.inventory.map((inv, iIdx) => (
+                      <div key={iIdx} className="flex gap-2">
                         <select
                           className="flex-1 p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs"
                           value={inv.size}
@@ -540,31 +544,30 @@ export default function SupplyInput({ editingTempId: initialId, onSuccess }: Sup
               ))}
             </div>
 
-        {/* Action Buttons at the Bottom */}
-        <div className="flex gap-3">
-          <button
-            type="button"
-            onClick={() => {
-              // Clear current edit session
-              setEditingTempId(null); 
-            }}
-            className="flex-1 py-4 px-6 border border-slate-200 rounded-2xl font-bold text-slate-500 hover:bg-slate-50 transition-all"
-          >
-            Cancel
-          </button>
-          
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="flex-1 py-4 px-6 bg-[#002d5a] text-white rounded-2xl font-bold hover:bg-[#001d3d] shadow-lg disabled:opacity-50 transition-all"
-          >
-            {isSubmitting
-              ? "Processing..."
-              : editingTempId
-              ? "Save Changes"
-              : "Create Supply Item"}
-          </button>
-        </div>
+            {/* Action Buttons at the Bottom */}
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setEditingTempId(null); 
+                }}
+                className="flex-1 py-4 px-6 border border-slate-200 rounded-2xl font-bold text-slate-500 hover:bg-slate-50 transition-all"
+              >
+                Cancel
+              </button>
+              
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="flex-1 py-4 px-6 bg-[#002d5a] text-white rounded-2xl font-bold hover:bg-[#001d3d] shadow-lg disabled:opacity-50 transition-all"
+              >
+                {isSubmitting
+                  ? "Processing..."
+                  : editingTempId
+                  ? "Save Changes"
+                  : "Create Supply Item"}
+              </button>
+            </div>
           </form>
         </div>
       </div>
