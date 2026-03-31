@@ -130,7 +130,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
           <h1 className="text-3xl font-extrabold text-slate-900">
             {svc.title}
           </h1>
-          <Stars />
+          <Stars serviceSlug={svc.slug} />
           <p className="text-slate-800">{svc.summary}</p>
           <p className="text-slate-700 text-sm">
             {svc.durationHint && <>Typical duration: {svc.durationHint} · </>}

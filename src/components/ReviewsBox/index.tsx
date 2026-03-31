@@ -98,7 +98,7 @@ export default function ReviewsBox({ serviceSlug }: { serviceSlug: string }) {
     setError("");
     try {
       const res = await fetch(
-        `/api/reviews?service=${encodeURIComponent(serviceSlug)}`
+        `/api/reviews?service=${encodeURIComponent(serviceSlug)}`,
       );
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Failed to load reviews.");
