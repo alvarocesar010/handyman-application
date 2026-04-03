@@ -2,12 +2,12 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/lib/mongodb";
 import { weeklySchedule } from "@/lib/schedule";
 import { toMinutes, overlaps } from "@/lib/time";
-import type { Booking } from "@/lib/bookings";
+import type { Booking } from "@/types/bookings";
 
 async function hasAvailability(
   date: string,
   duration: number,
-  dayBookings: Booking[]
+  dayBookings: Booking[],
 ): Promise<boolean> {
   const weekday = new Date(date).getDay();
   const rule = weeklySchedule.find((r) => r.weekday === weekday);
@@ -18,7 +18,7 @@ async function hasAvailability(
 
   for (let t = start; t + duration <= end; t += rule.interval) {
     const conflict = dayBookings.some((b) =>
-      overlaps(t, duration, toMinutes(b.startTime), b.durationMinutes)
+      overlaps(t, duration, toMinutes(b.startTime), b.durationMinutes),
     );
 
     if (!conflict) return true;

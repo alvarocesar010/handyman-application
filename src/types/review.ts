@@ -1,13 +1,15 @@
-import type { ObjectId } from "mongodb";
+
+type Photo = {
+  id: string;
+  filename: string;
+};
 
 export type Review = {
-  _id?: ObjectId;
-
+  _id: string;
   serviceSlug: string;
   customerName: string;
-  rating: number; // 1..5
+  rating: number;
   opinion: string;
-
-  photoUrls: string[]; // GCS public URLs
-  createdAtISO: string; // ISO stored in DB
+  photoUrls: Photo[];
+  createdAtISO: string;
 };

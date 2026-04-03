@@ -1,13 +1,15 @@
 import { NextResponse } from "next/server";
 import type { Review } from "@/types/review";
-import { reviewsCollection } from "@/lib/collections";
-import { uploadReviewImage, signImage } from "@/lib/gcs";
+import { uploadReviewImage } from "@/lib/gcs";
+import { getReviewsByService } from "@/lib/reviews";
+import { getDb } from "@/lib/mongodb";
+import { ObjectId } from "mongodb";
 
 const MAX_FILES = 5;
 const MAX_EACH_BYTES = 5 * 1024 * 1024;
 const MAX_OPINION_LEN = 500;
 
-//  formats for consistent display
+// formats for consistent display
 const ALLOWED = new Set([
   "image/jpeg",
   "image/png",
@@ -16,8 +18,8 @@ const ALLOWED = new Set([
   "image/heif",
 ]);
 
-// Signed URL expiry: 7 days (in seconds)
-const SIGNED_URL_EXPIRES_SECONDS = 7 * 24 * 60 * 60;
+// 🔥 your public bucket URL
+const BASE_URL = "https://storage.googleapis.com/handyman-reviews-images";
 
 export async function GET(req: Request) {
   try {
@@ -28,28 +30,9 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Missing service" }, { status: 400 });
     }
 
-    const col = await reviewsCollection();
-    const test = await col.find({}).toArray();
-    const filter = service === "AllReviews" ? {} : { serviceSlug: service };
+    const data = await getReviewsByService(service);
 
-    const reviews = await col
-      .find(filter)
-      .sort({ createdAtISO: -1 })
-      .limit(200)
-      .toArray();
-    // Convert object paths -> signed URLs for the client
-    const withSignedUrls = await Promise.all(
-      reviews.map(async (r) => ({
-        ...r,
-        photoUrls: await Promise.all(
-          (r.photoUrls ?? []).map((objectPath) =>
-            signImage(objectPath, SIGNED_URL_EXPIRES_SECONDS),
-          ),
-        ),
-      })),
-    );
-
-    return NextResponse.json({ reviews: withSignedUrls, test });
+    return NextResponse.json(data);
   } catch (err) {
     return NextResponse.json(
       { error: err instanceof Error ? err.message : "Failed to load reviews" },
@@ -86,6 +69,7 @@ export async function POST(req: Request) {
     }
 
     const files = form.getAll("photos").filter(Boolean) as File[];
+
     if (files.length > MAX_FILES) {
       return NextResponse.json(
         { error: `Up to ${MAX_FILES} photos.` },
@@ -93,7 +77,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Store object paths in DB (not signed URLs)
     const photoPaths: string[] = [];
 
     for (const f of files) {
@@ -111,12 +94,12 @@ export async function POST(req: Request) {
         );
       }
 
-      const prov = "reviews";
       const objectPath = await uploadReviewImage({
         serviceSlug,
         file: f,
-        prov,
+        prov: "reviews",
       });
+
       photoPaths.push(objectPath);
     }
 
@@ -127,30 +110,40 @@ export async function POST(req: Request) {
       customerName,
       rating,
       opinion,
-      photoUrls: photoPaths, // object paths
+      photoUrls: photoPaths.map((path) => ({
+        id: new ObjectId().toString(),
+        filename: path,
+      })), // still store paths only
       createdAtISO,
     };
 
-    const col = await reviewsCollection();
-    const result = await col.insertOne(doc);
+    const db = await getDb();
+    const col = db.collection("reviews");
 
-    // Return inserted review with signed URLs (nice UX)
+    const result = await col.insertOne(doc);
     const inserted = await col.findOne({ _id: result.insertedId });
 
     if (!inserted) {
       return NextResponse.json({ ok: true }, { status: 200 });
     }
 
-    const signedInserted = {
-      ...inserted,
-      photoUrls: await Promise.all(
-        (inserted.photoUrls ?? []).map((p) =>
-          signImage(p, SIGNED_URL_EXPIRES_SECONDS),
-        ),
+    // ✅ convert to public URLs (no signing)
+    const publicInserted = {
+      id: inserted._id.toString(),
+      serviceSlug: inserted.serviceSlug,
+      customerName: inserted.customerName,
+      rating: inserted.rating,
+      opinion: inserted.opinion,
+      photoUrls: (inserted.photoUrls ?? []).map(
+        (p: { id: string; filename: string }) => ({
+          id: p.id,
+          filename: `${BASE_URL}/${p.filename}`,
+        }),
       ),
+      createdAtISO: inserted.createdAtISO,
     };
 
-    return NextResponse.json({ review: signedInserted });
+    return NextResponse.json({ review: publicInserted });
   } catch (err) {
     return NextResponse.json(
       { error: err instanceof Error ? err.message : "Failed to save review" },

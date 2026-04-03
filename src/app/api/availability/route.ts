@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/lib/mongodb";
 import { weeklySchedule } from "@/lib/schedule";
 import { toMinutes, overlaps } from "@/lib/time";
-import type { Booking } from "@/lib/bookings";
+import type { Booking } from "@/types/bookings";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -32,7 +32,7 @@ export async function GET(req: Request) {
 
   for (let t = start; t + duration <= end; t += rule.interval) {
     const conflict = bookings.some((b) =>
-      overlaps(t, duration, toMinutes(b.startTime), b.durationMinutes)
+      overlaps(t, duration, toMinutes(b.startTime), b.durationMinutes),
     );
 
     if (!conflict) {

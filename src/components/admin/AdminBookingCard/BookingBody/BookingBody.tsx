@@ -19,7 +19,6 @@ export default function BookingBody({ booking }: { booking: AdminBooking }) {
   const options = [
     { value: "JobDetails", label: "Details" },
     { value: "ServiceDescription", label: "Description" },
-
     { value: "HardwareList", label: "Hardware" },
     { value: "Photos", label: "Photos" },
     { value: "Timetable", label: "Timetable" },

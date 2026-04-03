@@ -1,8 +1,9 @@
+//src\components\admin\PhotoGallery\PhotoGallery.tsx
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
 
-type Photo = { id: string; filename: string };
+type Photo = { id?: string; filename: string };
 
 export default function PhotoGallery({ photos = [] }: { photos?: Photo[] }) {
   const [open, setOpen] = useState(false);

@@ -5,6 +5,7 @@ import { SERVICES_EN, SERVICE_MAP_EN } from "@/lib/services_en";
 import { BudgeterProvider } from "@/context/budgeter";
 
 import { SERVICES_PT, SERVICE_MAP_PT } from "@/lib/services_pt";
+import { getReviewsByService } from "@/lib/reviews";
 
 import type { Metadata } from "next";
 import { CalendarCheck, MessageCircle } from "lucide-react";
@@ -118,6 +119,9 @@ export default async function ServiceDetailPage({ params }: PageProps) {
     ? Object.keys(svc.categories)
     : undefined;
 
+  // Get reviews at DB
+  const reviews = await getReviewsByService(svc.slug);
+
   return (
     <>
       <main className="mx-auto max-w-3xl px-6 py-10 pb-28 space-y-8">
@@ -130,7 +134,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
           <h1 className="text-3xl font-extrabold text-slate-900">
             {svc.title}
           </h1>
-          <Stars serviceSlug={svc.slug} />
+          <Stars avg={reviews.stars.avg} count={reviews.stars.count} />
           <p className="text-slate-800">{svc.summary}</p>
           <p className="text-slate-700 text-sm">
             {svc.durationHint && <>Typical duration: {svc.durationHint} · </>}
@@ -214,9 +218,13 @@ export default async function ServiceDetailPage({ params }: PageProps) {
           />
         )}
 
+        {/* Reviews */}
+
         <div id="reviews">
-          <ReviewsBox serviceSlug={svc.slug} />
+          <ReviewsBox initialReviews={reviews.reviews} serviceSlug={svc.slug} />
         </div>
+
+        {/* // */}
         {svc.faqs && svc.faqs.length > 0 && (
           <section className="space-y-3">
             <h3 className="text-lg font-semibold text-slate-900">FAQs</h3>
