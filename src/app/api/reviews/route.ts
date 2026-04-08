@@ -4,12 +4,12 @@ import { uploadReviewImage } from "@/lib/gcs";
 import { getReviewsByService } from "@/lib/reviews";
 import { getDb } from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
+import sharp from "sharp";
 
 const MAX_FILES = 5;
 const MAX_EACH_BYTES = 5 * 1024 * 1024;
 const MAX_OPINION_LEN = 500;
 
-// formats for consistent display
 const ALLOWED = new Set([
   "image/jpeg",
   "image/png",
@@ -18,7 +18,6 @@ const ALLOWED = new Set([
   "image/heif",
 ]);
 
-// 🔥 your public bucket URL
 const BASE_URL = "https://storage.googleapis.com/handyman-reviews-images";
 
 export async function GET(req: Request) {
@@ -31,7 +30,6 @@ export async function GET(req: Request) {
     }
 
     const data = await getReviewsByService(service);
-
     return NextResponse.json(data);
   } catch (err) {
     return NextResponse.json(
@@ -94,9 +92,19 @@ export async function POST(req: Request) {
         );
       }
 
+      // ✅ OPTIMIZATION STARTS HERE
+      const buffer = Buffer.from(await f.arrayBuffer());
+
+      const optimizedBuffer = await sharp(buffer)
+        .resize({ width: 1600 }) // max width
+        .webp({ quality: 85 }) // compress
+        .toBuffer();
+
+      // upload optimized image
       const objectPath = await uploadReviewImage({
         serviceSlug,
-        file: f,
+        file: optimizedBuffer,
+        contentType: "image/webp", // 🔥 REQUIRED
         prov: "reviews",
       });
 
@@ -113,7 +121,7 @@ export async function POST(req: Request) {
       photoUrls: photoPaths.map((path) => ({
         id: new ObjectId().toString(),
         filename: path,
-      })), // still store paths only
+      })),
       createdAtISO,
     };
 
@@ -127,7 +135,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: true }, { status: 200 });
     }
 
-    // ✅ convert to public URLs (no signing)
     const publicInserted = {
       id: inserted._id.toString(),
       serviceSlug: inserted.serviceSlug,

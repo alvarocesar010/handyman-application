@@ -1,6 +1,6 @@
 import SuppliesDashboard from "@/components/admin/Supplies/SuppliesDashboard";
 
-export default function SupplyManager() {
+export default async function SupplyManager() {
   return (
     <div>
       <SuppliesDashboard />

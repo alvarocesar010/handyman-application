@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/mongodb";
 import { ObjectId, UpdateFilter } from "mongodb";
 import { Storage, Bucket } from "@google-cloud/storage";
-import { uploadReviewImage, signImage } from "@/lib/gcs";
+import { uploadReviewImage } from "@/lib/gcs";
+import sharp from "sharp";
 
 /** --- Strict Interfaces --- **/
 interface InventoryItem {
@@ -47,7 +48,6 @@ const ALLOWED = new Set([
   "image/heic",
   "image/heif",
 ]);
-const SIGNED_URL_EXPIRES_SECONDS = 7 * 24 * 60 * 60;
 
 /** --- Helper Functions --- **/
 function toTitleCase(value: string): string {
@@ -84,6 +84,8 @@ function getBucket(): Bucket {
   return storage.bucket(bucketName);
 }
 
+const BASE_URL = "https://storage.googleapis.com/handyman-reviews-images";
+
 /** --- API Methods --- **/
 
 export async function POST(req: Request) {
@@ -105,20 +107,38 @@ export async function POST(req: Request) {
     );
 
   const photoPaths: string[] = [];
+
   for (const f of files) {
-    if (!ALLOWED.has(f.type))
+    if (!ALLOWED.has(f.type)) {
       return NextResponse.json(
-        { error: "Invalid file type." },
+        { error: "Only JPG/PNG/WEBP images are allowed." },
         { status: 400 },
       );
-    if (f.size > MAX_EACH_BYTES)
-      return NextResponse.json({ error: "Image too large." }, { status: 400 });
+    }
 
+    if (f.size > MAX_EACH_BYTES) {
+      return NextResponse.json(
+        { error: "Each image must be 5MB or smaller." },
+        { status: 400 },
+      );
+    }
+
+    // ✅ OPTIMIZATION STARTS HERE
+    const buffer = Buffer.from(await f.arrayBuffer());
+
+    const optimizedBuffer = await sharp(buffer)
+      .resize({ width: 1600 }) // max width
+      .webp({ quality: 85 }) // compress
+      .toBuffer();
+
+    // upload optimized image
     const objectPath = await uploadReviewImage({
       serviceSlug,
-      file: f,
+      file: optimizedBuffer,
+      contentType: "image/webp", // 🔥 REQUIRED
       prov: "supplies",
     });
+
     photoPaths.push(objectPath);
   }
 
@@ -166,16 +186,41 @@ export async function PUT(req: Request) {
     // 1. Process Photos
     const newPhotoPaths: string[] = [];
     const files = formData.getAll("photos").filter(Boolean) as File[];
+    const serviceSlug = slugify(payload.category);
 
     if (files.length > 0) {
-      const serviceSlug = slugify(payload.category);
       for (const f of files) {
-        const path = await uploadReviewImage({
+        if (!ALLOWED.has(f.type)) {
+          return NextResponse.json(
+            { error: "Only JPG/PNG/WEBP images are allowed." },
+            { status: 400 },
+          );
+        }
+
+        if (f.size > MAX_EACH_BYTES) {
+          return NextResponse.json(
+            { error: "Each image must be 5MB or smaller." },
+            { status: 400 },
+          );
+        }
+
+        // ✅ OPTIMIZATION STARTS HERE
+        const buffer = Buffer.from(await f.arrayBuffer());
+
+        const optimizedBuffer = await sharp(buffer)
+          .resize({ width: 1600 }) // max width
+          .webp({ quality: 85 }) // compress
+          .toBuffer();
+
+        // upload optimized image
+        const objectPath = await uploadReviewImage({
           serviceSlug,
-          file: f,
-          prov: "supplies",
+          file: optimizedBuffer,
+          contentType: "image/webp", // 🔥 REQUIRED
+          prov: "reviews",
         });
-        newPhotoPaths.push(path);
+
+        newPhotoPaths.push(objectPath);
       }
     }
 
@@ -230,26 +275,21 @@ export async function GET(req: NextRequest) {
     const filter: { serviceSlug?: string } = category
       ? { serviceSlug: category }
       : {};
-
-    const items = await db
+    console.log(limit);
+    const getItems = await db
       .collection("supplies")
       .find(filter)
       .sort({ createdAt: -1 })
       .limit(limit)
       .toArray();
 
-    const withSignedUrls = await Promise.all(
-      items.map(async (item) => ({
-        ...item,
-        photos: await Promise.all(
-          ((item.photos as string[]) ?? []).map((path) =>
-            signImage(path, SIGNED_URL_EXPIRES_SECONDS),
-          ),
-        ),
-      })),
-    );
-
-    return NextResponse.json(withSignedUrls);
+    const items = getItems.map((p) => {
+      return {
+        ...p,
+        photos: (p.photos ?? []).map((p: string) => `${BASE_URL}/${p}`),
+      };
+    });
+    return NextResponse.json(items);
   } catch {
     return NextResponse.json({ error: "Failed to fetch" }, { status: 500 });
   }
