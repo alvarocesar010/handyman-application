@@ -5,28 +5,17 @@ const BASE_URL = "https://storage.googleapis.com/handyman-reviews-images";
 
 export async function getItemBySlug(
   serviceSlug: string,
-  productSlug: string,
+  itemSlug: string,
 ): Promise<Supply | null> {
   const db = await getDb();
 
-  const supplies = await db
-    .collection<Supply>("supplies")
-    .find({ serviceSlug })
-    .toArray();
-
-  const item = supplies.find((item) => {
-    const slug = item.name
-      .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, "")
-      .trim()
-      .replace(/\s+/g, "-");
-
-    return slug === productSlug;
+  const item = await db.collection<Supply>("supplies").findOne({
+    serviceSlug,
+    itemSlug,
   });
 
   if (!item) return null;
 
-  // ✅ FIX: transform photos AFTER finding item
   return {
     ...item,
     photos: item.photos.map((photo) =>

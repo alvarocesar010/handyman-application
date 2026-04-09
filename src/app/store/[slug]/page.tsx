@@ -1,47 +1,31 @@
 import Image from "next/image";
 import Link from "next/link";
 import { getSuppliesBySlug } from "@/lib/store/getSuppliesBySlug";
-import { Supply } from "@/lib/store/types";
 
 type Props = {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 };
 
 export default async function StoreSlugPage({ params }: Props) {
-  const supplies: Supply[] = await getSuppliesBySlug(params.slug);
+  const { slug } = await params;
 
-  function getPrice(price: number): string {
-    let finalPrice: number;
-
-    if (price >= 100) {
-      finalPrice = price * 1.2;
-    } else if (price >= 50) {
-      finalPrice = price * 1.35;
-    } else {
-      finalPrice = price * 1.5;
-    }
-
-    return finalPrice.toFixed(2);
-  }
+  const supplies = await getSuppliesBySlug(slug);
 
   return (
     <div className="min-h-screen bg-gray-50 px-6 py-10">
       <div className="max-w-6xl mx-auto">
         {/* Title */}
         <h1 className="text-2xl font-bold mb-8 capitalize">
-          {params.slug.replace("-", " ")}
+          {slug.replace("-", " ")}
         </h1>
 
         {/* Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {supplies.map((item) => {
-            const price = item.storeEntries?.[0]?.price;
-
             return (
               <Link
                 key={item._id}
-                href={item.storeEntries?.[0]?.link || "#"}
-                target="_blank"
+                href={`/store/${item.serviceSlug}/${item.itemSlug}`}
                 className="bg-white rounded-xl shadow-sm hover:shadow-md transition overflow-hidden"
               >
                 {/* Image */}
@@ -62,7 +46,7 @@ export default async function StoreSlugPage({ params }: Props) {
 
                   {/* Price */}
                   <p className="mt-2 text-lg font-semibold text-gray-900">
-                    €{getPrice(price)}
+                    €{item.sellingPrice}
                   </p>
 
                   {/* Optional */}

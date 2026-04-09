@@ -15,4 +15,6 @@ export type Supply = {
       _id: string;
     }[];
   }[];
+  sellingPrice: number;
+  itemSlug: string;
 };

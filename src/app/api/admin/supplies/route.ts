@@ -32,6 +32,8 @@ interface UpdateDocument {
   description: string;
   category: string;
   serviceSlug: string;
+  itemSlug: string; // ✅
+  sellingPrice: number; // ✅
   color: string;
   storeEntries: StoreEntry[];
   updatedAt: Date;
@@ -39,7 +41,7 @@ interface UpdateDocument {
 }
 
 /** --- Constants & Validation --- **/
-const MAX_FILES = 5;
+const MAX_FILES = 7;
 const MAX_EACH_BYTES = 5 * 1024 * 1024;
 const ALLOWED = new Set([
   "image/jpeg",
@@ -58,6 +60,14 @@ function toTitleCase(value: string): string {
     .split(" ")
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join(" ");
+}
+function calculateSellingPrice(price: number): number {
+  let multiplier = 1.5;
+
+  if (price >= 100) multiplier = 1.2;
+  else if (price >= 50) multiplier = 1.35;
+
+  return Math.ceil(price * multiplier);
 }
 
 export function slugify(value: string): string {
@@ -142,22 +152,52 @@ export async function POST(req: Request) {
     photoPaths.push(objectPath);
   }
 
+  const formattedEntries = payload.storeEntries.map((entry) => ({
+    ...entry,
+    price: parseFloat(String(entry.price)) || 0,
+    inventory: entry.inventory.map((inv) => ({
+      ...inv,
+      _id: inv._id || new ObjectId().toString(),
+      qty: parseInt(String(inv.qty)) || 0,
+    })),
+  }));
+
+  // ✅ get base price (highest)
+  const basePrice =
+    formattedEntries.length > 0
+      ? Math.max(...formattedEntries.map((e) => e.price))
+      : 0;
+
+  // ✅ selling price
+  const sellingPrice = calculateSellingPrice(basePrice);
+
+  // ✅ slug
+  const itemSlug = slugify(payload.name);
+
+  // ✅ add Dubliner Handyman store
+  const dublinerEntry: StoreEntry = {
+    storeName: "Dubliner Handyman",
+    link: `https://dublinerhandyman.ie/store/${serviceSlug}/${itemSlug}`,
+    price: basePrice,
+    inventory: formattedEntries[0]?.inventory ?? [],
+  };
+
+  // avoid duplicate
+  const storeEntries = [
+    ...formattedEntries.filter((e) => e.storeName !== "Dubliner Handyman"),
+    dublinerEntry,
+  ];
+
   const supplyDoc = {
     name: toTitleCase(payload.name),
     description: payload.description,
     category: toTitleCase(payload.category),
     serviceSlug,
+    itemSlug, // ✅ NEW
     color: payload.color || "",
     photos: photoPaths,
-    storeEntries: payload.storeEntries.map((entry) => ({
-      ...entry,
-      price: parseFloat(String(entry.price)) || 0,
-      inventory: entry.inventory.map((inv) => ({
-        ...inv,
-        _id: inv._id || new ObjectId().toString(),
-        qty: parseInt(String(inv.qty)) || 0,
-      })),
-    })),
+    sellingPrice, // ✅ NEW
+    storeEntries, // ✅ UPDATED
     updatedAt: new Date(),
     createdAt: new Date(),
   };
@@ -177,69 +217,84 @@ export async function PUT(req: Request) {
   try {
     const formData = await req.formData();
     const payloadRaw = formData.get("payload");
-    if (!payloadRaw)
+
+    if (!payloadRaw) {
       return NextResponse.json({ error: "Missing payload" }, { status: 400 });
+    }
 
     const payload: SupplyPayload = JSON.parse(String(payloadRaw));
     const db = await getDb();
 
-    // 1. Process Photos
-    const newPhotoPaths: string[] = [];
-    const files = formData.getAll("photos").filter(Boolean) as File[];
     const serviceSlug = slugify(payload.category);
 
-    if (files.length > 0) {
-      for (const f of files) {
-        if (!ALLOWED.has(f.type)) {
-          return NextResponse.json(
-            { error: "Only JPG/PNG/WEBP images are allowed." },
-            { status: 400 },
-          );
-        }
+    // --- PHOTO UPLOAD ---
+    const newPhotoPaths: string[] = [];
+    const files = formData.getAll("photos").filter(Boolean) as File[];
 
-        if (f.size > MAX_EACH_BYTES) {
-          return NextResponse.json(
-            { error: "Each image must be 5MB or smaller." },
-            { status: 400 },
-          );
-        }
+    for (const f of files) {
+      if (!ALLOWED.has(f.type)) continue;
 
-        // ✅ OPTIMIZATION STARTS HERE
-        const buffer = Buffer.from(await f.arrayBuffer());
+      const buffer = Buffer.from(await f.arrayBuffer());
 
-        const optimizedBuffer = await sharp(buffer)
-          .resize({ width: 1600 }) // max width
-          .webp({ quality: 85 }) // compress
-          .toBuffer();
+      const optimizedBuffer = await sharp(buffer)
+        .resize({ width: 1600 })
+        .webp({ quality: 85 })
+        .toBuffer();
 
-        // upload optimized image
-        const objectPath = await uploadReviewImage({
-          serviceSlug,
-          file: optimizedBuffer,
-          contentType: "image/webp", // 🔥 REQUIRED
-          prov: "reviews",
-        });
+      const objectPath = await uploadReviewImage({
+        serviceSlug,
+        file: optimizedBuffer,
+        contentType: "image/webp",
+        prov: "supplies",
+      });
 
-        newPhotoPaths.push(objectPath);
-      }
+      newPhotoPaths.push(objectPath);
     }
 
-    // 2. Format Data
+    // --- FORMAT ENTRIES ---
+    const formattedEntries = payload.storeEntries.map((entry) => ({
+      ...entry,
+      price: parseFloat(String(entry.price)) || 0,
+      inventory: entry.inventory.map((inv) => ({
+        ...inv,
+        _id: inv._id || new ObjectId().toString(),
+        qty: parseInt(String(inv.qty)) || 0,
+      })),
+    }));
+
+    // --- PRICE LOGIC ---
+    const basePrice =
+      formattedEntries.length > 0
+        ? Math.max(...formattedEntries.map((e) => e.price))
+        : 0;
+
+    const sellingPrice = calculateSellingPrice(basePrice);
+
+    const itemSlug = slugify(payload.name);
+
+    // --- DUBLINER STORE ---
+    const dublinerEntry: StoreEntry = {
+      storeName: "Dubliner Handyman",
+      link: `https://dublinerhandyman.ie/store/${serviceSlug}/${itemSlug}`,
+      price: basePrice,
+      inventory: formattedEntries[0]?.inventory ?? [],
+    };
+
+    const storeEntries = [
+      ...formattedEntries.filter((e) => e.storeName !== "Dubliner Handyman"),
+      dublinerEntry,
+    ];
+
+    // --- UPDATE OBJECT ---
     const updateData: UpdateDocument = {
       name: toTitleCase(payload.name),
       description: payload.description,
       category: toTitleCase(payload.category),
-      serviceSlug: slugify(payload.category),
+      serviceSlug,
+      itemSlug,
+      sellingPrice,
       color: payload.color || "",
-      storeEntries: payload.storeEntries.map((entry) => ({
-        ...entry,
-        price: parseFloat(String(entry.price)) || 0,
-        inventory: entry.inventory.map((inv) => ({
-          ...inv,
-          _id: inv._id || new ObjectId().toString(),
-          qty: parseInt(String(inv.qty)) || 0,
-        })),
-      })),
+      storeEntries,
       updatedAt: new Date(),
     };
 
@@ -247,7 +302,7 @@ export async function PUT(req: Request) {
       updateData.photos = newPhotoPaths;
     }
 
-    // --- FIX IS HERE: Change 'id' to '_id' ---
+    // --- SAVE TO DB ---
     const result = await db
       .collection("supplies")
       .updateOne(
@@ -261,7 +316,7 @@ export async function PUT(req: Request) {
 
     return NextResponse.json({ ok: true });
   } catch (error) {
-    console.error("Update error:", error);
+    console.error(error);
     return NextResponse.json({ error: "Update failed" }, { status: 500 });
   }
 }

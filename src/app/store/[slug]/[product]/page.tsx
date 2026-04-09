@@ -1,35 +1,21 @@
 import Image from "next/image";
 import Link from "next/link";
 import { getItemBySlug } from "@/lib/store/getItemBySlug";
-import { Supply } from "@/lib/store/types";
 
 type Props = {
-  params: {
+  params: Promise<{
     slug: string;
     product: string;
-  };
+  }>;
 };
 
 export default async function ProductPage({ params }: Props) {
-  const item: Supply | null = await getItemBySlug(params.slug, params.product);
+  const { slug, product } = await params;
+
+  const item = await getItemBySlug(slug, product);
 
   if (!item) {
     return <div className="p-10">Product not found</div>;
-  }
-  const price = item.storeEntries?.[0]?.price;
-
-  function getPrice(price: number): string {
-    let finalPrice: number;
-
-    if (price >= 100) {
-      finalPrice = price * 1.2;
-    } else if (price >= 50) {
-      finalPrice = price * 1.35;
-    } else {
-      finalPrice = price * 1.5;
-    }
-
-    return finalPrice.toFixed(2);
   }
 
   return (
@@ -66,14 +52,14 @@ export default async function ProductPage({ params }: Props) {
 
           {/* Price */}
           <p className="text-3xl font-semibold text-gray-900 mt-4">
-            €{getPrice(price)}
+            €{item.sellingPrice}
           </p>
 
           {/* Delivery mock */}
           <div className="mt-6 p-4 border rounded-lg bg-white">
             <p className="font-medium">Home delivery</p>
             <p className="text-sm text-gray-500">
-              Available from our partner store
+              Available in Dublin & surrounding areas
             </p>
           </div>
 

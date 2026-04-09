@@ -23,6 +23,8 @@ export interface SupplyDB {
   category: string;
   serviceSlug?: string;
   color?: string;
+  itemSlug: string;
+  sellingPrice: string;
 
   photos?: string[];
   storeEntries: StoreEntry[];

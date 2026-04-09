@@ -6,6 +6,10 @@
         "label": "Home"
       },
       {
+        "href": "/store",
+        "label": "Store"
+      },
+      {
         "href": "/services",
         "label": "Services"
       },

@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from "react";
 import { Trash2, Plus, X, Package, Edit3 } from "lucide-react";
 import Image from "next/image";
 import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import {
   APIOptionsResponse,
   Category,
@@ -41,6 +40,8 @@ const EMPTY_FORM: SupplyDB = {
   description: "",
   category: "",
   color: "",
+  itemSlug: "",
+  sellingPrice: "",
   storeEntries: [
     {
       storeName: "",
@@ -89,6 +90,8 @@ export default function SupplyInput({
     description: initialData?.description || "",
     category: initialData?.category || "",
     color: initialData?.color || "",
+    sellingPrice: initialData?.sellingPrice || "",
+    itemSlug: initialData?.itemSlug || "",
     storeEntries: initialData?.storeEntries || [
       {
         storeName: "",
@@ -129,6 +132,8 @@ export default function SupplyInput({
       description: item.description || "",
       category: item.category,
       color: item.color || "",
+      itemSlug: item.itemSlug,
+      sellingPrice: item.sellingPrice,
       storeEntries: JSON.parse(JSON.stringify(item.storeEntries)), // Deep clone to avoid direct mutation
     });
     setPreviews(item.localPreview ? [item.localPreview] : []);
@@ -405,8 +410,8 @@ export default function SupplyInput({
   };
 
   return (
-    <div className="max-w-4xl mx-auto py-10 px-4 space-y-12">
-      <div className="bg-white border border-slate-200 rounded-3xl p-6 md:p-10 shadow-sm text-slate-900">
+    <div className="max-w-4xl mx-auto py-10 px-2 space-y-12">
+      <div className="bg-white border border-slate-200 rounded-3xl p-2 md:p-10 shadow-sm text-slate-900">
         <ToastContainer position="bottom-right" theme="colored" />
 
         <div className="max-w-2xl mx-auto space-y-8">
