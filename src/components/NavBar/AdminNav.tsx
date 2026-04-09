@@ -6,6 +6,7 @@ import {
   ChartLine,
   Layers,
   LucideIcon,
+  BrickWall,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -41,6 +42,13 @@ const data: NavItem[] = [
     label: "Dashboard",
     icon: ChartLine,
     children: [{ label: "Dashs", href: "/admin/dashboard" }],
+  },
+  {
+    label: "Development",
+    icon: BrickWall,
+    children: [
+      { label: "The Budgeter", href: "/admin/developing/the-budgeter" },
+    ],
   },
 ];
 

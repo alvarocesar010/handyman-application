@@ -5,13 +5,15 @@ export default function Start() {
   const [, dispatch] = useContext(BudgeterContext);
 
   return (
-    <div>
-      <p className="font-bold my-2">Click on button to start your quote</p>
+    <div className="w-full max-w-md space-y-2">
+      <span className="text-xl font-semibold text-slate-900">
+        Click on button to start your quote
+      </span>
       <button
-        className="bg-slate-400 py-2 px-4 rounded-2xl"
+        className="flex items-center justify-center gap-3 w-full py-4 px-3 rounded-xl bg-white border border-slate-200 shadow-sm hover:shadow-md hover:border-slate-300 transition"
         onClick={() => dispatch({ type: "TYPE_OF_SERVICES" })}
       >
-        Start
+        <span className="font-medium text-slate-800">Start </span>
       </button>
     </div>
   );

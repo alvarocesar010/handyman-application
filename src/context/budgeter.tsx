@@ -3,11 +3,28 @@ import { createContext, Dispatch, ReactNode, useReducer } from "react";
 
 type Stage = string;
 
+type SelectedSupply = {
+  _id: string;
+  name: string;
+  price: number;
+  photo?: string;
+};
+
 interface BudgetState {
   quoteStage: Stage;
+  selectedSupply?: SelectedSupply;
 }
 
-type Action = { type: string; payload?: string };
+type Action =
+  | { type: "TYPE_OF_SERVICES" }
+  | { type: "SUP_FIT" }
+  | { type: "CLOSE_TAB" }
+  | { type: "PREVIOUS" }
+  | {
+      type: "SELECT_SUPPLY";
+      payload: SelectedSupply;
+    }|
+    {type: "NEXT_STAGE"}
 
 const STAGES: Stage[] = [
   "Start",
