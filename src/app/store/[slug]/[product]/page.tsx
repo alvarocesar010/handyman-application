@@ -1,6 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { getItemBySlug } from "@/lib/store/getItemBySlug";
+import Stars from "@/components/ReviewsBox/Stars.tsx";
+import ReviewsBox from "@/components/ReviewsBox";
+import { getReviewsByService } from "@/lib/reviews";
 
 type Props = {
   params: Promise<{
@@ -13,6 +16,8 @@ export default async function ProductPage({ params }: Props) {
   const { slug, product } = await params;
 
   const item = await getItemBySlug(slug, product);
+
+  const reviews = await getReviewsByService(product);
 
   if (!item) {
     return <div className="p-10">Product not found</div>;
@@ -50,6 +55,9 @@ export default async function ProductPage({ params }: Props) {
           {/* Title */}
           <h1 className="text-2xl font-bold text-gray-900">{item.name}</h1>
 
+          {/* Stars reviews */}
+          <Stars avg={reviews.stars.avg} count={reviews.stars.count} />
+
           {/* Price */}
           <p className="text-3xl font-semibold text-gray-900 mt-4">
             €{item.sellingPrice}
@@ -80,7 +88,12 @@ export default async function ProductPage({ params }: Props) {
               {item.description}
             </p>
           </div>
+
+          {/* Review box */}
         </div>
+      </div>
+      <div id="reviews" className="max-w-6xl mx-auto my-6">
+        <ReviewsBox serviceSlug={product} initialReviews={reviews.reviews} />
       </div>
     </div>
   );
