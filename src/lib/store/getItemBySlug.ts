@@ -18,6 +18,7 @@ export async function getItemBySlug(
 
   return {
     ...item,
+    _id: item._id.toString(),
     photos: item.photos.map((photo) =>
       photo.startsWith("http") ? photo : `${BASE_URL}/${photo}`,
     ),

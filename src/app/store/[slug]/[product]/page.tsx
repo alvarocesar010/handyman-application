@@ -1,9 +1,9 @@
 import Image from "next/image";
-import Link from "next/link";
 import { getItemBySlug } from "@/lib/store/getItemBySlug";
 import Stars from "@/components/ReviewsBox/Stars.tsx";
 import ReviewsBox from "@/components/ReviewsBox";
 import { getReviewsByService } from "@/lib/reviews";
+import AddToTrolley from "@/components/Buttons/AddToTrolley";
 
 type Props = {
   params: Promise<{
@@ -72,13 +72,7 @@ export default async function ProductPage({ params }: Props) {
           </div>
 
           {/* CTA */}
-          <Link
-            href={"#"}
-            target="_blank"
-            className="block mt-6 bg-green-600 text-white text-center py-3 rounded-lg font-semibold hover:bg-green-700 transition"
-          >
-            Add to cart
-          </Link>
+          <AddToTrolley item={item} />
 
           {/* Description */}
           <div className="mt-8">

@@ -3,9 +3,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
+import { Menu, ShoppingCart, X } from "lucide-react";
 import Image from "next/image";
 import type { Messages } from "@/lib/getMessages";
+import { useCart } from "@/context/CartContext";
 
 type NavBarProps = {
   layout: Messages["layout"];
@@ -16,6 +17,7 @@ export default function Navbar({ layout }: NavBarProps) {
   const navBar = layout.NavBar;
   const [show, setShow] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const { totalQty } = useCart();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -46,7 +48,7 @@ export default function Navbar({ layout }: NavBarProps) {
         {/* Brand / Logo */}
         <Link
           href="/"
-          className="text-xl font-bold text-cyan-700 flex flex-row items-center"
+          className="text-lg font-bold text-cyan-700 flex flex-row items-center"
         >
           <Image
             height={navBar.Image.height}
@@ -64,11 +66,19 @@ export default function Navbar({ layout }: NavBarProps) {
             <Link
               key={href}
               href={href}
-              className="text-sm font-medium text-slate-700 hover:text-cyan-700 transition-colors"
+              className="text-sm font-medium text-cyan-700 hover:text-cyan-900 transition-colors"
             >
               {label}
             </Link>
           ))}
+          <Link href={"/store/trolley"} className=" relative p-2">
+            {totalQty > 0 && (
+              <span className="absolute w-5 h-5 p-0.25 top-0 right-0 bg-red-600/85 text-xs text-center text-white rounded-full font-bold flex items-center justify-center">
+                {totalQty}
+              </span>
+            )}
+            <ShoppingCart className="text-cyan-700 h-6 w-6" />
+          </Link>
           <Link
             href="/booking"
             className="rounded-lg bg-cyan-700 px-4 py-2 text-sm font-medium text-white shadow hover:bg-cyan-800 transition-colors"
@@ -85,9 +95,18 @@ export default function Navbar({ layout }: NavBarProps) {
         </div>
 
         {/* Mobile button */}
+        <Link href={"/store/trolley"} className="md:hidden relative p-2">
+          {totalQty > 0 && (
+            <span className="absolute w-5 h-5 p-0.25 top-0 right-0 bg-red-600/85 text-xs text-center text-white rounded-full font-bold flex items-center justify-center">
+              {totalQty}
+            </span>
+          )}
+          <ShoppingCart className="text-cyan-700 h-6 w-6" />
+        </Link>
+
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="md:hidden inline-flex items-center justify-center rounded p-2 text-slate-700 hover:bg-slate-100"
+          className="md:hidden inline-flex items-center justify-center rounded p-2 text-cyan-800 hover:bg-slate-100"
         >
           {mobileOpen ? (
             <X className="h-6 w-6" />
@@ -106,7 +125,7 @@ export default function Navbar({ layout }: NavBarProps) {
                 key={href}
                 href={href}
                 onClick={() => setMobileOpen(false)}
-                className="block rounded px-3 py-2 text-slate-700 hover:bg-slate-100 hover:text-cyan-700"
+                className="block rounded px-3 py-2 text-center border-b border-b-slate-400 text-cyan-900 hover:bg-slate-100 hover:text-cyan-800"
               >
                 {label}
               </Link>

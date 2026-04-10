@@ -8,6 +8,7 @@ import { getLocale } from "@/lib/getLocale";
 import { Metadata } from "next";
 import { getMessages } from "@/lib/getMessages";
 import JsonLd from "@/components/JsonLd";
+import { CartProvider } from "@/context/CartContext";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
@@ -60,10 +61,12 @@ export default async function RootLayout({
 
         {/* Schema.org */}
         {structuredData && <JsonLd data={structuredData} />}
-        <Navbar layout={layout} />
-        <div className="pt-16">{children}</div>
-        <ToastContainer position="top-center" autoClose={3000} />
-        <Footer />
+        <CartProvider>
+          <Navbar layout={layout} />
+          <div className="pt-16">{children}</div>
+          <ToastContainer position="top-center" autoClose={3000} />
+          <Footer />
+        </CartProvider>
       </body>
     </html>
   );
