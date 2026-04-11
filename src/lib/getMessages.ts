@@ -174,6 +174,7 @@ export type Messages = {
     cards: {
       phone: {
         title: string;
+        tel: string;
         description: string;
       };
       email: {

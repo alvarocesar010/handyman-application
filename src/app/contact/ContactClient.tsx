@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Phone, Mail, MessageCircle, Clock, MapPin, Send } from "lucide-react";
-import { handleConversionClick } from "@/lib/ads";
 import { Messages } from "@/lib/getMessages";
 
 type Status = "idle" | "loading" | "ok" | "error";
@@ -11,8 +10,6 @@ type Status = "idle" | "loading" | "ok" | "error";
 export default function ContactClient({ m }: { m: Messages["contact"] }) {
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string>("");
-
-  const href = "tel:+353894924563";
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -61,11 +58,10 @@ export default function ContactClient({ m }: { m: Messages["contact"] }) {
           </div>
           <div className="mt-2">
             <a
-              href={href}
+              href={`tel:${m.cards.phone.tel}`}
               className="text-cyan-700 hover:underline"
-              onClick={(e) => handleConversionClick(e, href)}
             >
-              +353 (89) 492 4563
+              {m.cards.phone.tel}
             </a>
             <p className="text-sm text-slate-600">
               {m.cards.phone.description}
