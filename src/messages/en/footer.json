@@ -1,0 +1,46 @@
+{
+  "cta": {
+    "text": "Need a repair this week? Same-day callouts when available.",
+    "book": "Book a Repair",
+    "call": "Call Now"
+  },
+  "brand": {
+    "name": "Dublin Handyman",
+    "description": "Reliable repairs and maintenance for homes and small businesses in Dublin. Transparent pricing, fast response, fully insured."
+  },
+  "nav": {
+    "title": "Quick Links",
+    "links": {
+      "home": "Home",
+      "services": "Services",
+      "booking": "Book a Repair",
+      "contact": "Contact",
+      "admin": "Admin"
+    }
+  },
+  "areas": {
+    "title": "Service Areas",
+    "list": [
+      "City Centre",
+      "Rathmines",
+      "Drumcondra",
+      "Tallaght",
+      "Blanchardstown",
+      "Clondalkin",
+      "Phibsborough",
+      "Docklands"
+    ],
+    "note": "If you’re nearby, just ask."
+  },
+  "contact": {
+    "title": "Contact",
+    "tel": "+353 89 492 4563",
+    "email": "info@handyman.ie",
+    "whatsapp": "https://wa.me/353894924563?text=Hi%2C%20I%20came%20across%20your%20website%20and%20I%E2%80%99d%20like%20to%20get%20a%20quote.%20Can%20I%20send%20some%20details%20or%20photos%20of%20the%20job%3F",
+    "location": "Dublin & surrounding areas"
+  },
+  "legal": {
+    "rights": "All rights reserved.",
+    "hours": "Mon–Sat 08:00–20:00 · Emergencies by phone"
+  }
+}

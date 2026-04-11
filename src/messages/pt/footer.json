@@ -1,0 +1,46 @@
+{
+  "cta": {
+    "text": "Precisa de uma reparação esta semana? Atendimentos no próprio dia quando disponíveis.",
+    "book": "Agendar reparação",
+    "call": "Ligar agora"
+  },
+  "brand": {
+    "name": "Lislock",
+    "description": "Reparações e manutenção de confiança para casas e pequenos negócios em Lisboa. Preços transparentes, resposta rápida e totalmente segurado."
+  },
+  "nav": {
+    "title": "Links rápidos",
+    "links": {
+      "home": "Início",
+      "services": "Serviços",
+      "booking": "Agendar reparação",
+      "contact": "Contacto",
+      "admin": "Admin"
+    }
+  },
+  "areas": {
+    "title": "Áreas de serviço",
+    "list": [
+      "Lisboa Centro",
+      "Alvalade",
+      "Benfica",
+      "Amadora",
+      "Odivelas",
+      "Loures",
+      "Cascais",
+      "Oeiras"
+    ],
+    "note": "Se estiver por perto, é só perguntar."
+  },
+  "contact": {
+    "title": "Contacto",
+    "tel": "+351 933 401 695",
+    "email": "info@handyman.ie",
+    "whatsapp": "https://wa.me/351933401695?text=Ol%C3%A1%2C%20vi%20o%20vosso%20site%20e%20gostava%20de%20pedir%20um%20or%C3%A7amento.%20Podem%20ajudar-me%3F",
+    "location": "Lisboa e arredores"
+  },
+  "legal": {
+    "rights": "Todos os direitos reservados.",
+    "hours": "Seg–Sáb 08:00–20:00 · Emergências por telefone"
+  }
+}

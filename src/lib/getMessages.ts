@@ -4,6 +4,7 @@ import enServices from "@/messages/en/services.json";
 import enBooking from "@/messages/en/booking.json";
 import enLayout from "@/messages/en/layout.json";
 import enServicesSlug from "@/messages/en/servicesSlug.json";
+import enFooter from "@/messages/en/footer.json";
 
 import ptCommon from "@/messages/pt/common.json";
 import ptHome from "@/messages/pt/home.json";
@@ -11,6 +12,7 @@ import ptServices from "@/messages/pt/services.json";
 import ptBooking from "@/messages/pt/booking.json";
 import ptLayout from "@/messages/pt/layout.json";
 import ptServicesSlug from "@/messages/pt/servicesSlug.json";
+import ptFooter from "@/messages/pt/footer.json";
 
 import { SeoJson } from "@/types/seo";
 
@@ -117,6 +119,49 @@ export type Messages = {
       whatsapp: string;
     };
   };
+
+  footer: {
+    cta: {
+      text: string;
+      book: string;
+      call: string;
+    };
+
+    brand: {
+      name: string;
+      description: string;
+    };
+
+    nav: {
+      title: string;
+      links: {
+        home: string;
+        services: string;
+        booking: string;
+        contact: string;
+        admin: string;
+      };
+    };
+
+    areas: {
+      title: string;
+      list: string[];
+      note: string;
+    };
+
+    contact: {
+      title: string;
+      tel: string;
+      email: string;
+      whatsapp: string;
+      location: string;
+    };
+
+    legal: {
+      rights: string;
+      hours: string;
+    };
+  };
 };
 
 export function getMessages(locale: "en" | "pt"): Messages {
@@ -128,6 +173,7 @@ export function getMessages(locale: "en" | "pt"): Messages {
         booking: ptBooking,
         layout: ptLayout,
         servicesSlug: ptServicesSlug,
+        footer: ptFooter,
       }
     : {
         common: enCommon,
@@ -136,5 +182,6 @@ export function getMessages(locale: "en" | "pt"): Messages {
         booking: enBooking,
         layout: enLayout,
         servicesSlug: enServicesSlug,
+        footer: enFooter,
       };
 }
