@@ -4,14 +4,14 @@ import { useState } from "react";
 import Link from "next/link";
 import { Phone, Mail, MessageCircle, Clock, MapPin, Send } from "lucide-react";
 import { handleConversionClick } from "@/lib/ads";
-
+import { Messages } from "@/lib/getMessages";
 
 type Status = "idle" | "loading" | "ok" | "error";
-// src/app/contact/page.tsx
 
-export default function ContactPage() {
+export default function ContactClient({ m }: { m: Messages["contact"] }) {
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string>("");
+
   const href = "tel:+353894924563";
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -24,7 +24,7 @@ export default function ContactPage() {
 
     if (!fd.get("name") || !fd.get("email") || !fd.get("message")) {
       setStatus("error");
-      setError("Please fill in name, email and message.");
+      setError(m.form.error.required);
       return;
     }
 
@@ -35,45 +35,51 @@ export default function ContactPage() {
       form.reset();
     } catch (err: unknown) {
       setStatus("error");
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Something went wrong. Please try again."
-      );
+      setError(err instanceof Error ? err.message : m.form.error.generic);
     }
   }
 
   return (
     <main className="mx-auto max-w-6xl px-6 py-12 space-y-12">
+      {/* HEADER */}
       <header className="text-center space-y-2">
-        <h1 className="text-4xl font-extrabold text-slate-900">Contact</h1>
-        <p className="text-slate-600">
-          Get in touch for bookings, quotes, or urgent repairs in Dublin.
-        </p>
+        <h1 className="text-4xl font-extrabold text-slate-900">
+          {m.header.title}
+        </h1>
+        <p className="text-slate-600">{m.header.subtitle}</p>
       </header>
 
+      {/* CARDS */}
       <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {/* PHONE */}
         <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex items-center gap-3">
             <Phone className="h-5 w-5 text-cyan-700" />
-            <h3 className="font-semibold text-slate-900">Phone</h3>
+            <h3 className="font-semibold text-slate-900">
+              {m.cards.phone.title}
+            </h3>
           </div>
           <div className="mt-2">
             <a
-              href="tel:+353894924563"
+              href={href}
               className="text-cyan-700 hover:underline"
               onClick={(e) => handleConversionClick(e, href)}
             >
               +353 (89) 492 4563
             </a>
-            <p className="text-sm text-slate-600">Best for urgent callouts</p>
+            <p className="text-sm text-slate-600">
+              {m.cards.phone.description}
+            </p>
           </div>
         </div>
 
+        {/* EMAIL */}
         <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex items-center gap-3">
             <Mail className="h-5 w-5 text-cyan-700" />
-            <h3 className="font-semibold text-slate-900">Email</h3>
+            <h3 className="font-semibold text-slate-900">
+              {m.cards.email.title}
+            </h3>
           </div>
           <div className="mt-2">
             <a
@@ -83,217 +89,174 @@ export default function ContactPage() {
               info@handyman.ie
             </a>
             <p className="text-sm text-slate-600">
-              We reply within one business day
+              {m.cards.email.description}
             </p>
           </div>
         </div>
 
+        {/* WHATSAPP */}
         <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex items-center gap-3">
             <MessageCircle className="h-5 w-5 text-cyan-700" />
-            <h3 className="font-semibold text-slate-900">WhatsApp</h3>
+            <h3 className="font-semibold text-slate-900">
+              {m.cards.whatsapp.title}
+            </h3>
           </div>
           <div className="mt-2">
             <a
-              href={`https://wa.me/353894924563?text=Hi%2C%20I%27d%20like%20to%20book%20a%20repair`}
+              href={m.cards.whatsapp.href}
               target="_blank"
               rel="noopener noreferrer"
               className="text-cyan-700 hover:underline"
-              onClick={(e) => handleConversionClick(e, href)}
             >
-              Chat on WhatsApp
+              {m.cards.whatsapp.cta}
             </a>
             <p className="text-sm text-slate-600">
-              Send photos/videos of the issue
+              {m.cards.whatsapp.description}
             </p>
           </div>
         </div>
 
+        {/* HOURS */}
         <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex items-center gap-3">
             <Clock className="h-5 w-5 text-cyan-700" />
-            <h3 className="font-semibold text-slate-900">Hours</h3>
+            <h3 className="font-semibold text-slate-900">
+              {m.cards.hours.title}
+            </h3>
           </div>
           <div className="mt-2 text-sm text-slate-700">
-            <p>Mon–Sat: 08:00–20:00</p>
-            <p>Emergencies by phone</p>
+            <p>{m.cards.hours.schedule}</p>
+            <p>{m.cards.hours.extra}</p>
           </div>
         </div>
       </section>
 
+      {/* FORM + MAP */}
       <section className="grid gap-10 lg:grid-cols-2">
+        {/* FORM */}
         <div>
           <h2 className="text-2xl font-bold text-slate-900 mb-4">
-            Send a message
+            {m.form.title}
           </h2>
 
           <form
             onSubmit={onSubmit}
             className="space-y-4 rounded-xl border border-slate-200 bg-slate-50 p-6 shadow-sm"
           >
-            <input
-              type="text"
-              name="company"
-              className="hidden"
-              tabIndex={-1}
-              autoComplete="off"
-            />
+            <input type="text" name="company" className="hidden" />
 
             <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <label className="mb-1 block text-sm font-medium text-slate-700">
-                  Full name
-                </label>
-                <input
-                  name="name"
-                  required
-                  className="block w-full rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-600"
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-sm font-medium text-slate-700">
-                  Phone
-                </label>
-                <input
-                  name="phone"
-                  type="tel"
-                  className="block w-full rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-600"
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-sm font-medium text-slate-700">
-                  Email
-                </label>
-                <input
-                  name="email"
-                  type="email"
-                  required
-                  className="block w-full rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-600"
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-sm font-medium text-slate-700">
-                  Preferred date
-                </label>
-                <input
-                  name="date"
-                  type="date"
-                  className="block w-full rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-600"
-                />
-              </div>
+              <Input label={m.form.fields.name} name="name" required />
+              <Input label={m.form.fields.phone} name="phone" />
+              <Input
+                label={m.form.fields.email}
+                name="email"
+                type="email"
+                required
+              />
+              <Input label={m.form.fields.date} name="date" type="date" />
             </div>
 
             <div>
               <label className="mb-1 block text-sm font-medium text-slate-700">
-                Service
+                {m.form.fields.service}
               </label>
-              <select
-                name="service"
-                defaultValue=""
-                className="block w-full rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-600"
-              >
-                <option value="" disabled>
-                  Choose a service…
+              <select className="block w-full rounded-md border px-3 py-2">
+                <option disabled value="">
+                  {m.form.select.default}
                 </option>
-                <option value="door-replacement">Door Replacement</option>
-                <option value="heater-maintenance">Heater Maintenance</option>
-                <option value="furniture-assembly">Furniture Assembly</option>
-                <option value="fit-shower">Fit Shower</option>
-                <option value="fit-washing-dishwasher">
-                  Fit Washing Machine & Dishwasher
-                </option>
-                <option value="tap-replacement">Tap Replacement</option>
-                <option value="lights-replacement">Lights Replacement</option>
-                <option value="electrical-repairs">Electrical Repairs</option>
-                <option value="other">Other</option>
+                {Object.entries(m.form.select.options).map(([key, value]) => (
+                  <option key={key} value={key}>
+                    {value}
+                  </option>
+                ))}
               </select>
             </div>
 
             <div>
               <label className="mb-1 block text-sm font-medium text-slate-700">
-                Message
+                {m.form.fields.message}
               </label>
               <textarea
                 name="message"
-                rows={5}
                 required
-                placeholder="Tell us what's happening and where in Dublin you are…"
-                className="block w-full rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-600"
+                placeholder={m.form.fields.placeholder}
+                className="block w-full rounded-md border px-3 py-2"
               />
             </div>
 
             <div className="flex items-center gap-2">
-              <input id="consent" name="consent" type="checkbox" required />
-              <label htmlFor="consent" className="text-sm text-slate-700">
-                I agree to be contacted about my enquiry.
-              </label>
+              <input type="checkbox" required />
+              <label className="text-sm text-slate-700">{m.form.consent}</label>
             </div>
 
-            <button
-              type="submit"
-              disabled={status === "loading"}
-              className="inline-flex items-center justify-center gap-2 rounded-lg bg-cyan-700 px-5 py-2.5 text-white font-medium shadow hover:bg-cyan-800 focus:outline-none focus:ring-2 focus:ring-cyan-600 disabled:opacity-60"
-            >
+            <button className="bg-cyan-700 text-white px-5 py-2.5 rounded-lg">
               <Send className="h-4 w-4" />
-              {status === "loading" ? "Sending…" : "Send message"}
+              {status === "loading"
+                ? m.form.submit.loading
+                : m.form.submit.idle}
             </button>
 
             {status === "ok" && (
-              <p className="text-sm text-emerald-700">
-                Thanks! We’ll get back to you shortly.
-              </p>
+              <p className="text-emerald-700">{m.form.success}</p>
             )}
             {status === "error" && (
-              <p className="text-sm text-rose-700">
-                {error || "Couldn’t send message, try again."}
-              </p>
+              <p className="text-rose-700">{error || m.form.error.fallback}</p>
             )}
           </form>
 
           <p className="mt-3 text-xs text-slate-500">
-            Prefer to book directly?{" "}
+            {m.cta.text}{" "}
             <Link href="/booking" className="text-cyan-700 underline">
-              Book a Repair
+              {m.cta.link}
             </Link>
           </p>
         </div>
 
+        {/* MAP */}
         <div>
           <h2 className="text-2xl font-bold text-slate-900 mb-4">
-            Service Area
+            {m.area.title}
           </h2>
-          <div className="rounded-xl overflow-hidden border border-slate-200 shadow-sm">
+
+          <div className="rounded-xl overflow-hidden border shadow-sm">
             <iframe
-              title="Dublin Map"
+              title={m.area.mapTitle}
               className="h-[380px] w-full"
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2381.706728022955!2d-6.2672!3d53.3438!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x48670e9a24f8d9d9%3A0x2608c7a4a2a7!2sDublin%20City%20Centre!5e0!3m2!1sen!2sie!4v1700000000000"
+              src={`https://maps.google.com?q=${m.area.mapTitle}&output=embed`}
             />
           </div>
 
           <ul className="mt-4 grid grid-cols-2 gap-2 text-sm text-slate-700">
-            <li className="flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-cyan-700" /> City Centre
-            </li>
-            <li className="flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-cyan-700" /> Rathmines
-            </li>
-            <li className="flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-cyan-700" /> Drumcondra
-            </li>
-            <li className="flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-cyan-700" /> Tallaght
-            </li>
-            <li className="flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-cyan-700" /> Blanchardstown
-            </li>
-            <li className="flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-cyan-700" /> Docklands
-            </li>
+            {m.area.locations.map((loc: string) => (
+              <li key={loc} className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-cyan-700" />
+                {loc}
+              </li>
+            ))}
           </ul>
         </div>
       </section>
     </main>
+  );
+}
+
+function Input({
+  label,
+  ...props
+}: {
+  label: string;
+  name: string;
+  type?: string;
+  required?: boolean;
+}) {
+  return (
+    <div>
+      <label className="mb-1 block text-sm font-medium text-slate-700">
+        {label}
+      </label>
+      <input {...props} className="block w-full rounded-md border px-3 py-2" />
+    </div>
   );
 }

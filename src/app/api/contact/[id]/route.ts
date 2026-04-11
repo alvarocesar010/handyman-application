@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/mongodb";
+import { ObjectId } from "mongodb";
 
+// ---------------------
+// CREATE CONTACT (POST)
+// ---------------------
 export async function POST(req: Request) {
   try {
     const form = await req.formData();
@@ -24,7 +28,7 @@ export async function POST(req: Request) {
 
     const db = await getDb();
 
-    await db.collection("contacts").insertOne({
+    const result = await db.collection("contacts").insertOne({
       name,
       email,
       phone,
@@ -34,13 +38,41 @@ export async function POST(req: Request) {
       createdAt: new Date(),
     });
 
-    if (process.env.NODE_ENV === "development") {
-      console.log("CONTACT SAVED");
+    return NextResponse.json({
+      ok: true,
+      id: result.insertedId,
+    });
+  } catch (error) {
+    console.error("CONTACT CREATE ERROR:", error);
+
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
+  }
+}
+
+// ---------------------
+// DELETE CONTACT
+// ---------------------
+export async function DELETE(
+  _: Request,
+  { params }: { params: { id: string } },
+) {
+  try {
+    const db = await getDb();
+
+    const result = await db.collection("contacts").deleteOne({
+      _id: new ObjectId(params.id),
+    });
+
+    if (result.deletedCount === 0) {
+      return NextResponse.json({ error: "Contact not found" }, { status: 404 });
     }
 
     return NextResponse.json({ ok: true });
   } catch (error) {
-    console.error("CONTACT ERROR:", error);
+    console.error("CONTACT DELETE ERROR:", error);
 
     return NextResponse.json(
       { error: "Internal server error" },

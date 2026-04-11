@@ -7,6 +7,7 @@ import {
   Layers,
   LucideIcon,
   BrickWall,
+  Contact,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -49,6 +50,11 @@ const data: NavItem[] = [
     children: [
       { label: "The Budgeter", href: "/admin/developing/the-budgeter" },
     ],
+  },
+  {
+    label: "Contacts",
+    icon: Contact,
+    children: [{ label: "Contacts", href: "/admin/contacts" }],
   },
 ];
 

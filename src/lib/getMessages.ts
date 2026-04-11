@@ -5,6 +5,7 @@ import enBooking from "@/messages/en/booking.json";
 import enLayout from "@/messages/en/layout.json";
 import enServicesSlug from "@/messages/en/servicesSlug.json";
 import enFooter from "@/messages/en/footer.json";
+import enContact from "@/messages/en/contact.json";
 
 import ptCommon from "@/messages/pt/common.json";
 import ptHome from "@/messages/pt/home.json";
@@ -13,6 +14,7 @@ import ptBooking from "@/messages/pt/booking.json";
 import ptLayout from "@/messages/pt/layout.json";
 import ptServicesSlug from "@/messages/pt/servicesSlug.json";
 import ptFooter from "@/messages/pt/footer.json";
+import ptContact from "@/messages/pt/contact.json";
 
 import { SeoJson } from "@/types/seo";
 
@@ -162,6 +164,90 @@ export type Messages = {
       hours: string;
     };
   };
+
+  contact: {
+    header: {
+      title: string;
+      subtitle: string;
+    };
+
+    cards: {
+      phone: {
+        title: string;
+        description: string;
+      };
+      email: {
+        title: string;
+        description: string;
+      };
+      whatsapp: {
+        title: string;
+        cta: string;
+        description: string;
+        href: string;
+      };
+      hours: {
+        title: string;
+        schedule: string;
+        extra: string;
+      };
+    };
+
+    form: {
+      title: string;
+
+      fields: {
+        name: string;
+        phone: string;
+        email: string;
+        date: string;
+        service: string;
+        message: string;
+        placeholder: string;
+      };
+
+      select: {
+        default: string;
+        options: {
+          door: string;
+          heater: string;
+          furniture: string;
+          shower: string;
+          appliances: string;
+          tap: string;
+          lights: string;
+          electrical: string;
+          other: string;
+        };
+      };
+
+      consent: string;
+
+      submit: {
+        idle: string;
+        loading: string;
+      };
+
+      success: string;
+
+      error: {
+        required: string;
+        generic: string;
+        fallback: string;
+      };
+    };
+
+    cta: {
+      text: string;
+      link: string;
+    };
+
+    area: {
+      title: string;
+      mapTitle: string;
+      locations: string[];
+    };
+  };
 };
 
 export function getMessages(locale: "en" | "pt"): Messages {
@@ -174,6 +260,7 @@ export function getMessages(locale: "en" | "pt"): Messages {
         layout: ptLayout,
         servicesSlug: ptServicesSlug,
         footer: ptFooter,
+        contact: ptContact,
       }
     : {
         common: enCommon,
@@ -183,5 +270,6 @@ export function getMessages(locale: "en" | "pt"): Messages {
         layout: enLayout,
         servicesSlug: enServicesSlug,
         footer: enFooter,
+        contact: enContact,
       };
 }

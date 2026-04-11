@@ -1,0 +1,84 @@
+{
+  "header": {
+    "title": "Contact",
+    "subtitle": "Get in touch for bookings, quotes, or urgent repairs in Dublin."
+  },
+
+  "cards": {
+    "phone": {
+      "title": "Phone",
+      "description": "Best for urgent callouts"
+    },
+    "email": {
+      "title": "Email",
+      "description": "We reply within one business day"
+    },
+    "whatsapp": {
+      "title": "WhatsApp",
+      "cta": "Chat on WhatsApp",
+      "description": "Send photos/videos of the issue",
+      "href": "https://wa.me/353894924563?text=Hi%2C%20I%27d%20like%20to%20book%20a%20repair"
+    },
+    "hours": {
+      "title": "Hours",
+      "schedule": "Mon–Sat: 08:00–20:00",
+      "extra": "Emergencies by phone"
+    }
+  },
+
+  "form": {
+    "title": "Send a message",
+    "fields": {
+      "name": "Full name",
+      "phone": "Phone",
+      "email": "Email",
+      "date": "Preferred date",
+      "service": "Service",
+      "message": "Message",
+      "placeholder": "Tell us what's happening and where in Dublin you are…"
+    },
+    "select": {
+      "default": "Choose a service…",
+      "options": {
+        "door": "Door Replacement",
+        "heater": "Heater Maintenance",
+        "furniture": "Furniture Assembly",
+        "shower": "Fit Shower",
+        "appliances": "Fit Washing Machine & Dishwasher",
+        "tap": "Tap Replacement",
+        "lights": "Lights Replacement",
+        "electrical": "Electrical Repairs",
+        "other": "Other"
+      }
+    },
+    "consent": "I agree to be contacted about my enquiry.",
+    "submit": {
+      "idle": "Send message",
+      "loading": "Sending…"
+    },
+    "success": "Thanks! We’ll get back to you shortly.",
+    "error": {
+      "required": "Please fill in name, email and message.",
+      "generic": "Something went wrong. Please try again.",
+      "fallback": "Couldn’t send message, try again."
+    }
+  },
+
+  "cta": {
+    "text": "Prefer to book directly?",
+    "link": "Book a Repair"
+  },
+
+  "area": {
+    "title": "Service Area",
+    "mapTitle": "Dublin Map",
+    "locations": [
+      "City Centre",
+      "Rathmines",
+      "Drumcondra",
+      "Tallaght",
+      "Blanchardstown",
+      "Docklands"
+    ]
+  }
+}

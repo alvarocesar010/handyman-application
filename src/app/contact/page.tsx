@@ -1,12 +1,10 @@
-// src/app/contact/page.tsx
-import type { Metadata } from "next";
+import { getLocale } from "@/lib/getLocale";
+import { getMessages } from "@/lib/getMessages";
 import ContactClient from "./ContactClient";
-import { getContactMetadata } from "./seo";
 
-export async function generateMetadata(): Promise<Metadata> {
-  return getContactMetadata();
-}
+export default async function ContactPage() {
+  const locale = await getLocale();
+  const m = getMessages(locale).contact;
 
-export default function ContactPage() {
-  return <ContactClient />;
+  return <ContactClient m={m} />;
 }

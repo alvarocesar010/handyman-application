@@ -1,0 +1,84 @@
+{
+  "header": {
+    "title": "Contacto",
+    "subtitle": "Entre em contacto para marcações, orçamentos ou reparações urgentes em Lisboa."
+  },
+
+  "cards": {
+    "phone": {
+      "title": "Telefone",
+      "description": "Melhor opção para situações urgentes"
+    },
+    "email": {
+      "title": "Email",
+      "description": "Respondemos no prazo de um dia útil"
+    },
+    "whatsapp": {
+      "title": "WhatsApp",
+      "cta": "Falar no WhatsApp",
+      "description": "Envie fotos/vídeos do problema",
+      "href": "https://wa.me/351933401695?text=Ol%C3%A1%2C%20gostava%20de%20marcar%20uma%20repara%C3%A7%C3%A3o"
+    },
+    "hours": {
+      "title": "Horário",
+      "schedule": "Seg–Sáb: 08:00–20:00",
+      "extra": "Emergências por telefone"
+    }
+  },
+
+  "form": {
+    "title": "Enviar mensagem",
+    "fields": {
+      "name": "Nome completo",
+      "phone": "Telefone",
+      "email": "Email",
+      "date": "Data preferida",
+      "service": "Serviço",
+      "message": "Mensagem",
+      "placeholder": "Descreva o problema e a zona em Lisboa…"
+    },
+    "select": {
+      "default": "Escolha um serviço…",
+      "options": {
+        "door": "Substituição de porta",
+        "heater": "Manutenção de aquecedor",
+        "furniture": "Montagem de móveis",
+        "shower": "Instalação de duche",
+        "appliances": "Instalação de máquina de lavar/loiça",
+        "tap": "Substituição de torneira",
+        "lights": "Substituição de iluminação",
+        "electrical": "Reparações elétricas",
+        "other": "Outro"
+      }
+    },
+    "consent": "Concordo em ser contactado relativamente ao meu pedido.",
+    "submit": {
+      "idle": "Enviar mensagem",
+      "loading": "A enviar…"
+    },
+    "success": "Obrigado! Entraremos em contacto em breve.",
+    "error": {
+      "required": "Preencha nome, email e mensagem.",
+      "generic": "Ocorreu um erro. Tente novamente.",
+      "fallback": "Não foi possível enviar a mensagem. Tente novamente."
+    }
+  },
+
+  "cta": {
+    "text": "Prefere agendar diretamente?",
+    "link": "Agendar reparação"
+  },
+
+  "area": {
+    "title": "Área de serviço",
+    "mapTitle": "Mapa de Lisboa",
+    "locations": [
+      "Lisboa Centro",
+      "Alvalade",
+      "Benfica",
+      "Amadora",
+      "Oeiras",
+      "Cascais"
+    ]
+  }
+}
