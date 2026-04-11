@@ -3,6 +3,10 @@ export type ServiceStep = {
   description: string;
   image: { src: string; alt: string };
 };
+type ServiceSteps = {
+  title: string;
+  items: ServiceStep[];
+};
 
 export type Service = {
   slug: string;
@@ -20,5 +24,5 @@ export type Service = {
   categoriesTitle?: string;
   categories?: Record<string, string[]>;
   categoryImages?: Record<string, { src: string; alt: string }>;
-  steps?: ServiceStep[];
+  steps?: ServiceSteps;
 };

@@ -9,7 +9,7 @@ export type CategoriesMap = Record<string, string[]>;
 export type CategoryImagesMap = Partial<Record<string, CategoryImage>>;
 
 type CategoriesGridProps = {
-  title: string;
+  title?: string;
   categories: CategoriesMap;
   categoryImages?: CategoryImagesMap;
   sectionClassName?: string;

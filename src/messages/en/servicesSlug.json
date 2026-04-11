@@ -1,0 +1,42 @@
+{
+  "header": {
+    "duration": "Typical duration",
+    "price": {
+      "value": "Price",
+      "from": "from",
+      "noValue": "Get a quote"
+    },
+    "buttons": {
+      "booking": "Book this service",
+      "whats": {
+        "href": "https://wa.me/353894924563?text=Hi%2C%20I%20came%20across%20your%20website%20and%20I%E2%80%99d%20like%20to%20get%20a%20quote.%20Can%20I%20send%20some%20details%20or%20photos%20of%20the%20job%3F",
+        "content": "Get in touch"
+      }
+    }
+  },
+  "description": {
+    "title": "What we do",
+    "cta": "Ready to get started?",
+    "cta1": "Book your",
+    "cta2": "in Dunblin today"
+  },
+
+  "included": {
+    "title": "What’s included"
+  },
+  "excluded": {
+    "title": "What’s not included",
+    "default": ["Parts & materials unless agreed"]
+  },
+
+  "faq": {
+    "title": "FAQs"
+  },
+  "actions": {
+    "book": "Book",
+    "back": "Back to all services"
+  },
+  "aria": {
+    "whatsapp": "https://wa.me/353894924563?text=Hi%2C%20I%20came%20across%20your%20website%20and%20I%E2%80%99d%20like%20to%20get%20a%20quote.%20Can%20I%20send%20some%20details%20or%20photos%20of%20the%20job%3F"
+  }
+}

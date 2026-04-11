@@ -1,0 +1,42 @@
+{
+  "header": {
+    "duration": "Duração típica",
+    "price": {
+      "value": "Preço",
+      "from": "desde",
+      "noValue": "Pedir orçamento"
+    },
+    "buttons": {
+      "booking": "Agendar este serviço",
+      "whats": {
+        "href": "https://wa.me/351933401695?text=Ol%C3%A1%2C%20vi%20o%20vosso%20site%20e%20gostava%20de%20pedir%20um%20or%C3%A7amento.%20Podem%20ajudar-me%3F",
+        "content": "Entrar em contacto"
+      }
+    }
+  },
+  "description": {
+    "title": "O que fazemos",
+    "cta": "Pronto para começar?",
+    "cta1": "Agende o seu",
+    "cta2": "em Lisboa hoje"
+  },
+
+  "included": {
+    "title": "O que está incluído"
+  },
+  "excluded": {
+    "title": "O que não está incluído",
+    "default": ["Peças e materiais, salvo acordo prévio"]
+  },
+
+  "faq": {
+    "title": "Perguntas frequentes"
+  },
+  "actions": {
+    "book": "Agendar",
+    "back": "Voltar a todos os serviços"
+  },
+  "aria": {
+    "whatsapp": "https://wa.me/351933401695?text=Ol%C3%A1%2C%20vi%20o%20vosso%20site%20e%20gostava%20de%20pedir%20um%20or%C3%A7amento.%20Podem%20ajudar-me%3F"
+  }
+}

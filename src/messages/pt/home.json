@@ -92,7 +92,10 @@
     "title": "Marido de Aluguer em Lisboa - Especialista em Reparações e Remodelações",
     "subtitle": "De pequenos arranjos a reparações urgentes, eu posso ajudar. Escolha abaixo o serviço que melhor se adapta às suas necessidades e reserve uma data conveniente.",
     "bookButton": "Agendar Reparação",
-    "callButton": { "phone": "+351933401695", "children": "Ligar Agora" },
+    "callButton": {
+      "phone": "https://wa.me/351933401695?text=Ol%C3%A1%2C%20vi%20o%20vosso%20site%20e%20gostava%20de%20pedir%20um%20or%C3%A7amento.%20Podem%20ajudar-me%3F",
+      "children": "Entrar em contacto"
+    },
     "ul": {
       "li0": "✔ Deslocações no próprio dia (mediante disponibilidade)",
       "li1": "✔ Preços fixos e transparentes",

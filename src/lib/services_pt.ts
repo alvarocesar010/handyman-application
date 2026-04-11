@@ -284,44 +284,47 @@ export const SERVICES_PT: Service[] = [
       },
     ],
 
-    steps: [
-      {
-        title: "Medir e confirmar a posição",
-        description:
-          "Confirmamos as medidas da janela, escolhemos a altura correta e marcamos os pontos de fixação para que tudo fique direito e simétrico.",
-        image: {
-          src: "/images/services/curtains/step-1-measure.jpg",
-          alt: "Medição de uma janela para colocação da calha de cortinas",
+    steps: {
+      title: "Como instalamos cortinas e estores",
+      items: [
+        {
+          title: "Medir e confirmar a posição",
+          description:
+            "Confirmamos as medidas da janela, escolhemos a altura correta e marcamos os pontos de fixação para que tudo fique direito e simétrico.",
+          image: {
+            src: "/images/services/curtains/step-1-measure.jpg",
+            alt: "Medição de uma janela para colocação da calha de cortinas",
+          },
         },
-      },
-      {
-        title: "Marcar e furar com segurança",
-        description:
-          "Identificamos pontos de fixação sólidos, verificamos a existência de cabos ou tubos ocultos quando necessário e fazemos furos limpos para uma montagem segura.",
-        image: {
-          src: "/images/services/curtains/step-2-drill.jpg",
-          alt: "Perfuração da parede para suporte de calha de cortinas",
+        {
+          title: "Marcar e furar com segurança",
+          description:
+            "Identificamos pontos de fixação sólidos, verificamos a existência de cabos ou tubos ocultos quando necessário e fazemos furos limpos para uma montagem segura.",
+          image: {
+            src: "/images/services/curtains/step-2-drill.jpg",
+            alt: "Perfuração da parede para suporte de calha de cortinas",
+          },
         },
-      },
-      {
-        title: "Instalar suportes e calha/varão",
-        description:
-          "Os suportes são fixados com segurança e a calha ou varão é instalado. Garantimos que fica nivelado e corretamente espaçado.",
-        image: {
-          src: "/images/services/curtains/step-3-fit.jpg",
-          alt: "Instalação e alinhamento do suporte e da calha",
+        {
+          title: "Instalar suportes e calha/varão",
+          description:
+            "Os suportes são fixados com segurança e a calha ou varão é instalado. Garantimos que fica nivelado e corretamente espaçado.",
+          image: {
+            src: "/images/services/curtains/step-3-fit.jpg",
+            alt: "Instalação e alinhamento do suporte e da calha",
+          },
         },
-      },
-      {
-        title: "Colocar, alinhar e finalizar",
-        description:
-          "As cortinas ou estores são colocados, alinhados e testados. No final, limpamos a área e removemos todas as embalagens.",
-        image: {
-          src: "/images/services/curtains/step-4-hang.jpg",
-          alt: "Cortinas instaladas e alinhadas corretamente na calha",
+        {
+          title: "Colocar, alinhar e finalizar",
+          description:
+            "As cortinas ou estores são colocados, alinhados e testados. No final, limpamos a área e removemos todas as embalagens.",
+          image: {
+            src: "/images/services/curtains/step-4-hang.jpg",
+            alt: "Cortinas instaladas e alinhadas corretamente na calha",
+          },
         },
-      },
-    ],
+      ],
+    },
   },
   // bathroom-renovation
   {

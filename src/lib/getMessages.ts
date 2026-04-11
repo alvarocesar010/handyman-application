@@ -3,12 +3,14 @@ import enHome from "@/messages/en/home.json";
 import enServices from "@/messages/en/services.json";
 import enBooking from "@/messages/en/booking.json";
 import enLayout from "@/messages/en/layout.json";
+import enServicesSlug from "@/messages/en/servicesSlug.json";
 
 import ptCommon from "@/messages/pt/common.json";
 import ptHome from "@/messages/pt/home.json";
 import ptServices from "@/messages/pt/services.json";
 import ptBooking from "@/messages/pt/booking.json";
 import ptLayout from "@/messages/pt/layout.json";
+import ptServicesSlug from "@/messages/pt/servicesSlug.json";
 
 import { SeoJson } from "@/types/seo";
 
@@ -68,6 +70,53 @@ export type Messages = {
       };
     };
   };
+
+  servicesSlug: {
+    header: {
+      duration: string;
+      price: {
+        value: string;
+        from: string;
+        noValue: string;
+      };
+      buttons: {
+        booking: string;
+        whats: {
+          href: string;
+          content: string;
+        };
+      };
+    };
+
+    description: {
+      title: string;
+      cta: string;
+      cta1: string;
+      cta2: string;
+    };
+
+    included: {
+      title: string;
+    };
+
+    excluded: {
+      title: string;
+      default: string[];
+    };
+
+    faq: {
+      title: string;
+    };
+
+    actions: {
+      book: string;
+      back: string;
+    };
+
+    aria: {
+      whatsapp: string;
+    };
+  };
 };
 
 export function getMessages(locale: "en" | "pt"): Messages {
@@ -78,6 +127,7 @@ export function getMessages(locale: "en" | "pt"): Messages {
         services: ptServices,
         booking: ptBooking,
         layout: ptLayout,
+        servicesSlug: ptServicesSlug,
       }
     : {
         common: enCommon,
@@ -85,5 +135,6 @@ export function getMessages(locale: "en" | "pt"): Messages {
         services: enServices,
         booking: enBooking,
         layout: enLayout,
+        servicesSlug: enServicesSlug,
       };
 }

@@ -17,6 +17,7 @@ import { ICON_MAP } from "@/lib/iconMap";
 import Budgeter from "@/components/Budgeter";
 import Stars from "@/components/ReviewsBox/Stars.tsx";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import { getMessages } from "@/lib/getMessages";
 
 type Params = { slug: string };
 type PageProps = { params: Promise<Params> };
@@ -102,6 +103,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
 
   const locale = await getLocale();
   const isPT = locale === "pt";
+  const m = getMessages(locale).servicesSlug;
 
   const svc = isPT ? SERVICE_MAP_PT.get(slug) : SERVICE_MAP_EN.get(slug);
   if (!svc) return notFound();
@@ -111,8 +113,8 @@ export default async function ServiceDetailPage({ params }: PageProps) {
   const siteName = isPT ? "Lislock" : "Dubliner Handyman";
 
   const price = svc.startingPrice
-    ? `from €${(svc.startingPrice / 100).toFixed(0)}`
-    : "Get a quote";
+    ? `${m.header.price.from} €${(svc.startingPrice / 100).toFixed(0)}`
+    : `${m.header.price.noValue}`;
 
   const Icon = ICON_MAP[svc.icon];
   const categoryNames = svc.categories
@@ -137,8 +139,12 @@ export default async function ServiceDetailPage({ params }: PageProps) {
           <Stars avg={reviews.stars.avg} count={reviews.stars.count} />
           <p className="text-slate-800">{svc.summary}</p>
           <p className="text-slate-700 text-sm">
-            {svc.durationHint && <>Typical duration: {svc.durationHint} · </>}
-            Price: {price}
+            {svc.durationHint && (
+              <>
+                {m.header.duration}: {svc.durationHint} ·{" "}
+              </>
+            )}
+            {m.header.price.value}: {price}
           </p>
 
           <div className="flex gap-3 pt-2">
@@ -146,18 +152,19 @@ export default async function ServiceDetailPage({ params }: PageProps) {
               href={`/booking?service=${svc.slug}`}
               className="inline-flex h-11 items-center justify-center rounded-lg bg-cyan-700 px-5 text-white font-medium shadow hover:bg-cyan-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-600"
             >
-              Book this service
+              {m.header.buttons.booking}
             </Link>
             <WhatsAppButton
-              href="https://wa.me/353894924563?text=Hi%2C%20I%27d%20like%20to%20book%20a%20repair"
+              href={m.header.buttons.whats.href}
               className="inline-flex h-11 gap-2 items-center justify-center rounded-lg bg-slate-900 px-5 text-white font-medium shadow hover:bg-black focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-700 focus-visible:ring-offset-2"
-              content="Get in touch"
+              content={m.header.buttons.whats.content}
             />
           </div>
         </header>
 
+        {/* Description */}
         <section className="prose prose-slate max-w-none">
-          <h2>What we do</h2>
+          <h2>{m.description.title}</h2>
           {(Array.isArray(svc.longDescription)
             ? svc.longDescription
             : [svc.longDescription]
@@ -165,27 +172,32 @@ export default async function ServiceDetailPage({ params }: PageProps) {
             <p key={i}>{p}</p>
           ))}
           <p>
-            Ready to get started?{" "}
+            {m.description.cta}{" "}
             <Link href={`/booking?service=${svc.slug}`}>
-              Book your {svc.title.toLowerCase()} in Dublin today
+              {m.description.cta1} {svc.title.toLowerCase()}{" "}
+              {m.description.cta2}
             </Link>
             .
           </p>
         </section>
+
+        {/* Budgeter */}
         <BudgeterProvider>{svc.budget && <Budgeter />}</BudgeterProvider>
 
+        {/* Services categories */}
         {svc.categories && (
           <CategoriesGrid
-            title={svc.categoriesTitle ?? "What we handle"}
+            title={svc.categoriesTitle}
             categories={svc.categories}
             categoryImages={svc.categoryImages}
           />
         )}
 
+        {/* included and excluded */}
         <section className="grid gap-6 md:grid-cols-2">
           <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
             <h3 className="text-lg font-semibold text-slate-900 mb-2">
-              What’s included
+              {m.included.title}
             </h3>
             <ul className="list-disc pl-5 text-slate-700 space-y-1">
               {svc.inclusions.map((x) => (
@@ -196,35 +208,27 @@ export default async function ServiceDetailPage({ params }: PageProps) {
 
           <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
             <h3 className="text-lg font-semibold text-slate-900 mb-2">
-              What’s not included
+              {m.excluded.title}
             </h3>
             <ul className="list-disc pl-5 text-slate-700 space-y-1">
-              {(
-                svc.exclusions ?? [
-                  "Parts & materials unless agreed",
-                  "Major re-tiling or re-wiring",
-                ]
-              ).map((x) => (
+              {(svc.exclusions ?? m.excluded.default).map((x) => (
                 <li key={x}>{x}</li>
               ))}
             </ul>
           </div>
         </section>
 
-        {svc.steps && svc.steps.length > 0 && (
-          <ServiceSteps
-            title="How we install curtains and blinds"
-            steps={svc.steps}
-          />
+        {/* ServiceSteps component */}
+        {svc.steps && svc.steps.items.length > 0 && (
+          <ServiceSteps title={svc.steps.title} steps={svc.steps.items} />
         )}
 
         {/* Reviews */}
-
         <div id="reviews">
           <ReviewsBox initialReviews={reviews.reviews} serviceSlug={svc.slug} />
         </div>
 
-        {/* // */}
+        {/* FAQS */}
         {svc.faqs && svc.faqs.length > 0 && (
           <section className="space-y-3">
             <h3 className="text-lg font-semibold text-slate-900">FAQs</h3>
@@ -241,18 +245,19 @@ export default async function ServiceDetailPage({ params }: PageProps) {
           </section>
         )}
 
+        {/* Actions */}
         <div className="flex flex-wrap gap-3 pt-2">
           <Link
             href={`/booking?service=${svc.slug}`}
             className="inline-flex h-11 items-center justify-center rounded-lg bg-cyan-700 px-5 text-white font-medium hover:bg-cyan-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-600"
           >
-            Book {svc.title}
+            {m.actions.book} {svc.title}
           </Link>
           <Link
             href="/services"
             className="inline-flex h-11 items-center justify-center rounded-lg border border-slate-300 px-5 text-slate-800 font-medium hover:bg-white"
           >
-            Back to all services
+            {m.actions.back}
           </Link>
         </div>
 
@@ -310,6 +315,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
         )}
       </main>
 
+      {/* Aria */}
       <div className="fixed inset-x-0 bottom-0 z-40 print:hidden">
         <div className="fixed bottom-6 right-6 z-50 flex flex-col items-center gap-3 print:hidden">
           <Link
@@ -320,7 +326,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
             <CalendarCheck className="h-6 w-6" />
           </Link>
           <a
-            href={`https://wa.me/353894924563?text=Hi%2C%20I%27d%20like%20to%20get%20a%20quote`}
+            href={m.aria.whatsapp}
             aria-label="Call for advice"
             className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-slate-900 text-white shadow hover:bg-black focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-700"
           >
