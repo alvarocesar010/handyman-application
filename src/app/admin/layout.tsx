@@ -22,7 +22,7 @@ export default async function AdminLayout({
     }
 
     return isLislock
-      ? "https://dublinerhandyman.pt/admin/bookings"
+      ? "https://dublinerhandyman.ie/admin/bookings"
       : "https://lislock.pt/admin/bookings";
   };
 
