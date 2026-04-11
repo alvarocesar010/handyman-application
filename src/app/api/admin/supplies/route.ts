@@ -330,7 +330,7 @@ export async function GET(req: NextRequest) {
     const filter: { serviceSlug?: string } = category
       ? { serviceSlug: category }
       : {};
-    console.log(limit);
+  
     const getItems = await db
       .collection("supplies")
       .find(filter)

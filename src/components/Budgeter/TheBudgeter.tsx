@@ -10,7 +10,7 @@ export default function TheBudgeter() {
   const [state] = useContext(BudgeterContext);
 
   const isOverlay = state.quoteStage !== "Start";
-  console.log(state);
+
   return (
     <div>
       {!isOverlay && <Start />}
