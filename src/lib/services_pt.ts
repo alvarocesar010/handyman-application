@@ -18,6 +18,7 @@ import { Service } from "@/types/service";
 export const SERVICES_PT: Service[] = [
   // servicos-portas
   {
+    key: "door-service",
     slug: "servicos-portas",
     title: "Instalação e Substituição de Portas",
     summary:
@@ -142,6 +143,7 @@ export const SERVICES_PT: Service[] = [
 
   // montagem-moveis
   {
+    key: "furniture-assembly",
     slug: "montagem-moveis",
     title: "Montagem e Instalação de Mobiliário",
     summary:
@@ -249,6 +251,7 @@ export const SERVICES_PT: Service[] = [
   },
   // curtain-installation
   {
+    key: "curtain-installation",
     slug: "instalacao-de-cortinas-e-estores",
     title: "Instalação de Cortinas & Estores",
     summary:
@@ -328,6 +331,7 @@ export const SERVICES_PT: Service[] = [
   },
   // bathroom-renovation
   {
+    key: "bathroom-renovation",
     slug: "renovacao-de-casa-de-banho",
     title: "Renovação e Melhorias de Casas de Banho",
     summary:
@@ -448,6 +452,7 @@ export const SERVICES_PT: Service[] = [
   },
   // laminate-flooring
   {
+    key: "laminate-flooring",
     slug: "instalacao-de-pavimento-laminado",
     title: "Instalação de Pavimento Laminado",
     summary:
@@ -551,6 +556,7 @@ export const SERVICES_PT: Service[] = [
   },
   // fit-shower
   {
+    key: "fit-shower",
     slug: "instalacao-de-duche",
     title: "Instalação de Duche",
     summary:
@@ -641,6 +647,7 @@ export const SERVICES_PT: Service[] = [
 
   // heater-maintenance
   {
+    key: "heater-maintenence",
     slug: "manutencao-de-aquecedores",
     title: "Manutenção de Aquecedores",
     summary:
@@ -684,6 +691,8 @@ export const SERVICES_PT: Service[] = [
 
   // fit-washing-dishwasher
   {
+    key: "fit-washing-machine",
+
     slug: "instalacao-de-maquina-de-lavar-e-lava-louca",
     title: "Instalação de Máquina de Lavar Roupa e Máquina de Lavar Loiça",
     summary:
@@ -719,6 +728,7 @@ export const SERVICES_PT: Service[] = [
 
   // tap-replacement
   {
+    key: "tap-replacement",
     slug: "substituicao-de-torneiras",
     title: "Substituição de Torneiras",
     summary:
@@ -752,6 +762,7 @@ export const SERVICES_PT: Service[] = [
 
   // lights-replacement
   {
+    key: "lights-replacement",
     slug: "substituicao-de-luminarias",
     title: "Substituição de Luminárias",
     summary:
@@ -785,6 +796,7 @@ export const SERVICES_PT: Service[] = [
 
   // electrical-repairs
   {
+    key: "eletrical-repairs",
     slug: "reparacoes-eletricas",
     title: "Reparações Elétricas",
     summary:
@@ -817,6 +829,7 @@ export const SERVICES_PT: Service[] = [
   },
   // tv-assembly
   {
+    key: "tv-assembly",
     slug: "instalacao-de-tv",
     title: "Instalação e Montagem de TV",
     summary:
@@ -851,6 +864,7 @@ export const SERVICES_PT: Service[] = [
 
   // shower-repair
   {
+    key: "shower-repair",
     slug: "reparacao-de-duche",
     title: "Reparação e Manutenção de Duches",
     summary:

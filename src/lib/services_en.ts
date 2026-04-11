@@ -3,6 +3,7 @@ import { Service } from "@/types/service";
 export const SERVICES_EN: Service[] = [
   //shower-doors
   {
+    key: "shower-doors",
     slug: "shower-doors",
     title: "Shower Doors & Enclosures - Supplied and Fitted",
     summary:
@@ -139,6 +140,7 @@ export const SERVICES_EN: Service[] = [
   },
   // internal-doors
   {
+    key: "internal-doors",
     slug: "internal-doors",
     title: "Internal Doors - Supplied and Fitted",
     summary:
@@ -276,6 +278,7 @@ export const SERVICES_EN: Service[] = [
 
   // door-service
   {
+    key: "door-service",
     slug: "door-services",
     title: "Door Installation & Replacement Services",
     summary:
@@ -405,6 +408,7 @@ export const SERVICES_EN: Service[] = [
   },
   // furniture-assembly
   {
+    key: "furniture-assembly",
     slug: "furniture-assembly",
     title: "Furniture Assembly & Installation",
     summary:
@@ -512,6 +516,7 @@ export const SERVICES_EN: Service[] = [
   },
   // curtain-installation
   {
+    key: "curtain-installation",
     slug: "curtain-installation",
     title: "Curtain & Blinds Installation",
     summary: "Professional fitting of curtains and blinds, safely and neatly.",
@@ -586,6 +591,7 @@ export const SERVICES_EN: Service[] = [
   },
   // bathroom-renovation
   {
+    key: "bathroom-renovation",
     slug: "bathroom-renovation",
     title: "Bathroom Renovation & Upgrades",
     summary:
@@ -706,6 +712,7 @@ export const SERVICES_EN: Service[] = [
   },
   // laminate-flooring
   {
+    key: "laminate-flooring",
     slug: "laminate-flooring-installation",
     title: "Laminate Flooring Installation",
     summary:
@@ -805,6 +812,7 @@ export const SERVICES_EN: Service[] = [
   },
   // fit-shower
   {
+    key: "fit-shower",
     slug: "fit-shower",
     title: "Fit Shower",
     summary:
@@ -889,6 +897,7 @@ export const SERVICES_EN: Service[] = [
   },
   // heater-maintenance
   {
+    key: "heater-maintenence",
     slug: "heater-maintenance",
     title: "Heater Maintenance",
     summary: "Annual check, cleaning and performance diagnostics (non-gas).",
@@ -921,6 +930,7 @@ export const SERVICES_EN: Service[] = [
   },
   // fit-washing-dishwasher
   {
+    key: "fit-washing-machine",
     slug: "fit-washing-dishwasher",
     title: "Fit Washing Machine & Dishwasher",
     summary: "Safe installation and testing of appliances.",
@@ -950,6 +960,8 @@ export const SERVICES_EN: Service[] = [
   },
   // tap-replacement
   {
+    key: "tap-replacement",
+
     slug: "tap-replacement",
     title: "Tap Replacement",
     summary: "Replace leaking or broken taps in kitchens and bathrooms.",
@@ -977,6 +989,7 @@ export const SERVICES_EN: Service[] = [
   },
   // lights-replacement
   {
+    key: "lights-replacement",
     slug: "lights-replacement",
     title: "Lights Replacement",
     summary: "Swap old fittings for modern, efficient lighting.",
@@ -1000,6 +1013,7 @@ export const SERVICES_EN: Service[] = [
   },
   // eletrical-repairs
   {
+    key: "eletrical-repairs",
     slug: "electrical-repairs",
     title: "Electrical Repairs",
     summary: "Minor electrical fixes carried out safely and efficiently.",
@@ -1027,6 +1041,7 @@ export const SERVICES_EN: Service[] = [
   },
   // tv-assembly
   {
+    key: "tv-assembly",
     slug: "tv-assembly",
     title: "TV Assembly & Installation",
     summary:
@@ -1057,6 +1072,7 @@ export const SERVICES_EN: Service[] = [
 
   // shower-repair
   {
+    key: "shower-repair",
     slug: "shower-repair",
     title: "Shower Repair & Maintenance",
     summary: "Expert repair and servicing of showers from all major brands.",

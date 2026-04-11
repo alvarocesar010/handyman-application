@@ -9,6 +9,7 @@ type ServiceSteps = {
 };
 
 export type Service = {
+  key: string;
   slug: string;
   title: string;
   summary: string;

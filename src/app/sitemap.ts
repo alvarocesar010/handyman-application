@@ -1,89 +1,99 @@
-// src/app/sitemap.ts
 import type { MetadataRoute } from "next";
 import { SERVICES_EN } from "@/lib/services_en";
 import { SERVICES_PT } from "@/lib/services_pt";
+
+type Service = {
+  key: string;
+  slug: string;
+};
 
 const DOMAINS = {
   en: "https://dublinerhandyman.ie",
   pt: "https://lislock.pt",
 };
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
 
-  const staticRoutes = ["", "services", "booking", "contact"];
+  // --------------------------
+  // STATIC ROUTES
+  // --------------------------
+  const staticRoutes: string[] = [
+    "",
+    "services",
+    "booking",
+    "contact",
+    "store",
+  ];
 
-  const staticUrls: MetadataRoute.Sitemap = staticRoutes.flatMap((route) => {
+  const staticUrls: MetadataRoute.Sitemap = staticRoutes.map((route) => {
     const path = route ? `/${route}` : "";
     const priority = route === "" ? 1 : 0.8;
 
-    return [
-      {
-        url: `${DOMAINS.en}${path}`,
-        lastModified: now,
-        changeFrequency: "weekly" as const,
-        priority,
-        alternates: {
-          languages: {
-            "en-IE": `${DOMAINS.en}${path}`,
-            "pt-PT": `${DOMAINS.pt}${path}`,
-          },
+    return {
+      url: `${DOMAINS.en}${path}`,
+      lastModified: now,
+      changeFrequency: "weekly" as const,
+      priority,
+      alternates: {
+        languages: {
+          "en-IE": `${DOMAINS.en}${path}`,
+          "pt-PT": `${DOMAINS.pt}${path}`,
+          "x-default": `${DOMAINS.en}${path}`,
         },
       },
-      {
-        url: `${DOMAINS.pt}${path}`,
-        lastModified: now,
-        changeFrequency: "weekly" as const,
-        priority,
-        alternates: {
-          languages: {
-            "en-IE": `${DOMAINS.en}${path}`,
-            "pt-PT": `${DOMAINS.pt}${path}`,
-          },
-        },
-      },
-    ];
+    };
   });
 
-  const serviceUrls: MetadataRoute.Sitemap = [
-    ...SERVICES_EN.map((serviceEn) => {
-      const matchingPt = SERVICES_PT.find((pt) => pt.slug === serviceEn.slug);
+  // --------------------------
+  // SERVICES EN (with optional PT)
+  // --------------------------
+  const enServices: Service[] = SERVICES_EN;
+  const ptServices: Service[] = SERVICES_PT;
 
-      return {
-        url: `${DOMAINS.en}/services/${serviceEn.slug}`,
-        lastModified: now,
-        changeFrequency: "monthly" as const,
-        priority: 0.7,
-        alternates: matchingPt
-          ? {
-              languages: {
-                "en-IE": `${DOMAINS.en}/services/${serviceEn.slug}`,
-                "pt-PT": `${DOMAINS.pt}/services/${matchingPt.slug}`,
-              },
-            }
-          : undefined,
-      };
-    }),
+  const serviceUrls: MetadataRoute.Sitemap = enServices.map((serviceEn) => {
+    const matchingPt = ptServices.find((pt) => pt.key === serviceEn.key);
 
-    ...SERVICES_PT.map((servicePt) => {
-      const matchingEn = SERVICES_EN.find((en) => en.slug === servicePt.slug);
+    return {
+      url: `${DOMAINS.en}/services/${serviceEn.slug}`,
 
+      lastModified: now,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+      alternates: {
+        languages: {
+          "en-IE": `${DOMAINS.en}/services/${serviceEn.slug}`,
+          ...(matchingPt && {
+            "pt-PT": `${DOMAINS.pt}/services/${matchingPt.slug}`,
+          }),
+          "x-default": `${DOMAINS.en}/services/${serviceEn.slug}`,
+        },
+      },
+    };
+  });
+
+  // --------------------------
+  // SERVICES PT ONLY (no EN match)
+  // --------------------------
+  const ptOnlyUrls: MetadataRoute.Sitemap = ptServices
+    .filter((pt) => !enServices.some((en) => en.key === pt.key))
+    .map((servicePt) => {
       return {
         url: `${DOMAINS.pt}/services/${servicePt.slug}`,
         lastModified: now,
         changeFrequency: "monthly" as const,
         priority: 0.7,
-        alternates: matchingEn
-          ? {
-              languages: {
-                "en-IE": `${DOMAINS.en}/services/${matchingEn.slug}`,
-                "pt-PT": `${DOMAINS.pt}/services/${servicePt.slug}`,
-              },
-            }
-          : undefined,
+        alternates: {
+          languages: {
+            "pt-PT": `${DOMAINS.pt}/services/${servicePt.slug}`,
+            "x-default": `${DOMAINS.pt}/services/${servicePt.slug}`,
+          },
+        },
       };
-    }),
-  ];
+    });
 
-  return [...staticUrls, ...serviceUrls];
+  // --------------------------
+  // FINAL SITEMAP
+  // --------------------------
+  return [...staticUrls, ...serviceUrls, ...ptOnlyUrls];
 }
