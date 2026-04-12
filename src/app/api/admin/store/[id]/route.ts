@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server"; // Use NextRequest for better typing
 import { getDb } from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 import { deleteImage } from "@/lib/uploadImage";
@@ -10,13 +10,14 @@ export type CategoryDB = {
   subCategories: SubCategory[];
 };
 
+// --- UPDATE PUT ---
 export async function PUT(
-  request: Request,
-  { params }: { params: { id: string } },
+  request: NextRequest, // Changed to NextRequest
+  { params }: { params: Promise<{ id: string }> }, // Wrap in Promise
 ) {
   try {
     const db = await getDb();
-    const { id } = await params;
+    const { id } = await params; // Now this matches the type above
 
     const body = (await request.json()) as {
       category: string;
@@ -34,21 +35,14 @@ export async function PUT(
     const oldSubs = existing.subCategories;
     const newSubs = body.subCategories;
 
-    // 🔥 Compare OLD vs NEW
     const newMap = new Map(newSubs.map((s) => [s._id, s]));
 
     for (const oldSub of oldSubs) {
       const newSub = newMap.get(oldSub._id);
-
-      // ❌ removed subcategory
       if (!newSub) {
-        if (oldSub.photoPath) {
-          await deleteImage(oldSub.photoPath);
-        }
+        if (oldSub.photoPath) await deleteImage(oldSub.photoPath);
         continue;
       }
-
-      // 🔄 replaced image
       if (oldSub.photoPath && oldSub.photoPath !== newSub.photoPath) {
         await deleteImage(oldSub.photoPath);
       }
@@ -71,15 +65,15 @@ export async function PUT(
   }
 }
 
+// --- UPDATE DELETE ---
 export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } },
+  request: NextRequest, // Changed to NextRequest
+  { params }: { params: Promise<{ id: string }> }, // Wrap in Promise
 ) {
   try {
     const db = await getDb();
-    const { id } = await params;
+    const { id } = await params; // Now this matches the type above
 
-    // ✅ Typed fetch (important)
     const existing = await db
       .collection<CategoryDB>("categoriesStore")
       .findOne({ _id: new ObjectId(id) });
@@ -88,14 +82,12 @@ export async function DELETE(
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
-    // ✅ Delete all images
     for (const sub of existing.subCategories || []) {
       if (sub.photoPath) {
         await deleteImage(sub.photoPath);
       }
     }
 
-    // ✅ Delete document
     const result = await db.collection("categoriesStore").deleteOne({
       _id: new ObjectId(id),
     });
