@@ -8,6 +8,7 @@ import {
   LucideIcon,
   BrickWall,
   Contact,
+  Store,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -30,6 +31,11 @@ const data: NavItem[] = [
       { label: "All Bookings", href: "/admin/bookings" },
       { label: "New Booking", href: "/admin/create-booking" },
     ],
+  },
+  {
+    label: "Store",
+    icon: Store,
+    children: [{ label: "Category Page", href: "/admin/store/category-page" }],
   },
   {
     label: "Inventory",

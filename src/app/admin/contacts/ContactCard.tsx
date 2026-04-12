@@ -31,7 +31,7 @@ export default function ContactCard({ contact }: { contact: Contact }) {
 
       setDeleted(true);
     } catch (err) {
-      console.log(err);
+      console.error(err);
       alert("Error deleting contact");
     } finally {
       setLoading(false);
