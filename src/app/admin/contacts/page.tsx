@@ -15,11 +15,17 @@ type Contact = {
 export default async function ContactsPage() {
   const db = await getDb();
 
-  const contacts = await db
+  const contactsRaw = await db
     .collection<Contact>("contacts") // ✅ THIS LINE FIXES EVERYTHING
     .find({})
     .sort({ createdAt: -1 })
     .toArray();
+
+  const contacts = contactsRaw.map((c) => ({
+    ...c,
+    _id: c._id.toString(),
+    createdAt: c.createdAt.toISOString(),
+  }));
 
   return (
     <main className="max-w-6xl mx-auto px-6 py-10 space-y-6">

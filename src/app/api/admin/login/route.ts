@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { signAdminJwt } from "@/lib/auth";
+import { getLocale } from "@/lib/getLocale";
 
 export async function POST(req: Request) {
   try {
@@ -24,10 +25,24 @@ export async function POST(req: Request) {
     });
 
     // --- 🎯 MODIFIED CODE HERE ---
-    const siteUrl = process.env.SITE_URL;
+    const locale = await getLocale();
+
+    const isDev = process.env.NODE_ENV === "development";
+
+    const port = process.env.PORT || 3000;
+
+    let siteUrl;
+
+    if (locale === "pt") {
+      siteUrl = isDev ? `http://lislock.local:${port}` : "https://lislock.pt";
+    } else {
+      siteUrl = isDev
+        ? `http://dublinerhandyman.local:${port}`
+        : "https://dublinerhandyman.ie";
+    }
 
     // Use the determined base URL to construct the redirect URL
-    const redirectUrl = new URL("/admin/bookings", siteUrl);
+    const redirectUrl = new URL("/admin/bookings", await siteUrl);
     // -----------------------------
 
     const res = NextResponse.redirect(redirectUrl);
