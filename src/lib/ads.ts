@@ -1,42 +1,51 @@
 // src/lib/ads.ts
-const ADS_SEND_TO = "AW-10991191295/_1A7CLqc3LYbEP-Jgfko";
+
+import { getLocale } from "./getLocale";
+
+const isPt = await getLocale();
+
+const ADS_SEND_TO = isPt
+  ? "AW-18086991911/m62ACNmxu5scEKewxrBD"
+  : "AW-10991191295/_1A7CLqc3LYbEP-Jgfko";
 
 /**
  * Sends a Google Ads conversion and then opens the given URL (tel:, wa.me, link etc.)
  */
-export async function handleConversionClick(
-  e: React.MouseEvent<HTMLElement>,
-  href: string,
-  newTab = false
-) {
-  e.preventDefault();
 
-  try {
-    if (typeof window.gtag === "function") {
-      const done = () => {
-        if (newTab) {
-          window.open(href, "_blank", "noopener,noreferrer");
-        } else {
-          window.location.href = href;
-        }
-      };
+export function reportConversionAwait(
+  params?: { value?: number; currency?: string },
+  timeoutMs = 2000,
+): Promise<void> {
+  return new Promise((resolve) => {
+    if (typeof window === "undefined" || typeof window.gtag === "undefined") {
+      setTimeout(resolve, 0);
+      return;
+    }
 
+    let settled = false;
+    const done = () => {
+      if (!settled) {
+        settled = true;
+        resolve();
+      }
+    };
+
+    const t = setTimeout(done, timeoutMs);
+    console.log(ADS_SEND_TO);
+    try {
       window.gtag("event", "conversion", {
         send_to: ADS_SEND_TO,
-        value: 1.0,
-        currency: "EUR",
-        event_callback: done,
+        value: params?.value ?? 1.0,
+        currency: params?.currency ?? "EUR",
+        transaction_id: crypto.randomUUID(),
+        event_callback: () => {
+          clearTimeout(t);
+          done();
+        },
       });
-
-      // fallback in case callback doesn’t fire
-      setTimeout(done, 1000);
-    } else {
-      // gtag not ready → just go
-      if (newTab) window.open(href, "_blank", "noopener,noreferrer");
-      else window.location.href = href;
+    } catch {
+      clearTimeout(t);
+      done();
     }
-  } catch {
-    if (newTab) window.open(href, "_blank", "noopener,noreferrer");
-    else window.location.href = href;
-  }
+  });
 }

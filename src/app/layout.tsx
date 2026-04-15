@@ -51,11 +51,15 @@ export default async function RootLayout({
             const isInternal = document.cookie.includes('traffic_type=internal');
             const isAdminRoute =
               location.pathname.startsWith('/admin') ||
-              location.pathname.startsWith('/customer');
+              location.pathname.startsWith('/customer') ||
+              location.pathname.startsWith('/internal')
 
             gtag('config', 'AW-10991191295', {
               traffic_type: isInternal || isAdminRoute ? 'internal' : undefined,
             });
+            gtag('config', 'AW-18086991911', {
+  traffic_type: isInternal || isAdminRoute ? 'internal' : undefined,
+});
           `}
         </Script>
 

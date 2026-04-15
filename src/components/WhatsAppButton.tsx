@@ -1,6 +1,6 @@
 "use client";
 
-import { handleConversionClick } from "@/lib/ads";
+import { reportConversionAwait } from "@/lib/ads";
 import { MessageCircle } from "lucide-react";
 import Link from "next/link";
 
@@ -19,7 +19,9 @@ export default function WhatsAppButton({
       target="_blank"
       rel="noopener noreferrer"
       className={className}
-      onClick={(e) => handleConversionClick(e, href)}
+      onClick={async () =>
+        await reportConversionAwait({ value: 1.0, currency: "EUR" }, 2000)
+      }
     >
       <MessageCircle />
       {content}
