@@ -10,7 +10,7 @@ type Contact = {
   date?: string;
   service?: string;
   message: string;
-  createdAt: Date;
+  createdAt: string;
 };
 
 export default function ContactCard({ contact }: { contact: Contact }) {

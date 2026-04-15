@@ -1,8 +1,9 @@
 import { getDb } from "@/lib/mongodb";
 import ContactCard from "./ContactCard";
+import { ObjectId } from "mongodb";
 
-type Contact = {
-  _id: string;
+type ContactFromDB = {
+  _id: ObjectId;
   name: string;
   email: string;
   phone?: string;
@@ -12,19 +13,30 @@ type Contact = {
   createdAt: Date;
 };
 
+type Contact = {
+  _id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  date?: string;
+  service?: string;
+  message: string;
+  createdAt: string;
+};
+
 export default async function ContactsPage() {
   const db = await getDb();
 
   const contactsRaw = await db
-    .collection<Contact>("contacts") // ✅ THIS LINE FIXES EVERYTHING
+    .collection<ContactFromDB>("contacts") // ✅ correct typing
     .find({})
     .sort({ createdAt: -1 })
     .toArray();
 
-  const contacts = contactsRaw.map((c) => ({
+  const contacts: Contact[] = contactsRaw.map((c) => ({
     ...c,
     _id: c._id.toString(),
-    createdAt: c.createdAt.toISOString(),
+    createdAt: c.createdAt.toISOString(), // ✅ better
   }));
 
   return (
@@ -33,7 +45,7 @@ export default async function ContactsPage() {
 
       <div className="grid gap-4">
         {contacts.map((c) => (
-          <ContactCard key={c._id.toString()} contact={c} />
+          <ContactCard key={c._id} contact={c} /> // ✅ no need for toString
         ))}
       </div>
     </main>
