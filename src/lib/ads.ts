@@ -12,6 +12,7 @@ export function reportConversionAwait(
   const ADS_SEND_TO = isPt
     ? "AW-18086991911/m62ACNmxu5scEKewxrBD"
     : "AW-10991191295/_1A7CLqc3LYbEP-Jgfko";
+
   return new Promise((resolve) => {
     if (typeof window === "undefined" || typeof window.gtag === "undefined") {
       setTimeout(resolve, 0);
@@ -33,7 +34,10 @@ export function reportConversionAwait(
         send_to: ADS_SEND_TO,
         value: params?.value ?? 1.0,
         currency: params?.currency ?? "EUR",
-        transaction_id: crypto.randomUUID(),
+        transaction_id:
+          typeof crypto !== "undefined"
+            ? crypto.randomUUID()
+            : Math.random().toString(36),
         event_callback: () => {
           clearTimeout(t);
           done();

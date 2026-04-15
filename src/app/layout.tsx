@@ -37,31 +37,39 @@ export default async function RootLayout({
   return (
     <html lang={isPT ? "pt-PT" : "en-IE"}>
       <body>
-        {/* Google tag (Ads + GA) */}
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=AW-10991191295"
-          strategy="afterInteractive"
-        />
-        <Script id="gtag-init" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
+    {/* Load the library only once using one of the IDs */}
+<Script
+  src="https://www.googletagmanager.com/gtag/js?id=AW-10991191295"
+  strategy="afterInteractive"
+/>
 
-            const isInternal = document.cookie.includes('traffic_type=internal');
-            const isAdminRoute =
-              location.pathname.startsWith('/admin') ||
-              location.pathname.startsWith('/customer') ||
-              location.pathname.startsWith('/internal')
+<Script id="gtag-init" strategy="afterInteractive">
+  {`
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
 
-            gtag('config', 'AW-10991191295', {
-              traffic_type: isInternal || isAdminRoute ? 'internal' : undefined,
-            });
-            gtag('config', 'AW-18086991911', {
-  traffic_type: isInternal || isAdminRoute ? 'internal' : undefined,
-});
-          `}
-        </Script>
+    const isInternal = document.cookie.includes('traffic_type=internal');
+    const isAdminRoute =
+      location.pathname.startsWith('/admin') ||
+      location.pathname.startsWith('/customer') ||
+      location.pathname.startsWith('/internal');
+    
+    const trafficType = isInternal || isAdminRoute ? 'internal' : undefined;
+
+    // Config for Account A (Original)
+    gtag('config', 'AW-10991191295', {
+      traffic_type: trafficType,
+      send_page_view: true // Ensures GA tracks this account
+    });
+
+    // Config for Account B (New Campaign)
+    gtag('config', 'AW-18086991911', {
+      traffic_type: trafficType,
+      send_page_view: true 
+    });
+  `}
+</Script>
 
         {/* Schema.org */}
         {structuredData && <JsonLd data={structuredData} />}
