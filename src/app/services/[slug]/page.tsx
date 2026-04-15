@@ -158,6 +158,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
               href={m.header.buttons.whats.href}
               className="inline-flex h-11 gap-2 items-center justify-center rounded-lg bg-slate-900 px-5 text-white font-medium shadow hover:bg-black focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-700 focus-visible:ring-offset-2"
               content={m.header.buttons.whats.content}
+              domain={locale}
             />
           </div>
         </header>

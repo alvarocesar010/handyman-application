@@ -8,10 +8,12 @@ export default function WhatsAppButton({
   href,
   className,
   content,
+  domain
 }: {
   href: string;
   className?: string;
   content?: string;
+  domain: string
 }) {
   return (
     <Link
@@ -20,7 +22,10 @@ export default function WhatsAppButton({
       rel="noopener noreferrer"
       className={className}
       onClick={async () =>
-        await reportConversionAwait({ value: 1.0, currency: "EUR" }, 2000)
+        await reportConversionAwait(
+          { value: 1.0, currency: "EUR", domain },
+          2000,
+        )
       }
     >
       <MessageCircle />

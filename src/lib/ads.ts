@@ -1,21 +1,17 @@
 // src/lib/ads.ts
 
-import { getLocale } from "./getLocale";
-
-const isPt = await getLocale();
-
-const ADS_SEND_TO = isPt
-  ? "AW-18086991911/m62ACNmxu5scEKewxrBD"
-  : "AW-10991191295/_1A7CLqc3LYbEP-Jgfko";
-
 /**
  * Sends a Google Ads conversion and then opens the given URL (tel:, wa.me, link etc.)
  */
 
 export function reportConversionAwait(
-  params?: { value?: number; currency?: string },
+  params?: { value?: number; currency?: string; domain: string },
   timeoutMs = 2000,
 ): Promise<void> {
+  const isPt = params?.domain == "pt";
+  const ADS_SEND_TO = isPt
+    ? "AW-18086991911/m62ACNmxu5scEKewxrBD"
+    : "AW-10991191295/_1A7CLqc3LYbEP-Jgfko";
   return new Promise((resolve) => {
     if (typeof window === "undefined" || typeof window.gtag === "undefined") {
       setTimeout(resolve, 0);
@@ -31,7 +27,7 @@ export function reportConversionAwait(
     };
 
     const t = setTimeout(done, timeoutMs);
-    console.log(ADS_SEND_TO);
+
     try {
       window.gtag("event", "conversion", {
         send_to: ADS_SEND_TO,

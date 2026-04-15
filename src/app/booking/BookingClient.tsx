@@ -27,6 +27,7 @@ declare global {
 
 type Props = {
   services: Service[];
+  domain: string
 };
 
 /* --------------------------------- Helpers -------------------------------- */
@@ -79,7 +80,7 @@ function findServiceSlug(input: string | null, services: Service[]): string {
 
 /* --------------------------------- Component -------------------------------- */
 
-export default function BookingClient({ services }: Props) {
+export default function BookingClient({ services, domain }: Props) {
   const search = useSearchParams();
   const [service, setService] = useState<string>("");
   const [photos, setPhotos] = useState<LocalPhoto[]>([]);
@@ -192,7 +193,7 @@ export default function BookingClient({ services }: Props) {
       const data: { id?: string } = await res.json();
       if (!data.id) throw new Error("Booking ID not returned.");
 
-      await reportConversionAwait({ value: 1.0, currency: "EUR" }, 2000);
+      await reportConversionAwait({ value: 1.0, currency: "EUR", domain }, 2000);
 
       toast.success("Booking request sent! We'll confirm shortly.");
 
