@@ -38,6 +38,7 @@ export default async function HeroSection() {
               href={t.callButton.phone}
               className="inline-flex h-11 gap-2 items-center justify-center rounded-lg bg-slate-900 px-5 text-white font-medium shadow hover:bg-black focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-700 focus-visible:ring-offset-2"
               content={t.callButton.children}
+              domain={locale}
             />
           </div>
         </div>
