@@ -37,19 +37,19 @@ export default async function RootLayout({
   return (
     <html lang={isPT ? "pt-PT" : "en-IE"}>
       <body>
-    {/* Load the library only once using one of the IDs */}
-<Script
-  src="https://www.googletagmanager.com/gtag/js?id=AW-10991191295"
-  strategy="afterInteractive"
-/>
+        {/* Load the library only once using one of the IDs */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=AW-10991191295"
+          strategy="afterInteractive"
+        />
 
-<Script id="gtag-init" strategy="afterInteractive">
-  {`
+        <Script id="gtag-init" strategy="afterInteractive">
+          {`
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
 
-    const isInternal = document.cookie.includes('traffic_type=internal');
+    const isInternal = document.cookie.includes('traffic_type=internal') || location.hostname.endsWith('.local') || location.hostname === 'localhost';
     const isAdminRoute =
       location.pathname.startsWith('/admin') ||
       location.pathname.startsWith('/customer') ||
@@ -69,7 +69,7 @@ export default async function RootLayout({
       send_page_view: true 
     });
   `}
-</Script>
+        </Script>
 
         {/* Schema.org */}
         {structuredData && <JsonLd data={structuredData} />}
