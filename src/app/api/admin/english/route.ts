@@ -4,8 +4,8 @@ import { getDb } from "@/lib/mongodb";
 type Question = {
   questions: string[];
   explanation: string;
-  pattern: string;
   type: string;
+  correctIndex: number;
 };
 
 // ✅ GET → fetch all questions
@@ -43,17 +43,40 @@ export async function POST(req: Request) {
       );
     }
 
-    // basic validation
+    const cleaned: Question[] = [];
+
     for (const item of body) {
-      if (!item.questions || !item.explanation || !item.pattern || !item.type) {
+      // ✅ validation
+      if (
+        !Array.isArray(item.questions) ||
+        item.questions.length < 2 ||
+        typeof item.explanation !== "string" ||
+        typeof item.type !== "string" ||
+        typeof item.correctIndex !== "number"
+      ) {
         return NextResponse.json(
           { error: "Invalid question format" },
           { status: 400 },
         );
       }
+
+      // ✅ validate correctIndex range
+      if (item.correctIndex < 0 || item.correctIndex >= item.questions.length) {
+        return NextResponse.json(
+          { error: "correctIndex out of range" },
+          { status: 400 },
+        );
+      }
+
+      cleaned.push({
+        questions: item.questions,
+        explanation: item.explanation,
+        type: item.type,
+        correctIndex: item.correctIndex,
+      });
     }
 
-    const result = await db.collection("english").insertMany(body);
+    const result = await db.collection<Question>("english").insertMany(cleaned);
 
     return NextResponse.json({
       insertedCount: result.insertedCount,

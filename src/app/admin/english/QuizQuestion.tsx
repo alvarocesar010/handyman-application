@@ -5,11 +5,12 @@ export type Question = {
   _id?: string;
   questions: string[];
   explanation: string;
-  pattern: string;
   type: string;
+  correctIndex: number;
 };
+
 type Props = {
-  data: Question[]; // 👈 now it's an array
+  data: Question[];
 };
 
 export default function QuizQuestion({ data }: Props) {
@@ -19,15 +20,14 @@ export default function QuizQuestion({ data }: Props) {
 
   const currentQuestion = data[currentIndex];
 
-  // reset when changing question
+  // ✅ reset when question changes
   useEffect(() => {
     setSelected(null);
     setShowResult(false);
   }, [currentIndex]);
 
-  const correctIndex = currentQuestion.questions.findIndex((q) =>
-    q.toLowerCase().includes(currentQuestion.pattern.toLowerCase()),
-  );
+  // ✅ correct answer from DB
+  const correctIndex = currentQuestion.correctIndex;
 
   function handleSelect(index: number) {
     if (showResult) return;
@@ -105,7 +105,7 @@ export default function QuizQuestion({ data }: Props) {
 
         <button
           onClick={handleNext}
-          disabled={currentIndex === data.length - 1}
+          disabled={currentIndex === data.length - 1 || selected === null}
           className="px-4 py-2 bg-blue-500 text-white rounded-lg disabled:opacity-50"
         >
           Next

@@ -8,7 +8,7 @@ async function getQuestions(): Promise<Question[]> {
   const questions = await db
     .collection<Question>("english")
     .aggregate([
-      { $sample: { size: 10 } }, // ✅ only this
+      { $sample: { size: 20 } }, // ✅ only this
     ])
     .toArray();
 
@@ -18,6 +18,7 @@ async function getQuestions(): Promise<Question[]> {
     pattern: q.pattern,
     type: q.type,
     _id: q._id?.toString(),
+    correctIndex: q.correctIndex
   }));
 }
 
