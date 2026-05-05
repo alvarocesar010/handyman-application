@@ -27,7 +27,7 @@ declare global {
 
 type Props = {
   services: Service[];
-  domain: string
+  domain: string;
 };
 
 /* --------------------------------- Helpers -------------------------------- */
@@ -184,16 +184,30 @@ export default function BookingClient({ services, domain }: Props) {
 
       const form = e.currentTarget;
       const fd = new FormData(form);
+
       fd.set("service", selected.slug);
       photos.forEach((p) => fd.append("photos", p.file));
 
-      const res = await fetch("/api/booking", { method: "POST", body: fd });
-      if (!res.ok) throw new Error("Failed to submit booking.");
+      const res = await fetch("/api/booking", {
+        method: "POST",
+        body: fd,
+      });
 
-      const data: { id?: string } = await res.json();
-      if (!data.id) throw new Error("Booking ID not returned.");
+      // ✅ read ONCE
+      const data: { id?: string; error?: string } = await res.json();
 
-      await reportConversionAwait({ value: 1.0, currency: "EUR", domain }, 2000);
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to submit booking.");
+      }
+
+      if (!data.id) {
+        throw new Error("Booking ID not returned.");
+      }
+
+      await reportConversionAwait(
+        { value: 1.0, currency: "EUR", domain },
+        2000,
+      );
 
       toast.success("Booking request sent! We'll confirm shortly.");
 
